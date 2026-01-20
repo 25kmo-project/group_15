@@ -12,7 +12,7 @@ Database "bank" utilizes a 5-table relational schema:![ER diagram](database/ER-k
 #### Table: user
 * user_id (PK, INT)
 * user_name (VARCHAR(45))
-* user.user_phonenumber (VARCHAR(45))
+* user_phonenumber (VARCHAR(45))
 #### Table: card
 Stores authentication credentials and their link to a user.
 * card_id (PK, INT)
