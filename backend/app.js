@@ -18,4 +18,5 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/transaction', transactionRouter);
 
+//tämä antaa mahdollisuus käyttää tätä tiedostoa muissa tiedostoissa
 module.exports = app;

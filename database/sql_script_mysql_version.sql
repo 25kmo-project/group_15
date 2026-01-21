@@ -20,11 +20,16 @@ USE `bank` ;
 DROP TABLE IF EXISTS `bank`.`user` ;
 
 CREATE TABLE IF NOT EXISTS `bank`.`user` (
-  `user_id` INT NOT NULL,
+  `user_id` INT NOT NULL AUTO_INCREMENT,
   `user_name` VARCHAR(45) NOT NULL,
-  `user_phonenumber` VARCHAR(45) NULL,
+  `user_lastname` VARCHAR(45) NOT NULL,
+  `user_address` VARCHAR(50) NOT NULL,
+  `user_email` VARCHAR(50) NOT NULL,
+  `user_phonenumber` VARCHAR(13) NOT NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE)
+  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
+  UNIQUE INDEX `user_email_UNIQUE` (`user_email` ASC) VISIBLE,
+  UNIQUE INDEX `user_phonenumber_UNIQUE` (`user_phonenumber` ASC) VISIBLE)
 ENGINE = InnoDB;
 
 
