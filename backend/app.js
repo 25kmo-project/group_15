@@ -4,9 +4,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-//luodaan uusi muuttuja ja tallennetaan sinne user.js
-var userRouter = require('./routes/user');
-
+var usersRouter = require('./routes/users');
+var transactionRouter = require('./routes/transaction');
 var app = express();
 
 app.use(logger('dev'));
@@ -16,8 +15,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-//kaikki pyynnöt jotka alkaavat /user käsittelee userRouter
-app.use('/user', userRouter);
+app.use('/users', usersRouter);
+app.use('/transaction', transactionRouter);
 
 //tämä antaa mahdollisuus käyttää tätä tiedostoa muissa tiedostoissa
 module.exports = app;
