@@ -38,3 +38,41 @@ A permanent, immutable audit trail of all account activities.
 * amount (DECIMAL(15,2))
 * date (DATETIME)
 * account_id (FK, INT): Links the transaction to the specific affected account.
+## project stucture
+```text
+.backend/
+├── app.js                      # Main server file (configures middleware & routes)
+├── .env                        # Private config: DB_USER, DB_PASSWORD, JWT_SECRET
+├── package.json                # Dependencies: express, mysql2, dotenv, jsonwebtoken
+├── config/
+│   └── db.js                   # MySQL connection pool logic
+├── middleware/
+│   └── auth.js                 # Middleware to verify JWT Token before allowing transactions
+├── models/                     # DATA LAYER (SQL Queries)
+│   ├── transactionModel.js     # SQL for INSERT/SELECT transactions
+│   ├── accountModel.js         # SQL for updating balances (used in your logic)
+│   └── cardModel.js            # SQL for card-related checks
+├── controllers/                # LOGIC LAYER (The "Brain")
+│   ├── transactionController.js # The logic for "Withdraw" (check balance -> update -> record)
+│   └── loginController.js      # Logic for authenticating and generating tokens
+└── routes/                     # API ENDPOINTS
+    ├── transaction.js          # API paths like /transaction/withdraw
+    └── login.js                # API path for /login
+```
+
+```text
+frontend/
+├── bank-automat.pro            # Qt project configuration
+├── main.cpp                    # Application entry
+├── headers/                    # Header files (.h)
+│   ├── transactionwindow.h     # Header for the transaction UI
+│   ├── mainmenu.h              # Header for the main menu navigation
+│   └── restapi.h               # Header for the central API communication class
+├── sources/                    # Implementation files (.cpp)
+│   ├── transactionwindow.cpp   # Logic for clicking buttons & handling JSON
+│   ├── mainmenu.cpp            # Logic for switching between balance and withdrawal
+│   └── restapi.cpp             # The class that handles QNetworkAccessManager (HTTP requests)
+└── forms/                      # UI Design files (.ui)
+    ├── transactionwindow.ui    # Design for the list of transactions
+    └── mainmenu.ui             # Design for the main ATM menu
+```
