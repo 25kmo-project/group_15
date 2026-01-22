@@ -12,7 +12,7 @@ const card={
         return db.query ("select * FROM card WHERE card_id=?", [card_id] , callback);
     },
  //hae card korttinumerolla 
-    getbynumber: function(card_number, callback){
+    getByNumber: function(card_number, callback){
        return db.query ("select * FROM card WHERE card_number=?",[card_number] , callback);
 
     },
