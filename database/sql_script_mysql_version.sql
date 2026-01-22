@@ -77,20 +77,25 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `bank`.`transaction` ;
 
 CREATE TABLE IF NOT EXISTS `bank`.`transaction` (
-  `transaction_id` INT NOT NULL,
+  `transaction_id` INT NOT NULL AUTO_INCREMENT,
   `type` ENUM('Withdrawal', 'Deposit', 'Transfer', 'Inquiry') NOT NULL,
   `amount` DECIMAL(15,2) NOT NULL,
-  `date` DATETIME NULL,
-  `account_id` INT NULL,
+  `date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `account_id` INT NOT NULL,
   `card_id` INT NULL,
   PRIMARY KEY (`transaction_id`),
-  UNIQUE INDEX `transaction_id_UNIQUE` (`transaction_id` ASC) VISIBLE,
   INDEX `account_id_idx` (`account_id` ASC) VISIBLE,
-  CONSTRAINT `account_id`
+  INDEX `card_id_idx` (`card_id` ASC) VISIBLE,
+  CONSTRAINT `fk_transaction_account`
     FOREIGN KEY (`account_id`)
     REFERENCES `bank`.`account` (`account_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_transaction_card`
+  FOREIGN KEY (`card_id`)
+  REFERENCES `bank`.`card` (`card_id`)
+  ON DELETE SET NULL
+  ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 

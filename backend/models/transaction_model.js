@@ -21,16 +21,21 @@ const transaction = {
             callback
         );
     },
+    getByCardId: function(id, callback) {
+        return db.query(
+            'SELECT * FROM transaction WHERE card_id = ?', 
+            [id], 
+            callback
+        );
+    },
 
     // Add a new transaction record
     add: function(transaction, callback) {
         return db.query(
-            "INSERT INTO transaction (transaction_id, type, amount, date, account_id, card_id) VALUES (?,?,?,?,?,?)",
+            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES (?,?,?,?)",
             [
-                transaction.transaction_id, 
                 transaction.type, 
                 transaction.amount, 
-                transaction.date, 
                 transaction.account_id, 
                 transaction.card_id
             ],
