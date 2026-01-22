@@ -1,5 +1,5 @@
 //haetaan tietokantayhteys database.js-tiedostosta
-const db = require('../database');
+const db = require('../routes/database');
 
 //luodaan objektin nimeltä user
 const user={
