@@ -37,6 +37,15 @@ router.get('/account/:id', function(request, response) {
     });
 });
 
+router.get('/card/:id', function(request, response) {
+    transaction.getByCardId(request.params.id, function(err, dbResult) {
+        if (err) {
+            response.json(err);
+        } else {
+            response.json(dbResult);
+        }
+    });
+});
 // Add a new transaction
 router.post('/', function(request, response) {
     transaction.add(request.body, function(err, dbResult) {
