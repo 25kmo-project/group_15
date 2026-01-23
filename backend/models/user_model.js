@@ -14,8 +14,10 @@ const user={
     },
  //lisätään uusi user   
     add: function (user, callback) {
-        return db. query ("INSERT INTO user VALUES (?,?,?,?,?)", [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber], callback)
+        return db. query ("INSERT INTO user (user_name, user_lastname, user_address, user_email, user_phonenumber) VALUES (?,?,?,?,?)",
+        [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber], callback)
     },
+
 //muokataan user:n tietoja
     update: function(user, user_id, callback){
         return db. query ("UPDATE user SET user_name=?, user_lastname=?, user_address=?, user_email=?, user_phonenumber=? WHERE user_id=?", 
