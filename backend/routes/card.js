@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const card = require("../models/card_model");
+const e = require("express");
 
 //Hae kaikki kortit
 router.get("/", function(request, response){
@@ -38,7 +39,19 @@ router.post("/", function(request, response){
     })
 });
 
-// päivitä kortti id:llä  
+
+// Päivitä PIN (hashataan)
+router.put("/:card_id/pin", function(request, response) {
+  card.updatePin(request.params.card_id, request.body.pin_code, function(err, result) {
+        if (err){
+            response.send(err);
+        }
+        else {
+            response.json(result);
+        }
+  });
+});
+// päivitä kortti id:llä (ei PINiä) 
 router.put("/:card_id", function(request, response){   
     card.update(request.body, request.params.card_id, function(err, result){
         if (err){

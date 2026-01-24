@@ -31,9 +31,21 @@ const card={
   },
 //päivitä card tietoja
     update: function(updatedCard, card_id, callback){
-        return db.query ("UPDATE card SET card_number=?, pin_code=?, status=?, user_id=? WHERE card_id=?", 
-        [updatedCard.card_number, updatedCard.pin_code, updatedCard.status, updatedCard.user_id, card_id], callback);
+        return db.query ("UPDATE card SET card_number=?, status=?, user_id=? WHERE card_id=?", 
+        [updatedCard.card_number, updatedCard.status, updatedCard.user_id, card_id], callback);
     },
+    // Päivitä PIN (hashataan aina)
+  updatePin: function(card_id, newPin, callback) {
+    bcrypt.hash(newPin, saltRounds, function(err, hash) {
+      if (err) return callback(err);
+
+      return db.query(
+        'UPDATE card SET pin_code = ? WHERE card_id = ?',
+        [hash, card_id],
+        callback
+      );
+    });
+  },
 //poista card
     delete: function(card_id, callback){
         return db.query ("DELETE FROM card WHERE card_id=?", [card_id], callback);
