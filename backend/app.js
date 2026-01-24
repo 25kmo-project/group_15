@@ -7,6 +7,7 @@ var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var transactionRouter = require('./routes/transaction');
 var cardRouter = require('./routes/card');
+var accountAccessRouter = require('./routes/account_access');
 var app = express();
 
 app.use(logger('dev'));
@@ -19,6 +20,7 @@ app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/transaction', transactionRouter);
 app.use('/cards', cardRouter);
+app.use('/account_access', accountAccessRouter);
 
 
 //tämä antaa mahdollisuus käyttää tätä tiedostoa muissa tiedostoissa
