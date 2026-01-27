@@ -1,0 +1,58 @@
+const db = require('../routes/database'); // varmista, että tietokantayhteys on oikein
+
+const account = {
+
+    // Hae kaikki tilit
+    getAll: function (callback) {
+        return db.query("SELECT * FROM account", callback);
+    },
+
+    // Hae yksi tili ID:n perusteella
+    getOne: function (account_id, callback) {
+        return db.query("SELECT * FROM account WHERE account_id = ?", [account_id], callback);
+    },
+
+    // Luo uusi tili
+    add: function (account, callback) {
+        return db.query(
+            `INSERT INTO account (account_type, balance, credit_limit, status)
+             VALUES (?, ?, ?, ?)`,
+            [
+                account.account_type,
+                account.balance,
+                account.credit_limit,
+                account.status
+            ],
+            callback
+        );
+    },
+
+    // Päivitä tili
+    update: function (account, account_id, callback) {
+        return db.query(
+            `UPDATE account
+             SET account_type=?, balance=?, credit_limit=?, status=?
+             WHERE account_id=?`,
+            [
+                account.account_type,
+                account.balance,
+                account.credit_limit,
+                account.status,
+                account_id
+            ],
+            callback
+        );
+    },
+
+    // Poista tili
+    delete: function (account_id, callback) {
+        return db.query(
+            "DELETE FROM account WHERE account_id=?",
+            [account_id],
+            callback
+        );
+    }
+
+};
+
+module.exports = account;
