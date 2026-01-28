@@ -79,4 +79,22 @@ router.delete('/:id', function(request, response) {
     });
 });
 
+// create a new withdrawal transaction
+router.post('/withdraw', function(req, res) {
+    transaction.withdraw(req.body, function(err, result) {
+        if (err) {
+            const clientErrors = ['INVALID_AMOUNT', 'NOT_FOUND', 'LOCKED', 'INSUFFICIENT_FUNDS'];
+            const statusCode = clientErrors.includes(err.error) ? 400 : 500;
+            return res.status(statusCode).json(err);
+        }
+        res.json({
+            status: "SUCCESS",
+            ...result,
+            transaction_date: new Date()
+        });
+    });
+});
+
+
+
 module.exports = router;
