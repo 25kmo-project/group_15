@@ -5,4 +5,5 @@ bank-automat/*.user
 backend/.env
 .DS_Store
 **/.DS_Store
-
+CMakeLists.txt.user.*
+*.bak
