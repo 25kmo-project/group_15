@@ -55,7 +55,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `bank`.`card` ;
 
 CREATE TABLE IF NOT EXISTS `bank`.`card` (
-  `card_id` INT NOT NULL,
+  `card_id` INT NOT NULL AUTO_INCREMENT,
   `card_number` VARCHAR(20) NOT NULL,
   `pin_code` VARCHAR(255) NOT NULL,
   `status` ENUM('Active', 'Blocked', 'Expired') NOT NULL,

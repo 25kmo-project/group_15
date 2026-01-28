@@ -23,8 +23,8 @@ const card={
       if (err) return callback(err);
 
       return db.query(
-        'INSERT INTO card (card_id, card_number, pin_code, status, user_id) VALUES (?,?,?,?,?)',
-        [newCard.card_id, newCard.card_number, hash, newCard.status, newCard.user_id],
+        'INSERT INTO card (card_number, pin_code, status, user_id) VALUES (?,?,?,?)',
+        [newCard.card_number, hash, newCard.status, newCard.user_id],
         callback
       );
     });
