@@ -62,7 +62,117 @@ const transaction = {
     // Remove a transaction from the database
     delete: function(id, callback) {
         return db.query("DELETE FROM transaction WHERE transaction_id=?", [id], callback);
-    }
-}
+    },
 
+   // withdraw function
+    withdraw: function(data, callback) {
+        const { account_id, card_id, amount } = data;
+
+        // 1. Input Validation
+        if (!amount || amount <= 0) {
+            return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0' });
+        }
+
+        // 2. Get a specific connection from the pool
+        db.getConnection(function(err, connection) {
+            if (err) return callback(err);
+
+            // 3. Begin Transaction
+            connection.beginTransaction(function(err) {
+                if (err) {
+                    connection.release();
+                    return callback(err);
+                }
+
+                // 4. Check Account and Card status with Row Locking
+                const checkSql = `
+                   SELECT 
+                       a.balance, 
+                       a.status AS acc_status, 
+                       c.status AS card_status,
+                       aa.access_type             
+                   FROM account a
+                   JOIN account_access aa ON a.account_id = aa.account_id 
+                   JOIN card c ON aa.card_id = c.card_id                  
+                   WHERE a.account_id = ? AND c.card_id = ?
+                   FOR UPDATE`;
+
+                // connection.query
+                connection.query(checkSql, [account_id, card_id], function(err, results) {
+                    if (err) {
+                        return connection.rollback(function() {
+                            connection.release();
+                            callback(err);
+                        });
+                    }
+
+                    // 5. Integrity & Business Logic Checks
+                    if (results.length === 0) {
+                        return connection.rollback(function() {
+                            connection.release();
+                            callback({ error: 'NOT_FOUND', message: 'Invalid Account or Card' });
+                        });
+                    }
+
+                    const { balance, acc_status, card_status } = results[0];
+
+                    if (acc_status !== 'ACTIVE' || card_status !== 'ACTIVE') {
+                        return connection.rollback(function() {
+                            connection.release();
+                            callback({ error: 'LOCKED', message: 'Account or Card is not active' });
+                        });
+                    }
+
+                    if (balance < amount) {
+                        return connection.rollback(function() {
+                            connection.release();
+                            callback({ error: 'INSUFFICIENT_FUNDS', message: 'Insufficient balance' });
+                        });
+                    }
+
+                    // 6. Update Account Balance
+                    connection.query("UPDATE account SET balance = balance - ? WHERE account_id = ?", [amount, account_id], function(err) {
+                        if (err) {
+                            return connection.rollback(function() {
+                                connection.release();
+                                callback(err);
+                            });
+                        }
+
+                        // 7. Log Transaction
+                        connection.query(
+                            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES ('Withdrawal', ?, ?, ?)",
+                            [amount, account_id, card_id],
+                            function(err, insRes) {
+                                if (err) {
+                                    return connection.rollback(function() {
+                                        connection.release();
+                                        callback(err);
+                                    });
+                                }
+
+                                // 8. Commit Transaction
+                                connection.commit(function(err) {
+                                    if (err) {
+                                        return connection.rollback(function() {
+                                            connection.release();
+                                            callback(err);
+                                        });
+                                    }
+                                    
+                                    // 9. Release Connection and Return Success
+                                    connection.release();
+                                    callback(null, { 
+                                        transaction_id: insRes.insertId, 
+                                        remaining_balance: balance - amount 
+                                    });
+                                }); // end commit
+                            }
+                        ); // end insert
+                    }); // end update
+                }); // end select
+            }); // end beginTransaction
+        }); // end getConnection
+    }
+};
 module.exports = transaction;
