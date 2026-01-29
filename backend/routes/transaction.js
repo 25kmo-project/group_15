@@ -95,6 +95,25 @@ router.post('/withdraw', function(req, res) {
     });
 });
 
+// Get paginated transaction history for an account and card
+router.get('/history', function(request, response) {
+    const data = {
+        account_id: parseInt(request.query.account_id),
+        card_id: parseInt(request.query.card_id),
+        page: parseInt(request.query.page) || 1
+    };
 
+    if (isNaN(data.account_id) || isNaN(data.card_id)) {
+        return response.status(400).json({ error: 'Valid IDs required' });
+    }
+
+    transaction.getTransactionHistory(data, function(err, dbResult) {
+        if (err) {
+            response.status(500).json(err);
+        } else {
+            response.json(dbResult);
+        }
+    });
+});
 
 module.exports = router;

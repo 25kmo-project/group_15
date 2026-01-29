@@ -173,6 +173,32 @@ const transaction = {
                 }); // end select
             }); // end beginTransaction
         }); // end getConnection
+    },
+
+    //View Transaction History
+    getTransactionHistory: function(data, callback) {
+        const { account_id, card_id, page } = data;
+        const limit = 10;
+        const offset = (page - 1) * limit;
+
+        const sql = `
+        SELECT 
+            u.user_name AS 'Etunimi', 
+            u.user_lastname AS 'Sukunimi', 
+            t.transaction_id AS 'ID', 
+            t.type AS 'Tyyppi', 
+            t.amount AS 'Määrä', 
+            t.date AS 'Aika'  -- 注意这里：改成 t.date，因为这是你建表时的名字
+        FROM account a
+        JOIN account_access aa ON a.account_id = aa.account_id
+        JOIN card c ON aa.card_id = c.card_id
+        JOIN user u ON c.user_id = u.user_id
+        LEFT JOIN transaction t ON a.account_id = t.account_id
+        WHERE a.account_id = ? AND c.card_id = ?
+        ORDER BY t.transaction_id DESC
+        LIMIT ? OFFSET ?`;
+
+        return db.query(sql, [account_id, card_id, limit, offset], callback);
     }
 };
 module.exports = transaction;
