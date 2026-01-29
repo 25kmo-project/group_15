@@ -116,4 +116,17 @@ router.get('/history', function(request, response) {
     });
 });
 
+// Get account balance 
+router.get('/balance', function(req, res) {
+    console.log("!!! SOMEONE IS CALLING BALANCE !!!");
+    console.log("Query Data:", req.query);
+    const data = {
+        account_id: req.query.account_id,
+        card_id: req.query.card_id
+    };
+    transaction.getBalance(data, function(err, result) {
+        if (err) return res.status(400).json(err);
+        res.json(result);
+    });
+});
 module.exports = router;
