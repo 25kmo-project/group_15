@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS `bank`.`user` (
   `user_phonenumber` VARCHAR(20) NOT NULL,
   `user_username` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `email_UNIQUE` (`user_email` ASC) VISIBLE,
-  UNIQUE INDEX `phone_UNIQUE` (`user_phonenumber` ASC) VISIBLE,
-  UNIQUE INDEX `user_username_UNIQUE` (`user_username` ASC) VISIBLE)
+  UNIQUE INDEX `email_UNIQUE` (`user_email`),
+  UNIQUE INDEX `phone_UNIQUE` (`user_phonenumber`),
+  UNIQUE INDEX `user_username_UNIQUE` (`user_username`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `bank`.`account` (
   `credit_limit` DECIMAL(15,2) NULL DEFAULT NULL,
   `account_number` CHAR(18) NOT NULL,
   PRIMARY KEY (`account_id`),
-  INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  UNIQUE INDEX `account_number_UNIQUE` (`account_number` ASC) VISIBLE,
+  INDEX `user_id_idx` (`user_id`),
+  UNIQUE INDEX `account_number_UNIQUE` (`account_number`),
   CONSTRAINT `fk_account_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `bank`.`user` (`user_id`)
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS `bank`.`card` (
   `user_id` INT NOT NULL,
   `status` ENUM('ACTIVE', 'CLOSED') NOT NULL,
   PRIMARY KEY (`card_id`),
-  UNIQUE INDEX `card_number_UNIQUE` (`card_number` ASC) VISIBLE,
-  INDEX `fk_card_user_idx` (`user_id` ASC) VISIBLE,
+  UNIQUE INDEX `card_number_UNIQUE` (`card_number`),
+  INDEX `fk_card_user_idx` (`user_id`),
   CONSTRAINT `fk_card_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `bank`.`user` (`user_id`)
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`account_access` (
   `account_id` INT NOT NULL,
   `access_type` ENUM('FULL', 'VIEW_ONLY') NOT NULL,
   PRIMARY KEY (`card_id`, `account_id`),
-  INDEX `account_id_idx` (`account_id` ASC) VISIBLE,
+  INDEX `account_id_idx` (`account_id`),
   CONSTRAINT `fk_access_account`
     FOREIGN KEY (`account_id`)
     REFERENCES `bank`.`account` (`account_id`)
@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS `bank`.`transaction` (
   `amount` DECIMAL(15,2) NOT NULL,
   `transaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`transaction_id`),
-  INDEX `account_id_idx` (`account_id` ASC) VISIBLE,
-  INDEX `card_id_idx` (`card_id` ASC) VISIBLE,
+  INDEX `account_id_idx` (`account_id`),
+  INDEX `card_id_idx` (`card_id`),
   CONSTRAINT `fk_transaction_account`
     FOREIGN KEY (`account_id`)
     REFERENCES `bank`.`account` (`account_id`)

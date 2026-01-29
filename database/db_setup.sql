@@ -1,0 +1,7 @@
+CREATE DATABASE IF NOT EXISTS bank;
+
+CREATE USER 'bank_admin'@'localhost' IDENTIFIED BY 'YOUR_PASSWORD_HERE';
+
+GRANT ALL PRIVILEGES ON `bank`.* TO 'bank_admin'@'localhost';
+
+FLUSH PRIVILEGES;

@@ -4,4 +4,4 @@ mysql> CREATE USER 'bank_admin'@'localhost' IDENTIFIED BY 'Jaksamista';
 
 mysql> GRANT ALL PRIVILEGES ON bank.* TO 'bank_admin'@'localhost';
 
-mysql> FLUSH PRIVILEGES;;
+mysql> FLUSH PRIVILEGES;
