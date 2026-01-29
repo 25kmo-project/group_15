@@ -84,11 +84,10 @@ const transaction = {
                     return callback(err);
                 }
 
-                // 4. Check Account and Card status with Row Locking
+                // 4. Check Card status with Row Locking
                 const checkSql = `
                    SELECT 
                        a.balance, 
-                       a.status AS acc_status, 
                        c.status AS card_status,
                        aa.access_type             
                    FROM account a
@@ -114,12 +113,12 @@ const transaction = {
                         });
                     }
 
-                    const { balance, acc_status, card_status } = results[0];
+                    const { balance, card_status } = results[0];
 
-                    if (acc_status !== 'ACTIVE' || card_status !== 'ACTIVE') {
+                    if ( card_status !== 'ACTIVE') {
                         return connection.rollback(function() {
                             connection.release();
-                            callback({ error: 'LOCKED', message: 'Account or Card is not active' });
+                            callback({ error: 'LOCKED', message: 'Card is not active' });
                         });
                     }
 
@@ -199,6 +198,45 @@ const transaction = {
         LIMIT ? OFFSET ?`;
 
         return db.query(sql, [account_id, card_id, limit, offset], callback);
+    },
+
+    // banlance inquiry
+    getBalance: function(data, callback) {
+        const { account_id, card_id } = data;
+
+        const sql = `
+            SELECT 
+                u.user_name, u.user_lastname, 
+                a.balance, a.account_number, 
+                c.status AS card_status
+            FROM account_access aa
+            JOIN account a ON aa.account_id = a.account_id
+            JOIN user u ON a.user_id = u.user_id
+            JOIN card c ON aa.card_id = c.card_id
+            WHERE aa.account_id = ? AND aa.card_id = ?`;
+
+        db.query(sql, [account_id, card_id], function(err, results) {
+            if (err) return callback(err);
+
+            // 1. Check if the card has access to this account
+            if (results.length === 0) {
+                return callback({ error: 'NOT_FOUND', message: 'Access denied' });
+            }
+
+            const row = results[0];
+
+            // 2. Validate card status
+            if (row.card_status !== 'ACTIVE') {
+                return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
+            }
+
+            // 3. Return success data
+            callback(null, {
+                owner: `${row.user_name} ${row.user_lastname}`,
+                balance: row.balance,
+                account_number: row.account_number
+            });
+        });
     }
 };
 module.exports = transaction;
