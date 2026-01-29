@@ -188,7 +188,7 @@ const transaction = {
             t.transaction_id AS 'ID', 
             t.type AS 'Tyyppi', 
             t.amount AS 'Määrä', 
-            t.date AS 'Aika'  -- 注意这里：改成 t.date，因为这是你建表时的名字
+            t.date AS 'Aika'  
         FROM account a
         JOIN account_access aa ON a.account_id = aa.account_id
         JOIN card c ON aa.card_id = c.card_id
