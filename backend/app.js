@@ -24,8 +24,5 @@ app.use('/cards', cardRouter);
 app.use('/account_access', accountAccessRouter);
 app.use('/account', accountRouter); // määritellään /account-reititin
 
-app.listen(3000); // lisätty serverille portti
-console.log('Server is running on port 3000');
-
 //tämä antaa mahdollisuus käyttää tätä tiedostoa muissa tiedostoissa
 module.exports = app;
