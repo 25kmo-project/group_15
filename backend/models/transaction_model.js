@@ -16,7 +16,7 @@ const transaction = {
     // Ordered by date DESC to show the latest transactions first
     getByAccountId: function(account_id, callback) {
         return db.query(
-            "SELECT * FROM transaction WHERE account_id=? ORDER BY date DESC", 
+            "SELECT * FROM transaction WHERE account_id=? ORDER BY transaction_date DESC", 
             [account_id], 
             callback
         );
@@ -32,9 +32,9 @@ const transaction = {
     // Add a new transaction record
     add: function(transaction, callback) {
         return db.query(
-            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES (?,?,?,?)",
+            "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES (?,?,?,?)",
             [
-                transaction.type, 
+                transaction.transaction_type, 
                 transaction.amount, 
                 transaction.account_id, 
                 transaction.card_id
@@ -46,11 +46,11 @@ const transaction = {
     // Update existing transaction data
     update: function(id, transaction, callback) {
         return db.query(
-            "UPDATE transaction SET type=?, amount=?, date=?, account_id=?, card_id=? WHERE transaction_id=?",
+            "UPDATE transaction SET transaction_type=?, amount=?, transaction_date=?, account_id=?, card_id=? WHERE transaction_id=?",
             [
-                transaction.type, 
+                transaction.transaction_type, 
                 transaction.amount, 
-                transaction.date, 
+                transaction.transaction_date, 
                 transaction.account_id, 
                 transaction.card_id, 
                 id
@@ -84,11 +84,10 @@ const transaction = {
                     return callback(err);
                 }
 
-                // 4. Check Account and Card status with Row Locking
+                // 4. Check Card status with Row Locking
                 const checkSql = `
                    SELECT 
                        a.balance, 
-                       a.status AS acc_status, 
                        c.status AS card_status,
                        aa.access_type             
                    FROM account a
@@ -114,12 +113,12 @@ const transaction = {
                         });
                     }
 
-                    const { balance, acc_status, card_status } = results[0];
+                    const { balance, card_status } = results[0];
 
-                    if (acc_status !== 'ACTIVE' || card_status !== 'ACTIVE') {
+                    if ( card_status !== 'ACTIVE') {
                         return connection.rollback(function() {
                             connection.release();
-                            callback({ error: 'LOCKED', message: 'Account or Card is not active' });
+                            callback({ error: 'LOCKED', message: 'Card is not active' });
                         });
                     }
 
@@ -141,7 +140,7 @@ const transaction = {
 
                         // 7. Log Transaction
                         connection.query(
-                            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES ('Withdrawal', ?, ?, ?)",
+                            "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES ('WITHDRAWAL', ?, ?, ?)",
                             [amount, account_id, card_id],
                             function(err, insRes) {
                                 if (err) {
@@ -173,6 +172,71 @@ const transaction = {
                 }); // end select
             }); // end beginTransaction
         }); // end getConnection
+    },
+
+    //View Transaction History
+    getTransactionHistory: function(data, callback) {
+        const { account_id, card_id, page } = data;
+        const limit = 10;
+        const offset = (page - 1) * limit;
+
+        const sql = `
+        SELECT 
+            u.user_name AS 'Etunimi', 
+            u.user_lastname AS 'Sukunimi', 
+            t.transaction_id AS 'ID', 
+            t.transaction_type AS 'Tyyppi', 
+            t.amount AS 'Määrä', 
+            t.transaction_date AS 'Aika'  
+        FROM account a
+        JOIN account_access aa ON a.account_id = aa.account_id
+        JOIN card c ON aa.card_id = c.card_id
+        JOIN user u ON c.user_id = u.user_id
+        LEFT JOIN transaction t ON a.account_id = t.account_id
+        WHERE a.account_id = ? AND c.card_id = ?
+        ORDER BY t.transaction_id DESC
+        LIMIT ? OFFSET ?`;
+
+        return db.query(sql, [account_id, card_id, limit, offset], callback);
+    },
+
+    // banlance inquiry
+    getBalance: function(data, callback) {
+        const { account_id, card_id } = data;
+
+        const sql = `
+            SELECT 
+                u.user_name, u.user_lastname, 
+                a.balance, a.account_number, 
+                c.status AS card_status
+            FROM account_access aa
+            JOIN account a ON aa.account_id = a.account_id
+            JOIN user u ON a.user_id = u.user_id
+            JOIN card c ON aa.card_id = c.card_id
+            WHERE aa.account_id = ? AND aa.card_id = ?`;
+
+        db.query(sql, [account_id, card_id], function(err, results) {
+            if (err) return callback(err);
+
+            // 1. Check if the card has access to this account
+            if (results.length === 0) {
+                return callback({ error: 'NOT_FOUND', message: 'Access denied' });
+            }
+
+            const row = results[0];
+
+            // 2. Validate card status
+            if (row.card_status !== 'ACTIVE') {
+                return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
+            }
+
+            // 3. Return success data
+            callback(null, {
+                owner: `${row.user_name} ${row.user_lastname}`,
+                balance: row.balance,
+                account_number: row.account_number
+            });
+        });
     }
 };
 module.exports = transaction;
