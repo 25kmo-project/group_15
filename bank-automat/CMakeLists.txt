@@ -42,9 +42,14 @@ else()
         add_executable(Pankkiautomaatti
             ${PROJECT_SOURCES}
             environment.h environment.cpp
+            style.qss
+            resource.qrc
         )
     endif()
 endif()
+
+qt_add_big_resources(RESOURCES_ADDED resource.qrc)
+target_sources(Pankkiautomaatti PRIVATE ${RESOURCES_ADDED})
 
 target_link_libraries(Pankkiautomaatti PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
 

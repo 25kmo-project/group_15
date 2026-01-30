@@ -1,0 +1,21 @@
+/* background color */
+
+QWidget {
+    background-color: #27DDF5;
+}
+
+/* signin */
+QPushButton {
+    background-color: #FFFFFF;
+    color: black;
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+
+QPushButton:pressed {
+    background-color: #ff77aa;
+    border: 2px solid #ff1493;
+}
+
+
+/* etc */

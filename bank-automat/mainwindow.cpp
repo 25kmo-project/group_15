@@ -6,7 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //login
     connect(ui->btnLogin, &QPushButton::clicked, this, &MainWindow::btnLoginSlot);
+
+
     manager = new QNetworkAccessManager(this);
 }
 
@@ -15,6 +18,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//login
 void MainWindow::btnLoginSlot()
 {
     QString url = Environment::base_url()+"login";
@@ -27,7 +31,7 @@ void MainWindow::btnLoginSlot()
     reply = manager->post(request, jsonDoc.toJson());
     connect(reply, &QNetworkReply::finished, this, &MainWindow::loginAction);
 }
-
+//login
 void MainWindow::loginAction()
 {
     QByteArray responseData=reply->readAll();

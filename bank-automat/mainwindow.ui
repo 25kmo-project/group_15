@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>966</width>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>40</y>
-      <width>441</width>
+      <x>300</x>
+      <y>30</y>
+      <width>201</width>
       <height>51</height>
      </rect>
     </property>
@@ -30,15 +30,15 @@
      </font>
     </property>
     <property name="text">
-     <string>Welcome to BANKNAME</string>
+     <string>Welcome to bank!</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>260</x>
       <y>110</y>
-      <width>201</width>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -55,9 +55,9 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>170</y>
-      <width>181</width>
+      <x>260</x>
+      <y>160</y>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
@@ -74,8 +74,8 @@
    <widget class="QPushButton" name="btnLogin">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>230</y>
+      <x>310</x>
+      <y>220</y>
       <width>171</width>
       <height>61</height>
      </rect>
@@ -127,7 +127,7 @@
      <rect>
       <x>90</x>
       <y>320</y>
-      <width>661</width>
+      <width>811</width>
       <height>81</height>
      </rect>
     </property>
@@ -138,7 +138,7 @@
      </font>
     </property>
     <property name="text">
-     <string>TextLabel(poistetaan myöhemmin sisältö)</string>
+     <string>ERROR: HERE SHOULD BE ERROR MESSAGE or SUCCESS</string>
     </property>
    </widget>
   </widget>
@@ -147,8 +147,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>24</height>
+     <width>966</width>
+     <height>30</height>
     </rect>
    </property>
   </widget>
