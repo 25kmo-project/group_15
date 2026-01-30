@@ -16,7 +16,7 @@ const transaction = {
     // Ordered by date DESC to show the latest transactions first
     getByAccountId: function(account_id, callback) {
         return db.query(
-            "SELECT * FROM transaction WHERE account_id=? ORDER BY date DESC", 
+            "SELECT * FROM transaction WHERE account_id=? ORDER BY transaction_date DESC", 
             [account_id], 
             callback
         );
@@ -32,9 +32,9 @@ const transaction = {
     // Add a new transaction record
     add: function(transaction, callback) {
         return db.query(
-            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES (?,?,?,?)",
+            "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES (?,?,?,?)",
             [
-                transaction.type, 
+                transaction.transaction_type, 
                 transaction.amount, 
                 transaction.account_id, 
                 transaction.card_id
@@ -46,11 +46,11 @@ const transaction = {
     // Update existing transaction data
     update: function(id, transaction, callback) {
         return db.query(
-            "UPDATE transaction SET type=?, amount=?, date=?, account_id=?, card_id=? WHERE transaction_id=?",
+            "UPDATE transaction SET transaction_type=?, amount=?, transaction_date=?, account_id=?, card_id=? WHERE transaction_id=?",
             [
-                transaction.type, 
+                transaction.transaction_type, 
                 transaction.amount, 
-                transaction.date, 
+                transaction.transaction_date, 
                 transaction.account_id, 
                 transaction.card_id, 
                 id
@@ -140,7 +140,7 @@ const transaction = {
 
                         // 7. Log Transaction
                         connection.query(
-                            "INSERT INTO transaction (type, amount, account_id, card_id) VALUES ('Withdrawal', ?, ?, ?)",
+                            "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES ('WITHDRAWAL', ?, ?, ?)",
                             [amount, account_id, card_id],
                             function(err, insRes) {
                                 if (err) {
@@ -185,9 +185,9 @@ const transaction = {
             u.user_name AS 'Etunimi', 
             u.user_lastname AS 'Sukunimi', 
             t.transaction_id AS 'ID', 
-            t.type AS 'Tyyppi', 
+            t.transaction_type AS 'Tyyppi', 
             t.amount AS 'Määrä', 
-            t.date AS 'Aika'  
+            t.transaction_date AS 'Aika'  
         FROM account a
         JOIN account_access aa ON a.account_id = aa.account_id
         JOIN card c ON aa.card_id = c.card_id
