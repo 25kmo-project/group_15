@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "environment.h"
+#include "debitvscredit.h"
 
 
 QT_BEGIN_NAMESPACE

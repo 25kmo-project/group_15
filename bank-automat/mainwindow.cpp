@@ -55,15 +55,19 @@ void MainWindow::loginAction()
         //qDebug() << "Server message:" << message;
     }
 
-    /*server lähettää token ja card_id qt konsoliin
+    //server lähettää token ja card_id qt konsoliin
+    //DebitvsCredit ikkunan asetus
     if(jsonObject.contains("token")) {
         QString token = jsonObject["token"].toString();
         QString cardId = jsonObject["card_id"].toString();
+        DebitvsCredit *objDebitvsCredit = new DebitvsCredit(this);
+        objDebitvsCredit->setToken(token);
+        objDebitvsCredit->show();
         qDebug() << "login ok";
         qDebug() << "cardid:" << cardId;
         qDebug() << "token:" << token;
     }
-    */
+
 
 
 }
