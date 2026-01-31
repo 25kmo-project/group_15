@@ -20,6 +20,10 @@ set(PROJECT_SOURCES
     mainwindow.ui
     environment.cpp
     environment.h
+
+    debitvscredit.cpp
+    debitvscredit.h
+    debitvscredit.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
