@@ -49,7 +49,7 @@
      </font>
     </property>
     <property name="text">
-     <string>username</string>
+     <string>card id</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -90,7 +90,7 @@
      <string>Sign in</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="textUsername">
+   <widget class="QLineEdit" name="textCardId">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -106,7 +106,7 @@
      </font>
     </property>
    </widget>
-   <widget class="QLineEdit" name="textPassword">
+   <widget class="QLineEdit" name="textPincode">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -138,7 +138,7 @@
      </font>
     </property>
     <property name="text">
-     <string>ERROR: HERE SHOULD BE ERROR MESSAGE or SUCCESS</string>
+     <string/>
     </property>
    </widget>
   </widget>

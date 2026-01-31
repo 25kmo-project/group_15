@@ -25,8 +25,8 @@ void MainWindow::btnLoginSlot()
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QJsonObject jObject;
-    jObject.insert("username", ui->textUsername->text());
-    jObject.insert("password", ui->textPassword->text());
+    jObject.insert("card_id", ui->textCardId->text());
+    jObject.insert("pin_code", ui->textPincode->text());
     QJsonDocument jsonDoc(jObject);
     reply = manager->post(request, jsonDoc.toJson());
     connect(reply, &QNetworkReply::finished, this, &MainWindow::loginAction);
@@ -35,19 +35,35 @@ void MainWindow::btnLoginSlot()
 void MainWindow::loginAction()
 {
     QByteArray responseData=reply->readAll();
-    if (responseData == "-4078" || responseData.length()==0){
-        qDebug()<<"Login ok";
+
+    //jos ei ole yhteyttä backendiin
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    if(!jsonDoc.isObject()) {
+        ui->labelInfo->setText("Sorry, we have some technical issues");
+        //jos tarvitaan qt konsoliin viestin
+        //qDebug() << "Problems with backend" << responseData;
+        return;
     }
-    else{
-        QJsonDocument jsonDoc=QJsonDocument::fromJson(responseData);
-        QJsonObject jsonObject = jsonDoc.object();
-        if(jsonObject.contains("token")){
-                QString token = jsonObject["token"].toString();
-                qDebug()<<token;
-            }
-        else{
-        ui->labelInfo->setText("Tunnus ja salasana eivät täsmää");
-            }
+
+    QJsonObject jsonObject = jsonDoc.object();
+
+    //kun backend lähettää viesti, näytetään
+    if(jsonObject.contains("message")) {
+        QString message = jsonObject["message"].toString();
+        ui->labelInfo->setText(message);
+        //jos tarvitaan qt konsoliin viestin
+        //qDebug() << "Server message:" << message;
     }
-    qDebug()<<responseData;
+
+    /*server lähettää token ja card_id qt konsoliin
+    if(jsonObject.contains("token")) {
+        QString token = jsonObject["token"].toString();
+        QString cardId = jsonObject["card_id"].toString();
+        qDebug() << "login ok";
+        qDebug() << "cardid:" << cardId;
+        qDebug() << "token:" << token;
+    }
+    */
+
+
 }
