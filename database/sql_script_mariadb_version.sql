@@ -27,11 +27,9 @@ CREATE TABLE IF NOT EXISTS `bank`.`user` (
   `user_address` VARCHAR(100) NOT NULL,
   `user_email` VARCHAR(100) NOT NULL,
   `user_phonenumber` VARCHAR(20) NOT NULL,
-  `user_username` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE INDEX `email_UNIQUE` (`user_email`),
-  UNIQUE INDEX `phone_UNIQUE` (`user_phonenumber`),
-  UNIQUE INDEX `user_username_UNIQUE` (`user_username`))
+  UNIQUE INDEX `phone_UNIQUE` (`user_phonenumber`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
@@ -70,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`card` (
   `status` ENUM('ACTIVE', 'CLOSED') NOT NULL,
   PRIMARY KEY (`card_id`),
   UNIQUE INDEX `card_number_UNIQUE` (`card_number`),
-  INDEX `fk_card_user_idx` (`user_id`),
+  INDEX `card_user_idx` (`user_id`),
   CONSTRAINT `fk_card_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `bank`.`user` (`user_id`)

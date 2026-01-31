@@ -44,6 +44,7 @@ else()
             environment.h environment.cpp
             style.qss
             resource.qrc
+            debitvscredit.h debitvscredit.cpp debitvscredit.ui
         )
     endif()
 endif()
