@@ -14,14 +14,14 @@ const user={
     },
  //lisätään uusi user   
     add: function (user, callback) {
-        return db. query ("INSERT INTO user (user_name, user_lastname, user_address, user_email, user_phonenumber, user_username) VALUES (?,?,?,?,?,?)",
-        [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber, user.user_username], callback)
+        return db. query ("INSERT INTO user (user_name, user_lastname, user_address, user_email, user_phonenumber) VALUES (?,?,?,?,?)",
+        [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber], callback)
     },
 
 //muokataan user:n tietoja
     update: function(user, user_id, callback){
-        return db. query ("UPDATE user SET user_name=?, user_lastname=?, user_address=?, user_email=?, user_phonenumber=?, user_username=? WHERE user_id=?", 
-            [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber, user.user_username, user_id], callback)
+        return db. query ("UPDATE user SET user_name=?, user_lastname=?, user_address=?, user_email=?, user_phonenumber=? WHERE user_id=?", 
+            [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber, user_id], callback)
     },
 
 //poistetaan user kokonaan tietokannasta
