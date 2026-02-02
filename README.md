@@ -31,7 +31,7 @@ Database "bank" utilizes a 5-table relational schema:![ER diagram](database/ER_d
 
 ## Backend-database
 ### User case
-login by card number + pin code.The database only stores pin codes that have been hashed using bcryptjs.
+login by card id + pin code.The database only stores pin codes that have been hashed using bcryptjs.
 After a user logs in, the system will provide selectable accounts for the user to operate:debit or credit.
 
 ......
