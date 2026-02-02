@@ -12,41 +12,79 @@ router.post('/', function(request, response){
         login.getCardIdPincode(card_id, function(err, result){
             if(err){
                 console.log("Database error");
-                response.json({"message":"Database error"});
+                return response.json({"message":"Database error"});
             }
             else{
                 if(result.length > 0){
+
+                    // kortin status tarkistus
+                    if(result[0].status && result[0].status !== 'ACTIVE'){
+                        console.log("Card is not active");
+                        return response.json({"message":"Card is not active"});
+                    }
+
                     bcrypt.compare(pin_code, result[0].pin_code, function(err, compareResult){
                         if(err){
                             console.log("Error checking pin:", err);
-                            response.json({"message": "Error checking pin code"});
+                            return response.json({"message": "Error checking pin code"});
                         }
                         else if(!compareResult){
                             console.log("Pincode is not correct");
-                            response.json({"message":"Pincode is not correct"});
+
+                            // kasvatetaan epäonnistuneet yritykset VAIN väärällä PINillä
+                            login.updateFailedPinAttempts(card_id, function(err2){
+                                if(err2){
+                                    console.log("Database error (updateFailedPinAttempts)");
+                                    return response.json({"message":"Database error"});
+                                }
+
+                                const attemptsNow = (result[0].failed_pin_attempts || 0) + 1;
+
+                                // 3 väärää -> sulje kortti
+                                if(attemptsNow >= 3){
+                                    login.closeCard(card_id, function(err3){
+                                        if(err3){
+                                            console.log("Database error (closeCard)");
+                                            return response.json({"message":"Database error"});
+                                        }
+                                        return response.json({"message":"Card closed: pin wrong 3 times"});
+                                    });
+                                } else {
+                                    return response.json({"message":`Pincode is not correct (${attemptsNow}/3)`});
+                                }
+                            });
+
                         }
                         else {
-                            const token = generateAccessToken(card_id);
-                            response.setHeader('Content-Type','application/json');
-                            response.json({
-                                success: true,
-                                message: "Success",
-                                card_id: card_id,
-                                token: token
+                            // oikea PIN -> nollaa epäonnistuneet yritykset
+                            login.resetFailedPinAttempts(card_id, function(err2){
+                                if(err2){
+                                    console.log("Database error (resetFailedPinAttempts)");
+                                    return response.json({"message":"Database error"});
+                                }
+
+                                const token = generateAccessToken(card_id);
+                                response.setHeader('Content-Type','application/json');
+                                return response.json({
+                                    success: true,
+                                    message: "Success",
+                                    card_id: card_id,
+                                    token: token
+                                });
                             });
                         }
                     }); 
                 }
                 else {
                     console.log("Card not found");
-                    response.json({"message":"Card not found"});
+                    return response.json({"message":"Card not found"});
                 }
             }
         }); 
     }
     else{
         console.log("Card id or pincode is not given");
-        response.json({"message":"Card id or pincode is not given"});
+        return response.json({"message":"Card id or pincode is not given"});
     }
 });
 

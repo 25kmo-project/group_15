@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`card` (
   `card_type` ENUM('PARENT', 'CHILD') NOT NULL DEFAULT 'PARENT',
   `user_id` INT NOT NULL,
   `status` ENUM('ACTIVE', 'CLOSED') NOT NULL,
+  `failed_pin_attempts` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`card_id`),
   UNIQUE INDEX `card_number_UNIQUE` (`card_number`),
   INDEX `card_user_idx` (`user_id`),
