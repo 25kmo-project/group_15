@@ -1,4 +1,34 @@
-# Group 15 Project
+# Group 15 Project-ATM Banking System
+This is a course project designed to simulate real-world bank ATM operations.
+
+## Project Introduction
+The system follows a decoupled architecture (Frontend and Backend separation):  
+Frontend (**Qt/C++**): Provides a Graphical User Interface (GUI) for interactive user operations.  
+Backend (**Node.js**): Processes core business logic, such as PIN verification and balance management.  
+Database (**MySQL**): Stores user information, account balances, and all transaction logs.
+
+## Tech Stack
+### Frontend
+Framework: Qt (C++)   
+Networking: QNetworkAccessManager (For asynchronous REST API communication)  
+Data Parsing: QJsonDocument & QJsonObject
+UI Design: ?
+
+### Backend
+Runtime: Node.js
+Framework: Express.js
+Environment Management: dotenv 
+Security: bcryptjs 
+Middleware: cors 
+
+### Database
+System: MySQL 8.0+  
+Library: mysql2   
+Schema: Relational multi-table design with Transactional Integrity  
+Data Structure
+Database "bank" utilizes a 5-table relational schema:![ER diagram](database/ER_diagram.pdf)
+
+
 ## Backend-database
 ### User case
 login by card number + pin code.The database only stores pin codes that have been hashed using bcryptjs.
@@ -7,8 +37,7 @@ After a user logs in, the system will provide selectable accounts for the user t
 ......
 
 
-### Data Structure
-Database "bank" utilizes a 5-table relational schema:![ER diagram](database/ER-kaavio_v2.png)
+### 
 #### Table: user
 * user_id (PK, INT)
 * user_name (VARCHAR(45))
