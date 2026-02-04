@@ -1,60 +1,50 @@
 # this workflow runs only for the build after each commit for macOS
 
 name: Build Bank App (macOS, Apple Silicon)
-
 on:
   push:
-    branches: ["*"]        # pushes from all branches
+    branches: ["*"] #pushed from all branches
   pull_request:
     branches: ["main"]     
-
 jobs:
   build-macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [clang_64]
-
+        arch: [clang_64]  # supports both Intel and Apple Silicon
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    #remove this part, only for testing purpose
-    - name: Check available Qt architectures
-      run: |
-        pip install aqtinstall
-        aqt list-qt mac desktop --arch 6.10.1
-    
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '6.10.1'
-        host: 'mac'
-        target: 'desktop'
-        arch: ${{ matrix.arch }}
-        modules: 'qtbase qttools'
-        cache: true
-
-    - name: Configure CMake
-      shell: bash
-      run: |
-        cmake -S bank-automat -B build \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_OSX_ARCHITECTURES=arm64 \
-          -DCMAKE_PREFIX_PATH="${Qt6_DIR}"
-
-    - name: Build
-      shell: bash
-      run: |
-        cmake --build build --config Release
-
-    - name: Package app for CI
-      shell: bash
-      run: |
-        cp -r build/Release/BankApp.app build/Release/BankApp-arm64.app
-
-    - name: Upload artifact (for CI)
-      uses: actions/upload-artifact@v4
-      with:
-        name: BankApp-macOS-arm64
-        path: build/Release/BankApp-arm64.app
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          host: 'mac'
+          target: 'desktop'
+          arch: ${{ matrix.arch }}
+          cache: true
+      
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake -S bank-automat -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_PREFIX_PATH="${Qt6_DIR}"
+      
+      - name: Build
+        shell: bash
+        run: |
+          cmake --build build --config Release
+      
+      - name: Package app for CI
+        shell: bash
+        run: |
+          cp -r build/Release/Pankkiautomaatti.app build/Release/BankApp-arm64.app
+      
+      - name: Upload artifact (for CI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: BankApp-macOS-arm64
+          path: build/Release/BankApp-arm64.app
