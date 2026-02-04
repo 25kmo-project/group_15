@@ -113,7 +113,14 @@ const transaction = {
                         });
                     }
 
-                    const { balance, card_status } = results[0];
+                    const { balance, card_status,account_type, credit_limit, access_type } = results[0];
+
+                    if (access_type !== 'FULL') {
+                        return connection.rollback(function () {
+                            connection.release();
+                            callback({error: 'UNAUTHORIZED',message: 'This card only has view access'});
+                        });
+                  }
 
                     if ( card_status !== 'ACTIVE') {
                         return connection.rollback(function() {
@@ -121,11 +128,14 @@ const transaction = {
                             callback({ error: 'LOCKED', message: 'Card is not active' });
                         });
                     }
+                    const bal = parseFloat(balance);
+                    const lim = parseFloat(credit_limit || 0);
+                    const availableFunds = account_type === 'CREDIT' ? (bal + lim) : bal;
 
-                    if (balance < amount) {
+                    if (availableFunds < amount) {
                         return connection.rollback(function() {
                             connection.release();
-                            callback({ error: 'INSUFFICIENT_FUNDS', message: 'Insufficient balance' });
+                            callback({ error: 'INSUFFICIENT_FUNDS', message: 'Insufficient funds available' });
                         });
                     }
 
@@ -163,7 +173,7 @@ const transaction = {
                                     connection.release();
                                     callback(null, { 
                                         transaction_id: insRes.insertId, 
-                                        remaining_balance: balance - amount 
+                                        remaining_balance: parseFloat((bal - amount).toFixed(2))
                                     });
                                 }); // end commit
                             }
@@ -233,7 +243,7 @@ const transaction = {
             // 3. Return success data
             callback(null, {
                 owner: `${row.user_name} ${row.user_lastname}`,
-                balance: row.balance,
+                balance: parseFloat(row.balance),
                 account_number: row.account_number
             });
         });
