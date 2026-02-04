@@ -1,5 +1,5 @@
 # this workflow runs the build and release when a tag is pushed on Windows
-name: Release Bank App (Windows)
+name: Release Windows
 
 on:
   push:

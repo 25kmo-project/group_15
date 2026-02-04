@@ -1,5 +1,5 @@
 # this workflow runs only for the build after each commit for Windows
-name: Build Bank App (Windows)
+name: Build Windows
 
 on:
   push:

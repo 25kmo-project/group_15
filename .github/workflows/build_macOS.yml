@@ -1,6 +1,6 @@
 # this workflow runs only for the build after each commit for macOS (Intel and Apple Silicon)
 
-name: Build Bank App (macOS)
+name: Build macOS
 on:
   push:
     branches: ["*"] #pushes from all branches
