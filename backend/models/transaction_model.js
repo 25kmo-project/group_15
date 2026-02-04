@@ -87,7 +87,7 @@ const transaction = {
                 // 4. Check Card status with Row Locking
                 const checkSql = `
                    SELECT 
-                       a.balance, 
+                       a.balance, a.account_type, a.credit_limit,
                        c.status AS card_status,
                        aa.access_type             
                    FROM account a
