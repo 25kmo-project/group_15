@@ -1,9 +1,8 @@
-# this workflow runs only for the build after each commit for macOS
-
+# this workflow runs only for the build after each commit for macOS (Apple Silicon)
 name: Build Bank App (macOS, Apple Silicon)
 on:
   push:
-    branches: ["*"] #pushed from all branches
+    branches: ["*"]        # pushes from all branches
   pull_request:
     branches: ["main"]     
 jobs:
@@ -11,7 +10,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [clang_64]  # supports both Intel and Apple Silicon
+        arch: [clang_64]      # only for Apple Silicon
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,13 +37,31 @@ jobs:
         run: |
           cmake --build build --config Release
       
+      - name: Debug - List build directory
+        shell: bash
+        run: |
+          echo "=== Contents of build directory ==="
+          ls -laR build/
+          echo ""
+          echo "=== Looking for .app files ==="
+          find build -name "*.app" -type d
+      
       - name: Package app for CI
         shell: bash
         run: |
-          cp -r build/Release/Pankkiautomaatti.app build/Release/BankApp-arm64.app
+          #etsitään missä .app
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: Pankkiautomaatti.app not found!"
+            exit 1
+          fi
+          
+          echo "Found app at: $APP_PATH"
+          cp -r "$APP_PATH" build/BankApp-arm64.app
       
       - name: Upload artifact (for CI)
         uses: actions/upload-artifact@v4
         with:
           name: BankApp-macOS-arm64
-          path: build/Release/BankApp-arm64.app
+          path: build/BankApp-arm64.app
