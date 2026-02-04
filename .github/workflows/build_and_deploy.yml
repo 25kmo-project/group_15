@@ -27,7 +27,9 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="%Qt6_DIR%"
+        cmake -S bank-automat -B build ^
+         -DCMAKE_BUILD_TYPE=Release ^
+         -DCMAKE_PREFIX_PATH="%Qt6_DIR%"
 
     - name: Build
       shell: cmd
@@ -38,7 +40,8 @@ jobs:
     - name: Deploy Qt dependencies
       shell: cmd
       run: |
-        "%Qt6_DIR%\..\..\bin\windeployqt.exe" build\Release\MyWeather.exe
+        "%Qt6_DIR%\..\..\bin\windeployqt.exe" build\Release\*.exe
+
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
