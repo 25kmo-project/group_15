@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const transaction = require('../models/transaction_model');
+const authenticateToken = require('../middleware/auth');
 
 // Get all transactions
 router.get('/', function(request, response) {
@@ -14,14 +15,14 @@ router.get('/', function(request, response) {
 });
 
 // Get a single transaction by its ID
-router.get('/:id', function(request, response) {
+router.get('/id/:id',authenticateToken, function(request, response) {
     transaction.getById(request.params.id, function(err, dbResult) {
-        if (err) {
-            response.json(err);
-        } else {
+        if (err) return response.status(500).json(err);
+        if (!dbResult ||dbResult.length === 0) {
+            return response.status(404).json({ error: "Transaction not found" });
+        }
             // Returns the first (and only) result from the array
             response.json(dbResult[0]);
-        }
     });
 });
 
@@ -80,8 +81,13 @@ router.delete('/:id', function(request, response) {
 });
 
 // create a new withdrawal transaction
-router.post('/withdraw', function(req, res) {
-    transaction.withdraw(req.body, function(err, result) {
+router.post('/withdraw',authenticateToken, function(req, res) {
+    const { account_id, card_id, amount } = req.body;
+    if (req.user.card_id != req.body.card_id) {
+            return res.status(403).json({ error: "Security breach: You cannot access other cards" });
+      }
+    transaction.withdraw({ account_id, card_id, amount }, function(err, result) {
+        
         if (err) {
             const clientErrors = ['INVALID_AMOUNT', 'NOT_FOUND', 'LOCKED', 'INSUFFICIENT_FUNDS'];
             const statusCode = clientErrors.includes(err.error) ? 400 : 500;
@@ -96,7 +102,7 @@ router.post('/withdraw', function(req, res) {
 });
 
 // Get paginated transaction history for an account and card
-router.get('/history', function(request, response) {
+router.get('/history', authenticateToken,function(request, response) {
     const data = {
         account_id: parseInt(request.query.account_id),
         card_id: parseInt(request.query.card_id),
@@ -105,6 +111,9 @@ router.get('/history', function(request, response) {
 
     if (isNaN(data.account_id) || isNaN(data.card_id)) {
         return response.status(400).json({ error: 'Valid IDs required' });
+    }
+    if (request.user.card_id != data.card_id) {
+        return response.status(403).json({ error: "Access denied" });
     }
 
     transaction.getTransactionHistory(data, function(err, dbResult) {
@@ -117,11 +126,14 @@ router.get('/history', function(request, response) {
 });
 
 // Get account balance 
-router.get('/balance', function(req, res) {
+router.get('/balance', authenticateToken,function(req, res) {
     const data = {
         account_id: req.query.account_id,
         card_id: req.query.card_id
     };
+    if (req.user.card_id != data.card_id) {
+        return res.status(403).json({ error: "Access denied" });
+    }
     transaction.getBalance(data, function(err, result) {
         if (err) return res.status(400).json(err);
         res.json(result);
