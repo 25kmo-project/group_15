@@ -41,11 +41,11 @@ jobs:
     - name: Deploy Qt dependencies
       shell: cmd
       run: |
-        for /r build %%f in (*.exe) do windeployqt "%%f"
-
+        cd build\Release
+        windeployqt Pankkiautomaatti.exe
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Bank App
+        name: Bank App-Windows
         path: build/Release/
