@@ -1,4 +1,4 @@
-# this workflow runs only for the build after each commit for macOS (Apple Silicon)
+# this workflow runs only for the build after each commit for macOS
 
 name: Build Bank App (macOS, Apple Silicon)
 
@@ -13,12 +13,18 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [arm64]      # onlo for apple silicon
+        arch: [clang_64]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    #remove this part, only for testing purpose
+    - name: Check available Qt architectures
+      run: |
+        pip install aqtinstall
+        aqt list-qt mac desktop --arch 6.10.1
+    
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
@@ -26,7 +32,7 @@ jobs:
         host: 'mac'
         target: 'desktop'
         arch: ${{ matrix.arch }}
-        modules: 'qtbase'
+        modules: 'qtbase qttools'
         cache: true
 
     - name: Configure CMake

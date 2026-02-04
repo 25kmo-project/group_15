@@ -1,4 +1,4 @@
-# this workflow runs the build and release when a tag is pushed on macOS (Apple Silicon)
+# this workflow runs the build and release when a tag is pushed on macOS
 
 name: Release Bank App (macOS, Apple Silicon)
 
