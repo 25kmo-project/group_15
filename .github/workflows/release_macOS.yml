@@ -1,16 +1,15 @@
 # this workflow runs the build and release when a tag is pushed on macOS
-
 name: Release Bank App (macOS, Apple Silicon)
 on:
   push:
     tags:
-      - "v*"  #after tag update (correct format v0.0.0 )
+      - "v*"   # after tag update (correct format v0.0.0 )
 jobs:
   release-macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [clang_64]  #supports both Intel and Apple Silicon
+        arch: [clang_64]  # Qt architecture for macOS (supports both Intel and Apple Silicon)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,16 +36,28 @@ jobs:
         run: |
           cmake --build build --config Release
       
+      - name: Debug - List build directory
+        shell: bash
+        run: |
+          echo "=== Contents of build directory ==="
+          ls -la build/
+          echo "=== Looking for .app files ==="
+          find build -name "*.app" -type d
+      
       - name: Package app for Release
         shell: bash
         run: |
-          #luodaan .dmg tiedosto
+          #etsitään missä .app tiedosto
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          
+          #luodaan .dmg
           mkdir -p build/dmg
-          cp -r build/Release/Pankkiautomaatti.app build/dmg/
-          hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/Release/BankApp-macOS-arm64.dmg
+          cp -r "$APP_PATH" build/dmg/
+          hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/Release/BankApp-macOS-arm64.dmg
+          files: build/BankApp-macOS-arm64.dmg
           generate_release_notes: true

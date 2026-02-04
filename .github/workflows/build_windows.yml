@@ -47,5 +47,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: MyWeather-Windows
+        name: Bank App
         path: build/Release/
