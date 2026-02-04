@@ -11,6 +11,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout code
       - uses: actions/checkout@v4
 
       - name: Install Qt
@@ -39,10 +40,16 @@ jobs:
       - name: Deploy Qt dependencies
         shell: cmd
         run: |
-          for /r build %%f in (*.exe) do windeployqt "%%f"
+          cd build\Release
+          windeployqt Pankkiautomaatti.exe
+
+      - name: Package app for Release
+        shell: powershell
+        run: |
+          Compress-Archive -Path build\Release\* -DestinationPath BankApp-Windows-x64.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/**/**/*.exe
+          files: BankApp-Windows-x64.zip
           generate_release_notes: true
