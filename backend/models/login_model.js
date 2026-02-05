@@ -6,7 +6,9 @@ const login={
     
     //sadaan yhden user ja pincode
     getCardIdPincode: function(card_id, callback) {
-        const query = `SELECT card_id, pin_code, status, failed_pin_attempts FROM card WHERE card_id = ?`;
+        const query = `SELECT c.card_id, c.pin_code, c.status, c.failed_pin_attempts,aa.account_id 
+                       FROM card c JOIN account_access aa ON c.card_id = aa.card_id 
+                       WHERE c.card_id = ?`;
         return db.query(query,[card_id], callback);
     },
 
