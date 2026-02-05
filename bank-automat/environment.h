@@ -10,8 +10,8 @@ public:
     Environment();
     QString static base_url();
     static QString token;
-    static int card_id;
-    static int account_id;
+    static int cardId;
+    static int accountId;
 
 };
 
