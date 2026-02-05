@@ -69,6 +69,7 @@ router.post('/', function(request, response){
                                     success: true,
                                     message: "Login successful",
                                     card_id: card_id,
+                                    account_id: result[0].account_id,
                                     token: token
                                 });
                             });
