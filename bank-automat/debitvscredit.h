@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <qdebug.h>
+#include "environment.h"
 
 namespace Ui {
 class DebitvsCredit;
@@ -23,6 +24,8 @@ public:
 private:
     Ui::DebitvsCredit *ui;
     QString token;
+    int cardId;
+    int accountId;
 };
 
 #endif // DEBITVSCREDIT_H
