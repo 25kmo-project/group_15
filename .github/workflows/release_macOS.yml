@@ -1,0 +1,61 @@
+# this workflow runs the build and release when a tag is pushed on macOS (Intel and Apple Silicon)
+name: Release macOS
+on:
+  push:
+    tags:
+      - "v*"  # after tag update (correct format v0.0.0)
+jobs:
+  release-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [clang_64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          host: 'mac'
+          target: 'desktop'
+          arch: ${{ matrix.arch }}
+          cache: true
+      
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake -S bank-automat -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_PREFIX_PATH="${Qt6_DIR}"
+      
+      - name: Build
+        shell: bash
+        run: |
+          cmake --build build --config Release
+      
+      - name: Package app for Release
+        shell: bash
+        run: |
+          #searching for Pankkiautomaatti.app
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: Pankkiautomaatti.app not found!"
+            exit 1
+          fi
+          
+          echo "Found app at: $APP_PATH"
+          
+          #luodaan .dmg tiedosto
+          mkdir -p build/dmg
+          cp -r "$APP_PATH" build/dmg/
+          hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/BankApp-macOS-arm64.dmg
+          generate_release_notes: true

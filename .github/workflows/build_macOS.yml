@@ -1,0 +1,59 @@
+# this workflow runs only for the build after each commit for macOS (Intel and Apple Silicon)
+
+name: Build macOS
+on:
+  push:
+    branches: ["*"] #pushes from all branches
+  pull_request:
+    branches: ["main"]     
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [clang_64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          host: 'mac'
+          target: 'desktop'
+          arch: ${{ matrix.arch }}
+          cache: true
+      
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake -S bank-automat -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_PREFIX_PATH="${Qt6_DIR}"
+      
+      - name: Build
+        shell: bash
+        run: |
+          cmake --build build --config Release
+      
+      - name: Package app for CI
+        shell: bash
+        run: |
+          #search for Pankkiautomaatti.app
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: Pankkiautomaatti.app not found!"
+            exit 1
+          fi
+          
+          echo "Found app at: $APP_PATH"
+          cp -r "$APP_PATH" build/BankApp-arm64.app
+      
+      - name: Upload artifact (for CI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: BankApp-macOS-arm64
+          path: build/BankApp-arm64.app

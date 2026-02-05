@@ -122,23 +122,24 @@ frontend/
 
 ## DRAFT_1 or What should be also included in readme
 
--how to install our app
--what folder documents have and what it describes(documents are not added yet)
--we have db version for mysql and mariadb
--we have client scenarios (scenarios are not added yet)
--(?)if client has no card, he/she cant use bank
--(?)if card is blocked, no access to bank
--database - procedures's description(not done yet, they will be for nosto/pano)
--app additional features: currency and digital receipt
--database description: if one card holder->menu, if dual card->debit or credit selection->menu
+- how to install our app
+- what folder documents have and what it describes(documents are not added yet)
+- we have db version for mysql and mariadb
+- e have client scenarios (scenarios are not added yet)
+- (?)if client has no card, he/she cant use bank
+- (?)if card is blocked, no access to bank
+- database - procedures's description(not done yet, they will be for nosto/pano)
+- app additional features: currency and digital receipt
+- database description: if one card holder->menu, if dual card->debit or credit selection->menu
+- github windows and mac build and release workflows
 
 ## DRAFT_2 or teacher's example
--What was the project: For example the project name, primary idea and target, when, why
--Which technologies were used
--Which tools were used
--Who did what parts of the project (if groupwork)
--Application architecture, database schema, APIs, maybe ABIs, UI/UX plan, protocols
--Instructions how to deploy and use the project code
--Link to the server / service where the project is/was running
--Related presentation material(s): slides, images, videos about the project, posters, links or good quality images to basic project management and tool views (kanban stuff, Trello, Taiga, Jira, Github, Jenkins, CI/CD, IaC etc)
--Actual source codes: Commented code, code hierarchy if it is not obvious, using programming language and framework style guide (code entity identifiers like classes, variables etc named ok, syntax is clear overall…), avoid obsolete stuff etc. Code commits, pull requests, issues, merges etc
+- What was the project: For example the project name, primary idea and target, when, why
+- Which technologies were used
+- Which tools were used
+- Who did what parts of the project (if groupwork)
+- Application architecture, database schema, APIs, maybe ABIs, UI/UX plan, protocols
+- Instructions how to deploy and use the project code
+- Link to the server / service where the project is/was running
+- Related presentation material(s): slides, images, videos about the project, posters, links or good quality images to basic project management and tool views (kanban stuff, Trello, Taiga, Jira, Github, Jenkins, CI/CD, IaC etc)
+- Actual source codes: Commented code, code hierarchy if it is not obvious, using programming language and framework style guide (code entity identifiers like classes, variables etc named ok, syntax is clear overall…), avoid obsolete stuff etc. Code commits, pull requests, issues, merges etc
