@@ -61,13 +61,20 @@ void MainWindow::loginAction()
     if(jsonObject.contains("token")) {
         Environment:: token = jsonObject["token"].toString();
         Environment:: cardId = jsonObject["card_id"].toInt();
-        Environment::accountId = jsonObject["account_id"].toInt();
+        Environment::accountIds.clear();
+        QJsonArray accounts = jsonObject["account_id"].toArray();
+        for (const QJsonValue &value : accounts) {
+            Environment::accountIds.append(value.toInt());
+        }
+        qDebug() << "Total accounts found:" << Environment::accountIds.size();
+
         DebitvsCredit *objDebitvsCredit = new DebitvsCredit(this);
         objDebitvsCredit->setToken(Environment::token);
         objDebitvsCredit->show();
+
         qDebug() << "login ok";
         qDebug() << "cardid:" << Environment::cardId;
-        qDebug() << "accountid:" << Environment::accountId;
+        qDebug() << "accountid:" << Environment::accountIds;
         qDebug() << "token:" << Environment::token;
     }
 

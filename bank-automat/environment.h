@@ -2,6 +2,7 @@
 #define ENVIRONMENT_H
 
 #include <QString>
+#include <QList>
 
 
 class Environment
@@ -12,6 +13,7 @@ public:
     static QString token;
     static int cardId;
     static int accountId;
+    static QList<int> accountIds;
 
 };
 
