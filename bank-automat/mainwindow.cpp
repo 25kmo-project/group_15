@@ -35,6 +35,7 @@ void MainWindow::btnLoginSlot()
 void MainWindow::loginAction()
 {
     QByteArray responseData=reply->readAll();
+    reply->deleteLater();
 
     //jos ei ole yhteyttä backendiin
     QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
@@ -58,14 +59,16 @@ void MainWindow::loginAction()
     //server lähettää token ja card_id qt konsoliin
     //DebitvsCredit ikkunan asetus
     if(jsonObject.contains("token")) {
-        QString token = jsonObject["token"].toString();
-        QString cardId = jsonObject["card_id"].toString();
+        Environment:: token = jsonObject["token"].toString();
+        Environment:: cardId = jsonObject["card_id"].toInt();
+        Environment::accountId = jsonObject["account_id"].toInt();
         DebitvsCredit *objDebitvsCredit = new DebitvsCredit(this);
-        objDebitvsCredit->setToken(token);
+        objDebitvsCredit->setToken(Environment::token);
         objDebitvsCredit->show();
         qDebug() << "login ok";
-        qDebug() << "cardid:" << cardId;
-        qDebug() << "token:" << token;
+        qDebug() << "cardid:" << Environment::cardId;
+        qDebug() << "accountid:" << Environment::accountId;
+        qDebug() << "token:" << Environment::token;
     }
 
 

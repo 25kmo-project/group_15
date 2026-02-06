@@ -68,7 +68,8 @@ router.post('/', function(request, response){
                                 return response.status(200).json({
                                     success: true,
                                     message: "Login successful",
-                                    card_id: card_id,
+                                    card_id: Number(card_id),
+                                    account_id: result[0].account_id,
                                     token: token
                                 });
                             });
