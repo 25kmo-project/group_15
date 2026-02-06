@@ -20,7 +20,7 @@ const card={
 
       return db.query(
         'INSERT INTO card (card_number, pin_code, card_type, user_id, status) VALUES (?,?,?,?,?)',
-        [newCard.card_number, hash, ,newCard.card_type, newCard.user_id, newCard.status],
+        [newCard.card_number, hash, newCard.card_type, newCard.user_id, newCard.status],
         callback
       );
     });
