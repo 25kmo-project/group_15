@@ -65,11 +65,12 @@ router.post('/', function(request, response){
 
                                 const token = generateAccessToken(card_id);
                                 response.setHeader('Content-Type','application/json');
+                                const accountIds = result.map(r => r.account_id);
                                 return response.status(200).json({
                                     success: true,
                                     message: "Login successful",
                                     card_id: Number(card_id),
-                                    account_id: result[0].account_id,
+                                    account_id: accountIds,
                                     token: token
                                 });
                             });
