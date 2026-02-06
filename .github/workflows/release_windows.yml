@@ -46,10 +46,14 @@ jobs:
       - name: Package app for Release
         shell: powershell
         run: |
-          Compress-Archive -Path build\Release\* -DestinationPath BankApp-Windows-x64.zip
+          mkdir dist
+          copy build\Release\Pankkiautomaatti.exe dist\BankApp-Windows-x64.exe #kopioidaan .exe kansioon dist
+          Compress-Archive -Path build\Release\* -DestinationPath dist\BankApp-Windows-x64.zip #source koodi dist kansioon
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: BankApp-Windows-x64.zip
+          files: |
+            dist/BankApp-Windows-x64.exe #tiedosto näkyviin releasiin
+            dist/BankApp-Windows-x64.zip
           generate_release_notes: true
