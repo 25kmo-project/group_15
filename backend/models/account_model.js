@@ -2,17 +2,17 @@ const db = require('../routes/database'); // varmista, että tietokantayhteys on
 
 const account = {
 
-    // Hae kaikki tilit
+    // Haetaan kaikki tilit tietokannasta
     getAll: function (callback) {
         return db.query("SELECT * FROM account", callback);
     },
 
-    // Hae yksi tili ID:n perusteella
+    // Hae yksi tili tietokannasta ID:n perusteella
     getOne: function (account_id, callback) {
         return db.query("SELECT * FROM account WHERE account_id = ?", [account_id], callback);
     },
 
-    // Luo uusi tili
+    // Luo uusi tili tietokantaan
     add: function (account, callback) {
         return db.query(
             `INSERT INTO account (account_type, balance, credit_limit, status)
@@ -27,7 +27,7 @@ const account = {
         );
     },
 
-    // Päivitä tili
+    // Päivitä tili tietokannassa ID:n perusteella
     update: function (account, account_id, callback) {
         return db.query(
             `UPDATE account
@@ -44,7 +44,7 @@ const account = {
         );
     },
 
-    // Poista tili
+    // Poista tili tietokannasta ID:n perusteella
     delete: function (account_id, callback) {
         return db.query(
             "DELETE FROM account WHERE account_id=?",
