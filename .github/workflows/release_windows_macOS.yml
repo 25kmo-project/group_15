@@ -1,0 +1,113 @@
+# This workflow runs the build and release when a tag is pushed
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          cache: true
+          
+      - name: Configure CMake
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake -S bank-automat -B build ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_PREFIX_PATH="%Qt6_DIR%"
+            
+      - name: Build
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build --config Release
+          
+      - name: Deploy Qt dependencies
+        shell: cmd
+        run: |
+          cd build\Release
+          windeployqt Pankkiautomaatti.exe
+          
+      - name: Package app for Release
+        shell: powershell
+        run: |
+          mkdir dist
+          copy build\Release\Pankkiautomaatti.exe dist\BankApp-Windows-x64.exe
+          Compress-Archive -Path build\Release\* -DestinationPath dist\BankApp-Windows-x64.zip
+          
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/BankApp-Windows-x64.exe
+            dist/BankApp-Windows-x64.zip
+          generate_release_notes: true
+
+  release-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [clang_64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          host: 'mac'
+          target: 'desktop'
+          arch: ${{ matrix.arch }}
+          cache: true
+          
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake -S bank-automat -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_PREFIX_PATH="${Qt6_DIR}"
+            
+      - name: Build
+        shell: bash
+        run: |
+          cmake --build build --config Release
+          
+      - name: Package app for Release
+        shell: bash
+        run: |
+          # searching for Pankkiautomaatti.app
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: Pankkiautomaatti.app not found!"
+            exit 1
+          fi
+          echo "Found app at: $APP_PATH"
+          # luodaan .dmg tiedosto
+          mkdir -p build/dmg
+          cp -r "$APP_PATH" build/dmg/
+          hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
+          
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/BankApp-macOS-arm64.dmg
+          generate_release_notes: true

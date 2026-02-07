@@ -64,13 +64,27 @@ router.post('/', function(request, response){
                                 }
 
                                 const token = generateAccessToken(card_id);
+
+                                //tarkistetaan kortin tyypit: debit ja credit rivit 69-77
+                                const accountTypes = [];
+                                const accountIds = [];
+
+                                for(let i = 0; i < result.length; i++){
+                                    accountIds.push(result[i].account_id);
+    
+                                    if(!accountTypes.includes(result[i].account_type)){
+                                        accountTypes.push(result[i].account_type);
+                                        }
+                                }
+                                //vastaus json-muodossa
                                 response.setHeader('Content-Type','application/json');
-                                const accountIds = result.map(r => r.account_id);
                                 return response.status(200).json({
                                     success: true,
                                     message: "Login successful",
                                     card_id: Number(card_id),
                                     account_id: accountIds,
+                                    account_types: accountTypes, //saadaan tili tyypit
+                                    side_selection: accountTypes.length > 1, //jos vastus on enemmän kuin 1->true
                                     token: token
                                 });
                             });
