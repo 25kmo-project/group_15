@@ -91,17 +91,21 @@ jobs:
         run: |
           cmake --build build --config Release
           
-      - name: Package app for Release
+      - name: Deploy Qt dependencies
         shell: bash
         run: |
-          # searching for Pankkiautomaatti.app
           APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
           if [ -z "$APP_PATH" ]; then
             echo "ERROR: Pankkiautomaatti.app not found!"
             exit 1
           fi
           echo "Found app at: $APP_PATH"
-          # luodaan .dmg tiedosto
+          macdeployqt "$APP_PATH" -verbose=2
+          
+      - name: Package app for Release
+        shell: bash
+        run: |
+          APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
           mkdir -p build/dmg
           cp -r "$APP_PATH" build/dmg/
           hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
