@@ -31,7 +31,7 @@ app.use('/user', userRouter);
 app.use('/transaction', transactionRouter);
 app.use('/cards', cardRouter);
 app.use('/account_access', accountAccessRouter);
-app.use('/account', accountRouter); // määritellään /account-reititin
+app.use('/accounts', accountRouter);
 
 
 //tarkisus jwt(jason web token)
