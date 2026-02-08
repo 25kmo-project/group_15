@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "menu.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -68,9 +69,23 @@ void MainWindow::loginAction()
         }
         qDebug() << "Total accounts found:" << Environment::accountIds.size();
 
-        DebitvsCredit *objDebitvsCredit = new DebitvsCredit(this);
-        objDebitvsCredit->setToken(Environment::token);
-        objDebitvsCredit->show();
+        // SINGLE: suoraan Menuun
+        if (Environment::accountIds.size() == 1) {
+            Environment::accountId = Environment::accountIds.first(); // (lisää tämä muuttuja jos ei ole)
+            menu *m = new menu(this);
+            m->show();
+            this->hide();
+        }
+        // DUAL: DebitvsCredit → Menu
+        else if (Environment::accountIds.size() > 1) {
+            DebitvsCredit *objDebitvsCredit = new DebitvsCredit(this);
+            objDebitvsCredit->setToken(Environment::token);
+            objDebitvsCredit->show();
+            this->hide();
+        }
+        else {
+            ui->labelInfo->setText("No accounts linked to this card.");
+        }
 
         qDebug() << "login ok";
         qDebug() << "cardid:" << Environment::cardId;
@@ -80,4 +95,5 @@ void MainWindow::loginAction()
 
 
 
-}
+    }
+
