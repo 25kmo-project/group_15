@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
     debitvscredit.cpp
     debitvscredit.h
     debitvscredit.ui
+
+    appicon.rc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
