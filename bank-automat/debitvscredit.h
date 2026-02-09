@@ -26,6 +26,9 @@ private:
     QString token;
     int cardId;
     int accountId;
+private slots:
+    void DebitButtonClicked();
+    void CreditButtonClicked();
 };
 
 #endif // DEBITVSCREDIT_H

@@ -1,4 +1,5 @@
 #include "debitvscredit.h"
+#include "menu.h"
 #include "ui_debitvscredit.h"
 
 
@@ -9,6 +10,8 @@ DebitvsCredit::DebitvsCredit(QWidget *parent)
     ui->setupUi(this);
     this->cardId = Environment::cardId;
     this->accountId = Environment::accountId;
+    connect(ui->btnDebit, &QPushButton::clicked, this, &DebitvsCredit::DebitButtonClicked);
+    connect(ui->btnCredit, &QPushButton::clicked, this, &DebitvsCredit::CreditButtonClicked);
 }
 
 DebitvsCredit::~DebitvsCredit()
@@ -23,4 +26,26 @@ void DebitvsCredit::setToken(const QString &newToken)
     qDebug()<<token;
     qDebug() << "Current cardId: " << cardId;
     qDebug() << "Current accountId: " << accountId;
+}
+
+void DebitvsCredit::DebitButtonClicked()
+{
+    if(Environment::accountIds.size() > 0){
+        Environment::accountId = Environment::accountIds[0];
+        qDebug()<<"Debit side"<<Environment::accountId;
+        menu *m = new menu(this);
+        m->show();
+        this->close();
+    }
+}
+
+void DebitvsCredit::CreditButtonClicked()
+{
+    if(Environment::accountIds.size() > 1){
+        Environment::accountId = Environment::accountIds[1];
+        qDebug()<<"Credit side"<<Environment::accountId;
+        menu *m = new menu(this);
+        m->show();
+        this->close();
+    }
 }
