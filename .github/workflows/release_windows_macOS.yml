@@ -101,6 +101,8 @@ jobs:
           fi
           echo "Found app at: $APP_PATH"
           macdeployqt "$APP_PATH" -verbose=2
+          xattr -cr "$APP_PATH"
+          codesign --force --deep --sign - "$APP_PATH"
           
       - name: Package app for Release
         shell: bash
