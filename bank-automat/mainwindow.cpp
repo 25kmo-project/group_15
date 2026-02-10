@@ -72,7 +72,7 @@ void MainWindow::loginAction()
         // SINGLE: suoraan Menuun
         if (Environment::accountIds.size() == 1) {
             Environment::accountId = Environment::accountIds.first(); // (lisää tämä muuttuja jos ei ole)
-            menu *m = new menu(this);
+            Menu *m = new Menu(this);
             m->show();
             this->hide();
         }

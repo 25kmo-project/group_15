@@ -33,7 +33,7 @@ void DebitvsCredit::DebitButtonClicked()
     if(Environment::accountIds.size() > 0){
         Environment::accountId = Environment::accountIds[0];
         qDebug()<<"Debit side"<<Environment::accountId;
-        menu *m = new menu(this);
+        Menu *m = new Menu(this);
         m->show();
         this->close();
     }
@@ -44,7 +44,7 @@ void DebitvsCredit::CreditButtonClicked()
     if(Environment::accountIds.size() > 1){
         Environment::accountId = Environment::accountIds[1];
         qDebug()<<"Credit side"<<Environment::accountId;
-        menu *m = new menu(this);
+        Menu *m = new Menu(this);
         m->show();
         this->close();
     }

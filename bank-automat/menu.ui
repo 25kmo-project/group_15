@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>menu</class>
- <widget class="QDialog" name="menu">
+ <class>Menu</class>
+ <widget class="QDialog" name="Menu">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,8 +25,9 @@
    <property name="text">
     <string>My profile</string>
    </property>
-  </widget>
+  </widget> 
   <widget class="QPushButton" name="btnBalance">
+ 
    <property name="geometry">
     <rect>
      <x>100</x>
