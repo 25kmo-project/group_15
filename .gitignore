@@ -1,6 +1,7 @@
 backend/node_modules/
 bank-automat/build/
 bank-automat/*.user
+bank-automat/output/
 .qtcreator/
 backend/.env
 .DS_Store
