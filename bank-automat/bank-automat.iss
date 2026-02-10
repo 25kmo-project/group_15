@@ -1,4 +1,4 @@
-; myweather Setup Script for Inno Setup
+; Pankkiautomaatti Setup Script for Inno Setup
 ; Requires Inno Setup 6.0 or later
 
 #define MyAppName "Pankkiautomaatti"
@@ -19,9 +19,6 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=
-InfoBeforeFile=
-InfoAfterFile=
 OutputDir=output
 OutputBaseFilename=PankkiautomaattiSetup
 SetupIconFile=bankicon.ico
@@ -49,7 +46,6 @@ Source: "build\Desktop_Qt_6_8_3_MinGW_64_bit-Release\*"; DestDir: "{app}"; Flags
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "bankicon.ico"
 
 [Run]
