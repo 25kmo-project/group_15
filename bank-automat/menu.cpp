@@ -3,6 +3,7 @@
 #include "deposit.h"
 #include <QUrlQuery>
 #include <QDebug>
+#include "transactionhistory.h"
 
 
 Menu::Menu(QWidget *parent)
@@ -11,6 +12,10 @@ Menu::Menu(QWidget *parent)
 {
     ui->setupUi(this);
     networkManager = new QNetworkAccessManager(this);
+    ui->stackedWidget->setCurrentIndex(0);
+    connect(ui->backButton, &QPushButton::clicked, this, [=]() {
+        ui->stackedWidget->setCurrentIndex(0);
+    });
 }
 
 Menu::~Menu()
@@ -70,6 +75,7 @@ void Menu::on_btnBalance_clicked()
 
 void Menu::onBalanceReceived()
 {
+     ui->stackedWidget->setCurrentIndex(1);
     // 1.Check if the network response was successful
     if (reply->error() == QNetworkReply::NoError) {
         // Read the raw response data and parse it into a JSON document
@@ -83,14 +89,34 @@ void Menu::onBalanceReceived()
 
         qDebug() << "Balance received:" << balance;
         // Update the UI Label
-        ui->btnBalance->setText(QString::number(balance, 'f', 2) + " €");
+        ui->labelBalance2->setText(QString::number(balance, 'f', 2) + " €");
 
 
     } else {
         // 2.Handle network errors or server-side failures
         qDebug() << "Error fetching balance:" << reply->errorString();
-        ui->btnBalance->setText("Error!");
+        ui->labelBalance2->setText("Error!");
     }
 
     reply->deleteLater();
+}
+
+void Menu::on_btnTransactionHistory_clicked() {
+    if (Environment::token.isEmpty()) {
+        qDebug() << "Error: Token is empty, cannot open history";
+        return;
+    }
+    
+    // new windows
+    TransactionHistory *historyWin = new TransactionHistory(
+        Environment::accountId, 
+        Environment::cardId, 
+        Environment::token, 
+        this
+    );
+    historyWin->setAttribute(Qt::WA_DeleteOnClose); 
+    
+    connect(historyWin, &QWidget::destroyed, this, &Menu::show);
+    
+    historyWin->show();
 }

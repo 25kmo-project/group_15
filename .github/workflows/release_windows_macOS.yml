@@ -44,19 +44,39 @@ jobs:
         run: |
           cd build\Release
           windeployqt Pankkiautomaatti.exe
-          
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build Windows Installer
+        shell: powershell
+        run: |
+          if (Test-Path "build\Release\Pankkiautomaatti.exe") {
+            Write-Host "✓ Found Pankkiautomaatti.exe"
+            
+            & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "bank-automat\bank-automat.iss"
+          } else {
+            Write-Error "ERROR: build\Release\Pankkiautomaatti.exe not found!"
+            exit 1
+          }
+
       - name: Package app for Release
         shell: powershell
         run: |
           mkdir dist
-          copy build\Release\Pankkiautomaatti.exe dist\BankApp-Windows-x64.exe
-          Compress-Archive -Path build\Release\* -DestinationPath dist\BankApp-Windows-x64.zip
+
+          if (Test-Path "bank-automat\output\PankkiautomaattiSetup.exe") {
+            Copy-Item "bank-automat\output\PankkiautomaattiSetup.exe" "dist\BankApp-Windows-x64-Setup.exe"
+          }
+          
+          Compress-Archive -Path "build\Release\*" -DestinationPath "dist\BankApp-Windows-x64.zip"
           
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/BankApp-Windows-x64.exe
+            dist/BankApp-Windows-x64-Setup.exe
             dist/BankApp-Windows-x64.zip
           generate_release_notes: true
 
