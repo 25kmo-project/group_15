@@ -34,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         menu.h menu.cpp menu.ui
         deposit.h deposit.cpp deposit.ui
+        transactionhistory.h transactionhistory.cpp transactionhistory.ui
 
 
     )
