@@ -50,10 +50,16 @@ jobs:
           choco install innosetup -y
 
       - name: Build Windows Installer
-        shell: cmd
+        shell: powershell
         run: |
-          cd bank-automat
-          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" bank-automat.iss
+          if (Test-Path "build\Release\Pankkiautomaatti.exe") {
+            Write-Host "✓ Found Pankkiautomaatti.exe"
+            
+            & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "bank-automat\bank-automat.iss"
+          } else {
+            Write-Error "ERROR: build\Release\Pankkiautomaatti.exe not found!"
+            exit 1
+          }
 
       - name: Package app for Release
         shell: powershell
@@ -70,7 +76,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/BankApp-Windows-x64.exe
+            dist/BankApp-Windows-x64-Setup.exe
             dist/BankApp-Windows-x64.zip
           generate_release_notes: true
 
