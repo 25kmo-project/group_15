@@ -11,6 +11,8 @@
 #include <QJsonArray>
 #include "environment.h"
 
+class TransactionHistory;
+
 namespace Ui {
 class Menu;
 }
@@ -29,10 +31,12 @@ private:
     QNetworkReply *reply;
 
     void setupRequest(QNetworkRequest &request, const QString &path);
+    TransactionHistory* ptrTransactionHistory = nullptr;
 
 private slots:
     void on_btnBalance_clicked();
     void onBalanceReceived();
+    void on_btnTransactionHistory_clicked();
 
 
 };

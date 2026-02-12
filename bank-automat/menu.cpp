@@ -2,6 +2,7 @@
 #include "ui_menu.h"
 #include <QUrlQuery>
 #include <QDebug>
+#include "transactionhistory.h"
 
 Menu::Menu(QWidget *parent)
     : QDialog(parent)
@@ -83,4 +84,24 @@ void Menu::onBalanceReceived()
     }
 
     reply->deleteLater();
+}
+
+void Menu::on_btnTransactionHistory_clicked() {
+    if (Environment::token.isEmpty()) {
+        qDebug() << "Error: Token is empty, cannot open history";
+        return;
+    }
+    
+    // new windows
+    TransactionHistory *historyWin = new TransactionHistory(
+        Environment::accountId, 
+        Environment::cardId, 
+        Environment::token, 
+        this
+    );
+    historyWin->setAttribute(Qt::WA_DeleteOnClose); 
+    
+    connect(historyWin, &QWidget::destroyed, this, &Menu::show);
+    
+    historyWin->show();
 }
