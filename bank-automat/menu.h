@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "environment.h"
+#include "deposit.h"
 
 namespace Ui {
 class Menu;
@@ -33,6 +34,7 @@ private:
 private slots:
     void on_btnBalance_clicked();
     void onBalanceReceived();
+    void on_btnDeposit_clicked();
 
 
 };

@@ -184,6 +184,116 @@ const transaction = {
         }); // end getConnection
     },
 
+// deposit function
+deposit: function(data, callback) {
+    const { account_id, card_id, amount } = data;
+
+    // 1. Input Validation
+    if (!amount || amount <= 0) {
+        return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0' });
+    }
+
+    db.getConnection(function(err, connection) {
+        if (err) return callback(err);
+
+        connection.beginTransaction(function(err) {
+            if (err) {
+                connection.release();
+                return callback(err);
+            }
+
+            // 2. Check access + card status with row lock
+            const checkSql = `
+                SELECT 
+                    a.balance,
+                    c.status AS card_status,
+                    aa.access_type
+                FROM account a
+                JOIN account_access aa ON a.account_id = aa.account_id 
+                JOIN card c ON aa.card_id = c.card_id
+                WHERE a.account_id = ? AND c.card_id = ?
+                FOR UPDATE`;
+
+            connection.query(checkSql, [account_id, card_id], function(err, results) {
+                if (err) {
+                    return connection.rollback(function() {
+                        connection.release();
+                        callback(err);
+                    });
+                }
+
+                if (results.length === 0) {
+                    return connection.rollback(function() {
+                        connection.release();
+                        callback({ error: 'NOT_FOUND', message: 'Invalid Account or Card' });
+                    });
+                }
+
+                const { balance, card_status, access_type } = results[0];
+
+                if (access_type !== 'FULL') {
+                    return connection.rollback(function() {
+                        connection.release();
+                        callback({ error: 'UNAUTHORIZED', message: 'This card only has view access' });
+                    });
+                }
+
+                if (card_status !== 'ACTIVE') {
+                    return connection.rollback(function() {
+                        connection.release();
+                        callback({ error: 'LOCKED', message: 'Card is not active' });
+                    });
+                }
+
+                const bal = parseFloat(balance);
+
+                // 3. Update balance
+                connection.query(
+                    "UPDATE account SET balance = balance + ? WHERE account_id = ?",
+                    [amount, account_id],
+                    function(err) {
+                        if (err) {
+                            return connection.rollback(function() {
+                                connection.release();
+                                callback(err);
+                            });
+                        }
+
+                        // 4. Log transaction
+                        connection.query(
+                            "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES ('DEPOSIT', ?, ?, ?)",
+                            [amount, account_id, card_id],
+                            function(err, insRes) {
+                                if (err) {
+                                    return connection.rollback(function() {
+                                        connection.release();
+                                        callback(err);
+                                    });
+                                }
+
+                                connection.commit(function(err) {
+                                    if (err) {
+                                        return connection.rollback(function() {
+                                            connection.release();
+                                            callback(err);
+                                        });
+                                    }
+
+                                    connection.release();
+                                    callback(null, {
+                                        transaction_id: insRes.insertId,
+                                        new_balance: parseFloat((bal + amount).toFixed(2))
+                                    });
+                                });
+                            }
+                        );
+                    }
+                );
+            });
+        });
+    });
+},
+    
     //View Transaction History
     getTransactionHistory: function(data, callback) {
         const { account_id, card_id, page } = data;

@@ -78,4 +78,27 @@ router.get('/balance', authenticateToken, function(req, res) {
         res.json(result);
     });
 });
+
+// create a new deposit transaction
+router.post('/deposit', authenticateToken, function(req, res) {
+    const { account_id, card_id, amount } = req.body;
+
+    if (req.user.card_id != card_id) {
+        return res.status(403).json({ error: "Access denied" });
+    }
+
+    transaction.deposit({ account_id, card_id, amount }, function(err, result) {
+        if (err) {
+            const clientErrors = ['INVALID_AMOUNT', 'NOT_FOUND', 'LOCKED', 'UNAUTHORIZED'];
+            const statusCode = clientErrors.includes(err.error) ? 400 : 500; 
+            return res.status(statusCode).json(err);
+        }
+
+        res.json({
+            status: "SUCCESS",
+            ...result,
+            transaction_date: new Date()
+        });
+    });
+});
 module.exports = router;

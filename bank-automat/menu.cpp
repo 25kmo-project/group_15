@@ -1,7 +1,9 @@
 #include "menu.h"
 #include "ui_menu.h"
+#include "deposit.h"
 #include <QUrlQuery>
 #include <QDebug>
+
 
 Menu::Menu(QWidget *parent)
     : QDialog(parent)
@@ -26,6 +28,19 @@ void Menu::setupRequest(QNetworkRequest &request, const QString &path)
     request.setRawHeader("Authorization", authHeader);
 
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+}
+
+void Menu::on_btnDeposit_clicked()
+{
+    Deposit d(this);
+    if (d.exec() == QDialog::Accepted) {
+        on_btnBalance_clicked();
+    }
+}
+
+void Deposit::on_btnBack_clicked()
+{
+    this->reject();  // closes deposit window
 }
 
 
