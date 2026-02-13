@@ -49,7 +49,7 @@ jobs:
         shell: pwsh
         run: |
           if (Test-Path "build\Release\Pankkiautomaatti.exe") {
-            Write-Host "✓ Found Pankkiautomaatti.exe"
+            Write-Host "Found Pankkiautomaatti.exe"
             Get-Item "build\Release\Pankkiautomaatti.exe" | Select-Object Name, Length, LastWriteTime
           } else {
             Write-Host "ERROR: Executable not found!"
@@ -66,7 +66,7 @@ jobs:
         shell: pwsh
         run: |
           if (Test-Path "build\Release\Pankkiautomaatti.exe") {
-            Write-Host "✓ Building installer..."
+            Write-Host "Building installer..."
             
             # Run Inno Setup compiler
             & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "bank-automat\bank-automat.iss"
@@ -76,7 +76,7 @@ jobs:
               exit 1
             }
             
-            Write-Host "✓ Installer built successfully"
+            Write-Host "Installer built successfully"
           } else {
             Write-Error "ERROR: build\Release\Pankkiautomaatti.exe not found!"
             exit 1
@@ -89,13 +89,13 @@ jobs:
 
           if (Test-Path "bank-automat\output\PankkiautomaattiSetup.exe") {
             Copy-Item "bank-automat\output\PankkiautomaattiSetup.exe" "dist\BankApp-Windows-x64-Setup.exe"
-            Write-Host "✓ Copied installer to dist"
+            Write-Host "Copied installer to dist"
           } else {
             Write-Warning "Installer not found, skipping copy"
           }
           
           Compress-Archive -Path "build\Release\*" -DestinationPath "dist\BankApp-Windows-x64.zip"
-          Write-Host "✓ Created portable ZIP archive"
+          Write-Host "Created portable ZIP archive"
           
           # List final artifacts
           Write-Host "`nFinal artifacts:"
@@ -150,11 +150,11 @@ jobs:
             find build -type d -name "*.app"
             exit 1
           fi
-          echo "✓ Found app at: $APP_PATH"
+          echo "Found app at: $APP_PATH"
           macdeployqt "$APP_PATH" -verbose=2
           xattr -cr "$APP_PATH"
           codesign --force --deep --sign - "$APP_PATH"
-          echo "✓ App deployed and signed"
+          echo "App deployed and signed"
           
       - name: Package app for Release
         shell: bash
@@ -163,7 +163,7 @@ jobs:
           mkdir -p build/dmg
           cp -r "$APP_PATH" build/dmg/
           hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
-          echo "✓ DMG created successfully"
+          echo "DMG created successfully"
           ls -lh build/BankApp-macOS-arm64.dmg
           
       - name: Upload Release Assets

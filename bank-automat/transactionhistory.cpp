@@ -4,10 +4,10 @@
 #include <QHeaderView>
 #include <QDebug>
 #include <QUrlQuery>
-#include <QNetworkRequest> 
+#include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QJsonDocument>
-#include <QJsonArray> 
+#include <QJsonArray>
 #include <QJsonObject>
 
 TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *parent) :
@@ -16,12 +16,14 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
 {
     ui->setupUi(this);
     manager = new QNetworkAccessManager(this);
+
     if (!ui->tableTransactions) {
-         qDebug() << "Table widget not found in UI!";
-         return; 
+        qDebug() << "Table widget not found in UI!";
+        return;
     }
+
     initTableStyle();
-    displayData(); 
+    displayData();
 }
 
 TransactionHistory::~TransactionHistory()
@@ -33,26 +35,33 @@ void TransactionHistory::initTableStyle()
 {
     QHeaderView *header = ui->tableTransactions->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
-    
+
     header->setSectionResizeMode(0, QHeaderView::Stretch);
-    
+
     header->setSectionResizeMode(1, QHeaderView::Fixed);
     ui->tableTransactions->setColumnWidth(1, 100); // Type
-    
+
     header->setSectionResizeMode(2, QHeaderView::Fixed);
     ui->tableTransactions->setColumnWidth(2, 100); // Amount
-    
+
     header->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(3, 60);  // ID
+    ui->tableTransactions->setColumnWidth(3, 60); // ID
 
     ui->tableTransactions->verticalHeader()->setVisible(false);
 }
 
 void TransactionHistory::displayData()
 {
+    if (!ui->lblPageNumber) {
+        qDebug() << "ERROR: lblPageNumber is NULL!";
+        return;
+    }
+
     ui->lblPageNumber->setText(QString("Page: %1").arg(currentPage));
+
     QString path = "transaction/history";
     QUrl url(Environment::base_url() + path);
+
     QUrlQuery query;
     query.addQueryItem("account_id", QString::number(accountId));
     query.addQueryItem("card_id", QString::number(cardId));
@@ -70,7 +79,6 @@ void TransactionHistory::displayData()
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
             QJsonArray jsonArray = doc.array();
-
             // new page,clear old data
             ui->tableTransactions->setRowCount(0);
 
@@ -82,7 +90,6 @@ void TransactionHistory::displayData()
 
             // if page is 1,disable previous page button
             ui->btnPrevPage->setEnabled(currentPage > 1);
-
             // 4. populate the table with data
             for (const QJsonValue &value : jsonArray) {
                 QJsonObject obj = value.toObject();
@@ -90,6 +97,7 @@ void TransactionHistory::displayData()
                 ui->tableTransactions->insertRow(row);
 
                 ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(obj["Aika"].toString()));
+
                 QTableWidgetItem *typeItem = new QTableWidgetItem(obj["Tyyppi"].toString());
                 typeItem->setTextAlignment(Qt::AlignCenter);
                 ui->tableTransactions->setItem(row, 1, typeItem);
@@ -110,14 +118,12 @@ void TransactionHistory::displayData()
         reply->deleteLater();
     });
 }
-
 // next page
 void TransactionHistory::on_btnNextPage_clicked()
 {
     currentPage++;
-    displayData(); 
+    displayData();
 }
-
 // previous page
 void TransactionHistory::on_btnPrevPage_clicked()
 {
@@ -126,9 +132,8 @@ void TransactionHistory::on_btnPrevPage_clicked()
         displayData();
     }
 }
-
 // back to menu
 void TransactionHistory::on_btnBackToMenu_clicked()
 {
-    this->close(); 
+    this->close();
 }
