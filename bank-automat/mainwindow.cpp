@@ -62,12 +62,18 @@ void MainWindow::loginAction()
     if(jsonObject.contains("token")) {
         Environment:: token = jsonObject["token"].toString();
         Environment:: cardId = jsonObject["card_id"].toInt();
+        Environment::userId = jsonObject["user_id"].toInt();
         Environment::accountIds.clear();
         QJsonArray accounts = jsonObject["account_id"].toArray();
         for (const QJsonValue &value : accounts) {
             Environment::accountIds.append(value.toInt());
         }
         qDebug() << "Total accounts found:" << Environment::accountIds.size();
+        qDebug() << "login ok";
+        qDebug() << "cardid:" << Environment::cardId;
+        qDebug() << "userId:" << Environment::userId;
+        qDebug() << "accountid:" << Environment::accountIds;
+        qDebug() << "token:" << Environment::token;
 
         // SINGLE: suoraan Menuun
         if (Environment::accountIds.size() == 1) {
@@ -86,11 +92,6 @@ void MainWindow::loginAction()
         else {
             ui->labelInfo->setText("No accounts linked to this card.");
         }
-
-        qDebug() << "login ok";
-        qDebug() << "cardid:" << Environment::cardId;
-        qDebug() << "accountid:" << Environment::accountIds;
-        qDebug() << "token:" << Environment::token;
     }
 
 

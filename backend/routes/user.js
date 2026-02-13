@@ -31,8 +31,8 @@ router.get('/:user_id', function(request, response){
 });
 
 //lisätään uusi user
-router.post('/',function(request,response){
-    user.add(request.body,function(err,result){
+router.post('/:user_id',function(request,response){
+    user.add(request.body,request.params.user_id,function(err,result){
         if(err){
             response.send(err);
         }

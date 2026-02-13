@@ -4,9 +4,9 @@ const db = require('../routes/database');
 //luodaan objektin nimeltä login
 const login={
     
-    //sadaan card_id, pin_code, status, failed_pin_attempts, account_id, account_type
+    //sadaan card_id, pin_code, status, failed_pin_attempts, account_id, account_type, user_id
     getCardIdPincode: function(card_id, callback) {
-        const query = `SELECT c.card_id, c.pin_code, c.status, c.failed_pin_attempts,aa.account_id, a.account_type 
+        const query = `SELECT c.card_id, c.pin_code, c.status, c.failed_pin_attempts,aa.account_id, a.account_type, a.user_id 
                        FROM card c JOIN account_access aa ON c.card_id = aa.card_id JOIN account a on aa.account_id = a.account_id
                        WHERE c.card_id = ?`;
         return db.query(query,[card_id], callback);

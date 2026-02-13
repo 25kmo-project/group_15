@@ -20,8 +20,8 @@ const user={
 
 //muokataan user:n tietoja
     update: function(user, user_id, callback){
-        return db. query ("UPDATE user SET user_name=?, user_lastname=?, user_address=?, user_email=?, user_phonenumber=? WHERE user_id=?", 
-            [user.user_name, user.user_lastname, user.user_address, user.user_email, user.user_phonenumber, user_id], callback)
+        return db. query ("UPDATE user SET user_address=?, user_email=?, user_phonenumber=? WHERE user_id=?", 
+            [user.user_address, user.user_email, user.user_phonenumber, user_id], callback)
     },
 
 //poistetaan user kokonaan tietokannasta
