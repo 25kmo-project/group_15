@@ -184,6 +184,41 @@ const transaction = {
         }); // end getConnection
     },
 
+// deposit function (STORED PROCEDURE)
+deposit: function (data, callback) {
+    const { account_id, card_id, amount } = data;
+
+    // 1) Input validation
+    if (!amount || amount <= 0) {
+        return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0' });
+    }
+
+    // 2) Call stored procedure
+    return db.query(
+        "CALL deposit_money(?, ?, ?)",
+        [account_id, card_id, amount],
+        function (err, results) {
+            if (err) {
+                return callback({
+                    error: 'DB_ERROR',
+                    message: err.sqlMessage || err.message || 'Deposit failed'
+                });
+            }
+
+            // Stored procedure tekee SELECT new_balance
+            const newBalance =
+                results && results[0] && results[0][0] && results[0][0].new_balance !== undefined
+                    ? parseFloat(results[0][0].new_balance)
+                    : null;
+
+            callback(null, {
+                status: "SUCCESS",
+                new_balance: newBalance
+            });
+        }
+    );
+},
+    
     //View Transaction History
     getTransactionHistory: function(data, callback) {
         const { account_id, card_id, page } = data;

@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         menu.h menu.cpp menu.ui
+        deposit.h deposit.cpp deposit.ui
         transactionhistory.h transactionhistory.cpp transactionhistory.ui
         clientinfo.h clientinfo.cpp clientinfo.ui
 
