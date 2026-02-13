@@ -45,32 +45,61 @@ jobs:
           cd build\Release
           windeployqt Pankkiautomaatti.exe
 
+      - name: Verify executable exists
+        shell: pwsh
+        run: |
+          if (Test-Path "build\Release\Pankkiautomaatti.exe") {
+            Write-Host "✓ Found Pankkiautomaatti.exe"
+            Get-Item "build\Release\Pankkiautomaatti.exe" | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Host "ERROR: Executable not found!"
+            Write-Host "Listing build directory contents:"
+            Get-ChildItem -Path "build" -Recurse -File | Select-Object FullName
+            exit 1
+          } 
+
       - name: Install Inno Setup
         run: |
           choco install innosetup -y
 
       - name: Build Windows Installer
-        shell: powershell
+        shell: pwsh
         run: |
           if (Test-Path "build\Release\Pankkiautomaatti.exe") {
-            Write-Host "✓ Found Pankkiautomaatti.exe"
+            Write-Host "✓ Building installer..."
             
+            # Run Inno Setup compiler
             & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "bank-automat\bank-automat.iss"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
+              exit 1
+            }
+            
+            Write-Host "✓ Installer built successfully"
           } else {
             Write-Error "ERROR: build\Release\Pankkiautomaatti.exe not found!"
             exit 1
           }
 
       - name: Package app for Release
-        shell: powershell
+        shell: pwsh
         run: |
-          mkdir dist
+          New-Item -ItemType Directory -Force -Path "dist"
 
           if (Test-Path "bank-automat\output\PankkiautomaattiSetup.exe") {
             Copy-Item "bank-automat\output\PankkiautomaattiSetup.exe" "dist\BankApp-Windows-x64-Setup.exe"
+            Write-Host "✓ Copied installer to dist"
+          } else {
+            Write-Warning "Installer not found, skipping copy"
           }
           
           Compress-Archive -Path "build\Release\*" -DestinationPath "dist\BankApp-Windows-x64.zip"
+          Write-Host "✓ Created portable ZIP archive"
+          
+          # List final artifacts
+          Write-Host "`nFinal artifacts:"
+          Get-ChildItem "dist" | Select-Object Name, Length
           
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
@@ -117,12 +146,15 @@ jobs:
           APP_PATH=$(find build -name "Pankkiautomaatti.app" -type d | head -n 1)
           if [ -z "$APP_PATH" ]; then
             echo "ERROR: Pankkiautomaatti.app not found!"
+            echo "Listing build directory:"
+            find build -type d -name "*.app"
             exit 1
           fi
-          echo "Found app at: $APP_PATH"
+          echo "✓ Found app at: $APP_PATH"
           macdeployqt "$APP_PATH" -verbose=2
           xattr -cr "$APP_PATH"
           codesign --force --deep --sign - "$APP_PATH"
+          echo "✓ App deployed and signed"
           
       - name: Package app for Release
         shell: bash
@@ -131,6 +163,8 @@ jobs:
           mkdir -p build/dmg
           cp -r "$APP_PATH" build/dmg/
           hdiutil create -volname "Bank App" -srcfolder build/dmg -ov -format UDZO build/BankApp-macOS-arm64.dmg
+          echo "✓ DMG created successfully"
+          ls -lh build/BankApp-macOS-arm64.dmg
           
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
