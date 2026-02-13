@@ -96,13 +96,16 @@ void TransactionHistory::displayData()
                 int row = ui->tableTransactions->rowCount();
                 ui->tableTransactions->insertRow(row);
 
-                ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(obj["Aika"].toString()));
+                QString dateStr = obj.contains("DATE") ? obj["DATE"].toString() : obj["Aika"].toString();
+                dateStr = dateStr.replace("T", " ").left(19);
+                ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(dateStr));
 
                 QTableWidgetItem *typeItem = new QTableWidgetItem(obj["Tyyppi"].toString());
                 typeItem->setTextAlignment(Qt::AlignCenter);
                 ui->tableTransactions->setItem(row, 1, typeItem);
 
-                double amount = obj["Määrä"].toDouble();
+                QJsonValue amtVal = obj.contains("AMOUNT") ? obj["AMOUNT"] : obj["Määrä"];
+                double amount = amtVal.toString().toDouble();
                 QTableWidgetItem *amountItem = new QTableWidgetItem(QString::number(amount, 'f', 2) + " €");
                 amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
                 ui->tableTransactions->setItem(row, 2, amountItem);
