@@ -76,12 +76,16 @@ router.post('/', function(request, response){
                                         accountTypes.push(result[i].account_type);
                                         }
                                 }
+
+                                const user_id = result[0].user_id;
+
                                 //vastaus json-muodossa
                                 response.setHeader('Content-Type','application/json');
                                 return response.status(200).json({
                                     success: true,
                                     message: "Login successful",
                                     card_id: Number(card_id),
+                                    user_id: user_id,
                                     account_id: accountIds,
                                     account_types: accountTypes, //saadaan tili tyypit
                                     side_selection: accountTypes.length > 1, //jos vastus on enemmän kuin 1->true
