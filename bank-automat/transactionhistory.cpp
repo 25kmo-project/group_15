@@ -18,7 +18,7 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
     manager = new QNetworkAccessManager(this);
 
     if (!ui->tableTransactions) {
-        qDebug() << "ERROR: Table widget not found in UI!";
+        qDebug() << "Table widget not found in UI!";
         return;
     }
 
@@ -39,13 +39,13 @@ void TransactionHistory::initTableStyle()
     header->setSectionResizeMode(0, QHeaderView::Stretch);
 
     header->setSectionResizeMode(1, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(1, 100);
+    ui->tableTransactions->setColumnWidth(1, 100); // Type
 
     header->setSectionResizeMode(2, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(2, 100);
+    ui->tableTransactions->setColumnWidth(2, 100); // Amount
 
     header->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(3, 60);
+    ui->tableTransactions->setColumnWidth(3, 60); // ID
 
     ui->tableTransactions->verticalHeader()->setVisible(false);
 }
@@ -73,23 +73,24 @@ void TransactionHistory::displayData()
 
     QNetworkReply *reply = manager->get(request);
 
+    // connect the reply's finished signal to a lambda function to handle the response
     connect(reply, &QNetworkReply::finished, [this, reply]() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
             QJsonArray jsonArray = doc.array();
-
+            // new page,clear old data
             ui->tableTransactions->setRowCount(0);
 
-            if (!ui->btnNextPage || !ui->btnPrevPage) {
-                qDebug() << "ERROR: Navigation buttons not found!";
-                reply->deleteLater();
-                return;
+            if (jsonArray.size() < 10) {
+                ui->btnNextPage->setEnabled(false);
+            } else {
+                ui->btnNextPage->setEnabled(true);
             }
 
-            ui->btnNextPage->setEnabled(jsonArray.size() >= 10);
+            // if page is 1,disable previous page button
             ui->btnPrevPage->setEnabled(currentPage > 1);
-
+            // 4. populate the table with data
             for (const QJsonValue &value : jsonArray) {
                 QJsonObject obj = value.toObject();
                 int row = ui->tableTransactions->rowCount();
@@ -111,19 +112,19 @@ void TransactionHistory::displayData()
                 ui->tableTransactions->setItem(row, 3, idItem);
             }
         } else {
-            qDebug() << "Error fetching transaction history:" << reply->errorString();
+            qDebug() << "Error fetching data:" << reply->errorString();
             ui->btnNextPage->setEnabled(false);
         }
         reply->deleteLater();
     });
 }
-
+// next page
 void TransactionHistory::on_btnNextPage_clicked()
 {
     currentPage++;
     displayData();
 }
-
+// previous page
 void TransactionHistory::on_btnPrevPage_clicked()
 {
     if(currentPage > 1) {
@@ -131,7 +132,7 @@ void TransactionHistory::on_btnPrevPage_clicked()
         displayData();
     }
 }
-
+// back to menu
 void TransactionHistory::on_btnBackToMenu_clicked()
 {
     this->close();
