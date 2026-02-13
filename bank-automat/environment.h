@@ -14,6 +14,7 @@ public:
     static int cardId;
     static int accountId;
     static QList<int> accountIds;
+    static int userId;
 
 };
 

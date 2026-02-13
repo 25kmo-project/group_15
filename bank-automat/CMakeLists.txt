@@ -34,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         menu.h menu.cpp menu.ui
         transactionhistory.h transactionhistory.cpp transactionhistory.ui
+        clientinfo.h clientinfo.cpp clientinfo.ui
 
 
     )

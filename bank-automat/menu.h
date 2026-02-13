@@ -34,9 +34,14 @@ private:
     TransactionHistory* ptrTransactionHistory = nullptr;
 
 private slots:
+    //balance
     void on_btnBalance_clicked();
     void onBalanceReceived();
+    //transaction
     void on_btnTransactionHistory_clicked();
+    //my profile
+    void on_btnMyProfile_clicked();
+    void onMyProfileReceived();
 
 
 };
