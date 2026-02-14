@@ -101,4 +101,45 @@ router.post('/deposit', authenticateToken, function(req, res) {
         });
     });
 });
+
+router.post('/transfer', authenticateToken, function(request, response) {
+    // 1. check if request body exists
+    if (!request.body) {
+        return response.status(400).json({ error: "No request body received" });
+    }
+    
+    const data = {
+        sender_account_id: parseInt(request.body.sender_account_id),
+        receiver_account_number: request.body.receiver_account_number,
+        card_id: request.body.card_id, 
+        amount: parseFloat(request.body.amount)
+    };
+    
+    // 2. validate required parameters and their types
+    if (!data.sender_account_id || !data.receiver_account_number || !data.card_id || isNaN(data.amount)) {
+        return response.status(400).json({ error: "Missing or invalid parameters" });
+    }
+
+    // 3. validate that the card_id in the token matches the card_id in the request body
+    if (request.body.card_id != data.card_id) {
+        console.log(`Unauthorized: Token(${request.body.card_id}) vs Body(${data.card_id})`);
+        return response.status(403).json({ message: "UNAUTHORIZED_CARD" });
+    }
+
+    transaction.transfer(data, function(err, dbResult) {
+    if (err) {
+        console.error('SQL Error:', err.sqlMessage);
+        console.error('Data:', data);
+        return response.status(500).json({ message: err.sqlMessage || "Database Error" });
+    } else {
+        console.log('DB Result:', dbResult);
+        if (dbResult && dbResult[0] && dbResult[0][0]) {
+            response.json(dbResult[0][0]);
+        } else {
+            return response.json({ message: "Transfer completed" });
+        }
+     }
+    });
+});
+
 module.exports = router;
