@@ -1,11 +1,13 @@
-#include "menu.h"
-#include "ui_menu.h"
-#include "deposit.h"
 #include <QUrlQuery>
 #include <QDebug>
+#include <QApplication>
 #include "clientinfo.h"
 #include "transactionhistory.h"
 #include "transfer.h"
+#include "mainwindow.h"
+#include "menu.h"
+#include "ui_menu.h"
+#include "deposit.h"
 
 
 Menu::Menu(QWidget *parent)
@@ -145,4 +147,23 @@ void Menu::onMyProfileReceived()
     }
 
     reply->deleteLater();
+}
+
+void Menu::on_btnLogOut_clicked()
+{
+        //clear client's data
+        Environment::token = "";
+        Environment::userId = 0;
+        Environment::cardId = 0;
+        Environment::accountId = 0;
+        Environment::accountIds.clear();
+
+        qDebug() << "Log out";
+
+        //creating new mainwindow
+        MainWindow *newLoginWindow = new MainWindow();
+        newLoginWindow->show();
+
+        //close current window
+        this->close();
 }
