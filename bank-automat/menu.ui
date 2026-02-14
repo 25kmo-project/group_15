@@ -104,7 +104,7 @@
     <string>Receipt</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_8">
+  <widget class="QPushButton" name="btnTransfer">
    <property name="geometry">
     <rect>
      <x>100</x>
