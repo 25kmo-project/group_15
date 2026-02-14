@@ -45,6 +45,9 @@ private slots:
     //my profile
     void on_btnMyProfile_clicked();
     void onMyProfileReceived();
+    //log out
+    void on_btnLogOut_clicked();
+
 
 
 };
