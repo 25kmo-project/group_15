@@ -8,8 +8,7 @@ var userRouter = require('./routes/user');
 var transactionRouter = require('./routes/transaction');
 var cardRouter = require('./routes/card');
 var accountAccessRouter = require('./routes/account_access');
-var accountRouter = require('./routes/account'); // lisätty account-reititin
-//login
+var accountRouter = require('./routes/account');
 var loginRouter = require('./routes/login');
 const jwt = require('jsonwebtoken');
 
