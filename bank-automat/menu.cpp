@@ -3,6 +3,7 @@
 #include <QApplication>
 #include "clientinfo.h"
 #include "transactionhistory.h"
+#include "transfer.h"
 #include "mainwindow.h"
 #include "menu.h"
 #include "ui_menu.h"
@@ -104,6 +105,15 @@ void Menu::on_btnTransactionHistory_clicked()
 
     historyWin->show();
     this->hide();
+}
+
+void Menu::on_btnTransfer_clicked()
+{
+    Transfer t(Environment::accountId, Environment::cardId, Environment::token, this);
+
+    if (t.exec() == QDialog::Accepted) {
+        on_btnBalance_clicked(); 
+    }
 }
 
 void Menu::on_btnMyProfile_clicked()

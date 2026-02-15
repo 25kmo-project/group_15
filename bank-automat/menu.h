@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include "environment.h"
 #include "deposit.h"
+#include "transfer.h"
 
 class TransactionHistory;
 
@@ -33,6 +34,7 @@ private:
 
     void setupRequest(QNetworkRequest &request, const QString &path);
     TransactionHistory* ptrTransactionHistory = nullptr;
+    Transfer* ptrTransfer = nullptr;
 
 private slots:
     //balance
@@ -42,6 +44,8 @@ private slots:
     void on_btnTransactionHistory_clicked();
     //deposit
     void on_btnDeposit_clicked();
+    //Transfer
+    void on_btnTransfer_clicked();
     //my profile
     void on_btnMyProfile_clicked();
     void onMyProfileReceived();

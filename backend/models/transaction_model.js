@@ -282,6 +282,17 @@ deposit: function (data, callback) {
                 account_number: row.account_number
             });
         });
+    },
+    
+    transfer: function(data, callback) {
+        const { sender_account_id, receiver_account_number, card_id, amount } = data;
+        const sql = "CALL transfer_money(?, ?, ?, ?)";
+        
+        return db.query(
+            sql, 
+            [sender_account_id, receiver_account_number, card_id, amount], 
+            callback
+        );
     }
 };
 module.exports = transaction;
