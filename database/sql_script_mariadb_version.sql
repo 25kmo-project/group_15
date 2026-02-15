@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`account` (
   `credit_limit` DECIMAL(15,2) NULL DEFAULT NULL,
   `account_number` CHAR(18) NOT NULL,
   PRIMARY KEY (`account_id`),
-  INDEX `user_id_idx` (`user_id`),
+  INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   UNIQUE INDEX `account_number_UNIQUE` (`account_number`),
   CONSTRAINT `fk_account_user`
     FOREIGN KEY (`user_id`)
@@ -197,6 +197,89 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- =====================================================
+-- STORED PROCEDURE: TRANSFER
+-- =====================================================
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS transfer_money $$
+
+CREATE PROCEDURE transfer_money(
+    IN p_sender_acc_id INT,
+    IN p_receiver_acc_num CHAR(18), 
+    IN p_card_id INT,
+    IN p_amount DECIMAL(15,2)
+)
+BEGIN
+    DECLARE v_sender_balance DECIMAL(15,2);
+    DECLARE v_sender_type ENUM('DEBIT', 'CREDIT');
+    DECLARE v_sender_limit DECIMAL(15,2);
+    DECLARE v_receiver_acc_id INT;
+    DECLARE v_card_status VARCHAR(20);
+    DECLARE v_access_type VARCHAR(20);
+
+    -- 1. check amount
+    IF p_amount <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID_AMOUNT';
+    END IF;
+
+    START TRANSACTION;
+
+    -- 2. check sender info and lock the row
+    SELECT a.balance, a.account_type, a.credit_limit, c.status, aa.access_type
+      INTO v_sender_balance, v_sender_type, v_sender_limit, v_card_status, v_access_type
+    FROM account a
+    JOIN account_access aa ON aa.account_id = a.account_id
+    JOIN card c ON c.card_id = aa.card_id
+    WHERE a.account_id = p_sender_acc_id AND c.card_id = p_card_id
+    FOR UPDATE;
+
+    -- 3. sender account validation
+    IF v_access_type <> 'FULL' THEN
+        ROLLBACK; SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'UNAUTHORIZED';
+    END IF;
+
+    IF v_card_status <> 'ACTIVE' THEN
+        ROLLBACK; SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'CARD_LOCKED';
+    END IF;
+
+    -- 4. balance check based on account type
+    IF v_sender_type = 'DEBIT' AND (v_sender_balance < p_amount) THEN
+        ROLLBACK; SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INSUFFICIENT_FUNDS';
+    ELSEIF v_sender_type = 'CREDIT' AND (v_sender_balance - p_amount < -IFNULL(v_sender_limit, 0)) THEN
+        ROLLBACK; SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EXCEEDS_CREDIT_LIMIT';
+    END IF;
+
+    -- 5. check receiver account 
+    SELECT account_id INTO v_receiver_acc_id FROM account 
+    WHERE account_number = p_receiver_acc_num;
+
+    IF v_receiver_acc_id IS NULL THEN
+        ROLLBACK; SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'RECEIVER_NOT_FOUND';
+    END IF;
+
+    -- 6. amount transfer
+    UPDATE account SET balance = balance - p_amount WHERE account_id = p_sender_acc_id;
+    UPDATE account SET balance = balance + p_amount WHERE account_id = v_receiver_acc_id;
+
+    -- 7. record for both sender and receiver
+    INSERT INTO `transaction` (account_id, card_id, transaction_type, amount)
+    VALUES (p_sender_acc_id, p_card_id, 'TRANSFER', -p_amount);
+    
+    INSERT INTO `transaction` (account_id, card_id, transaction_type, amount)
+    VALUES (v_receiver_acc_id, NULL, 'TRANSFER', p_amount);
+
+    COMMIT;
+    
+    SELECT (v_sender_balance - p_amount) AS new_balance;
+
+END $$
+
+DELIMITER ;
+
+
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
