@@ -44,11 +44,6 @@ void Menu::on_btnDeposit_clicked()
     }
 }
 
-void Deposit::on_btnBack_clicked()
-{
-    this->reject();  // closes deposit window
-}
-
 
 void Menu::on_btnBalance_clicked()
 {
@@ -121,6 +116,16 @@ void Menu::on_btnTransfer_clicked()
     transferWin->show();
     this->hide();
 
+}
+void Menu::on_btnCurrency_clicked()
+{
+    if (Environment::token.isEmpty()) {
+        qDebug() << "Error: Token is empty, cannot open currency";
+        return;
+    }
+
+    Currency c(Environment::token, this);
+    c.exec();
 }
 
 void Menu::on_btnMyProfile_clicked()
