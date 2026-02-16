@@ -188,6 +188,18 @@ deposit: function (data, callback) {
                 return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
             }
 
+            //insert inquiry log
+            const logSql = `
+            INSERT INTO transaction (account_id, card_id, amount, transaction_type, transaction_date) 
+            VALUES (?, ?, 0.00, 'INQUIRY', NOW())`;
+        
+        db.query(logSql, [account_id, card_id], function(logErr) {
+            if (logErr) {
+                console.error("Failed to log Inquiry:", logErr.sqlMessage);
+            } else {
+                console.log(`Inquiry logged for account ${account_id}`);
+            }
+
             // 3. Return success data
             callback(null, {
                 owner: `${row.user_name} ${row.user_lastname}`,
@@ -195,6 +207,7 @@ deposit: function (data, callback) {
                 account_number: row.account_number
             });
         });
+       });
     },
     
     transfer: function(data, callback) {
