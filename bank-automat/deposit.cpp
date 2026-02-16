@@ -8,32 +8,36 @@
 #include <QDoubleValidator>
 #include <QDebug>
 #include <QTimer>
+#include <QLocale>
 
 
 Deposit::Deposit(QWidget *parent)
     : QDialog(parent),
-      ui(new Ui::Deposit),
+    ui(new Ui::Deposit),
     networkManager(new QNetworkAccessManager(this)),
     reply(nullptr)
-
 {
     ui->setupUi(this);
 
-    auto *validator = new QDoubleValidator(0, 1000000000, 2, this);
+    auto *validator = new QDoubleValidator(0.0, 1000000000.0, 2, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
+    validator->setLocale(QLocale(QLocale::Finnish, QLocale::Finland));
     ui->lineAmount->setValidator(validator);
 
     connect(ui->btnConfirm, &QPushButton::clicked, this, &Deposit::onConfirmClicked);
 }
 
-Deposit::~Deposit()
-{
-    delete ui;
-}
 void Deposit::onConfirmClicked()
 {
+    QString text = ui->lineAmount->text().trimmed();
+
     bool ok = false;
-    double amount = ui->lineAmount->text().trimmed().toDouble(&ok);
+    QLocale fi(QLocale::Finnish, QLocale::Finland);
+    double amount = fi.toDouble(text, &ok);
+
+    if (!ok) { // hyväksy myös piste
+        amount = QLocale::c().toDouble(text, &ok);
+    }
 
     if (!ok || amount <= 0.0) {
         ui->lblInfo->setText("Enter a positive amount.");
@@ -87,4 +91,13 @@ void Deposit::onReplyFinished()
     }
 
     reply->deleteLater();
+}
+Deposit::~Deposit()
+{
+    delete ui;
+}
+
+void Deposit::on_btnBack_clicked()
+{
+    reject();  // sulkee ikkunan ja palaa Menuun
 }
