@@ -109,11 +109,18 @@ void Menu::on_btnTransactionHistory_clicked()
 
 void Menu::on_btnTransfer_clicked()
 {
-    Transfer t(Environment::accountId, Environment::cardId, Environment::token, this);
+    Transfer *transferWin = new Transfer(Environment::accountId, Environment::cardId, Environment::token, this);
+    transferWin->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (t.exec() == QDialog::Accepted) {
-        on_btnBalance_clicked(); 
-    }
+    connect(transferWin, &QDialog::accepted, this, [this](){
+        on_btnBalance_clicked();
+    });
+
+    connect(transferWin, &QWidget::destroyed, this, &Menu::show);
+
+    transferWin->show();
+    this->hide();
+
 }
 
 void Menu::on_btnMyProfile_clicked()
