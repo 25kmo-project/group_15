@@ -10,6 +10,7 @@ var cardRouter = require('./routes/card');
 var accountAccessRouter = require('./routes/account_access');
 var accountRouter = require('./routes/account');
 var loginRouter = require('./routes/login');
+var currencyRouter = require('./routes/currency');
 const jwt = require('jsonwebtoken');
 
 var app = express();
@@ -31,6 +32,7 @@ app.use('/transaction', transactionRouter);
 app.use('/cards', cardRouter);
 app.use('/account_access', accountAccessRouter);
 app.use('/accounts', accountRouter);
+app.use('/currency', currencyRouter);
 
 
 //tarkisus jwt(jason web token)

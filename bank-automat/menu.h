@@ -12,6 +12,8 @@
 #include "environment.h"
 #include "deposit.h"
 #include "transfer.h"
+#include "currency.h"
+
 
 class TransactionHistory;
 
@@ -51,6 +53,8 @@ private slots:
     void onMyProfileReceived();
     //log out
     void on_btnLogOut_clicked();
+    //currency
+    void on_btnCurrency_clicked();
 
 
 

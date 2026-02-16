@@ -37,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         transactionhistory.h transactionhistory.cpp transactionhistory.ui
         clientinfo.h clientinfo.cpp clientinfo.ui
         transfer.h transfer.cpp transfer.ui
+        currency.h currency.cpp currency.ui
 
 
     )
