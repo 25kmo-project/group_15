@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>withdraw</class>
- <widget class="QWidget" name="withdraw">
+ <class>Withdraw</class>
+ <widget class="QDialog" name="Withdraw">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -65,7 +65,7 @@
     <string>100</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="amount">
+  <widget class="QLineEdit" name="lineAmount">
    <property name="geometry">
     <rect>
      <x>150</x>
@@ -88,17 +88,17 @@
     <string>Muu summa</string>
    </property>
   </widget>
-  <widget class="QLabel" name="saldo">
+  <widget class="QLabel" name="lblInfo">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>130</y>
-     <width>71</width>
+     <x>106</x>
+     <y>160</y>
+     <width>191</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Saldo 0 €</string>
+    <string>info</string>
    </property>
   </widget>
  </widget>

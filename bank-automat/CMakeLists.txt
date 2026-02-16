@@ -25,6 +25,10 @@ set(PROJECT_SOURCES
     debitvscredit.h
     debitvscredit.ui
 
+    withdraw.cpp
+    withdraw.h
+    withdraw.ui
+
     appicon.rc
 )
 
