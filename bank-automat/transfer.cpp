@@ -27,10 +27,15 @@ void Transfer::setupUiLogic()
     validator->setLocale(QLocale(QLocale::Finnish));
     ui->leAmount->setValidator(validator);
     ui->lblErrorDisplay->clear();
+    ui->labelTransfer->clear();
 }
 
 void Transfer::on_btnConfirm_clicked()
 {
+    //clean text in label and error display
+    ui->labelTransfer->clear();
+    ui->lblErrorDisplay->clear();
+
     QString receiverAcc = ui->leTargetAccount->text();
     // Use Finnish locale  to ensure comma is accepted as decimal separator
     bool ok;
@@ -67,9 +72,8 @@ void Transfer::on_btnConfirm_clicked()
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             double newBalance = doc.object()["new_balance"].toString().toDouble();
 
-            QMessageBox::information(this, "Success",
-                                     QString("Transfer successful!\nNew balance: %1 €").arg(newBalance, 0, 'f', 2));
-            this->close();
+            ui->labelTransfer->setText(QString("Transfer successful!\nNew balance: %1 €").arg(newBalance, 0, 'f', 2));
+
         } else {
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
