@@ -22,14 +22,25 @@ Transfer::~Transfer()
 void Transfer::setupUiLogic()
 {
     // Restrict amount to numbers with 2 decimal places
-    ui->leAmount->setValidator(new QDoubleValidator(0.0, 1000000.0, 2, this));
+    QDoubleValidator *validator = new QDoubleValidator(0.0, 1000000.0, 2, this);
+    validator->setNotation(QDoubleValidator::StandardNotation);
+    validator->setLocale(QLocale(QLocale::Finnish));
+    ui->leAmount->setValidator(validator);
     ui->lblErrorDisplay->clear();
+    ui->labelTransfer->clear();
 }
 
 void Transfer::on_btnConfirm_clicked()
 {
+    //clean text in label and error display
+    ui->labelTransfer->clear();
+    ui->lblErrorDisplay->clear();
+
     QString receiverAcc = ui->leTargetAccount->text();
-    double amount = ui->leAmount->text().toDouble();
+    // Use Finnish locale  to ensure comma is accepted as decimal separator
+    bool ok;
+    QLocale locale(QLocale::Finnish); 
+    double amount = locale.toDouble(ui->leAmount->text(), &ok);
 
     if (receiverAcc.length() < 18) {
         ui->lblErrorDisplay->setText("Account number must be 18 characters.");
@@ -61,9 +72,8 @@ void Transfer::on_btnConfirm_clicked()
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             double newBalance = doc.object()["new_balance"].toString().toDouble();
 
-            QMessageBox::information(this, "Success",
-                                     QString("Transfer successful!\nNew balance: %1 €").arg(newBalance, 0, 'f', 2));
-            this->close();
+            ui->labelTransfer->setText(QString("Transfer successful!\nNew balance: %1 €").arg(newBalance, 0, 'f', 2));
+
         } else {
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
