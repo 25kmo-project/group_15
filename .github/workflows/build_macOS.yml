@@ -1,9 +1,7 @@
 # this workflow runs only for the build after each commit for macOS (Intel and Apple Silicon)
-
 name: Build macOS
+
 on:
-  push:
-    branches: ["*"] #pushes from all branches
   pull_request:
     branches: ["main"]     
 jobs:
