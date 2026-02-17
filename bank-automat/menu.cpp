@@ -8,6 +8,8 @@
 #include "menu.h"
 #include "ui_menu.h"
 #include "deposit.h"
+#include "withdraw.h"
+
 
 
 Menu::Menu(QWidget *parent)
@@ -44,6 +46,15 @@ void Menu::on_btnDeposit_clicked()
     }
 }
 
+void Menu::on_btnWithdraw_clicked()
+{
+    Withdraw w(this);
+
+    if (w.exec() == QDialog::Accepted) {
+        // Päivitä saldo jos nosto onnistunut
+        on_btnBalance_clicked();
+    }
+}
 
 void Menu::on_btnBalance_clicked()
 {

@@ -89,7 +89,7 @@
     <string>Deposit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnWithdrawl">
+  <widget class="QPushButton" name="btnWithdraw">
    <property name="geometry">
     <rect>
      <x>100</x>

@@ -84,12 +84,12 @@ void Withdraw::onReplyFinished()
         btn->setEnabled(true);
 
     if (reply->error() == QNetworkReply::NoError) {
-        ui->lblInfo->setText("Withdraw successful.");
+        ui->lblInfo->setText("Withdrawal successful.");
         ui->lineAmount->clear();
         QTimer::singleShot(2000, this, [this]() { this->accept(); }); // Sulje dialogi hetken kuluttua
         qDebug() << "Withdraw OK:" << data;
     } else {
-        ui->lblInfo->setText("Withdraw failed: " + reply->errorString());
+        ui->lblInfo->setText("Withdrawal failed: " + reply->errorString());
         qDebug() << "Withdraw error:" << reply->errorString() << data;
     }
 
