@@ -9,10 +9,12 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+
 #include "environment.h"
 #include "deposit.h"
 #include "transfer.h"
 #include "currency.h"
+#include "balance.h"
 
 
 class TransactionHistory;
@@ -41,7 +43,6 @@ private:
 private slots:
     //balance
     void on_btnBalance_clicked();
-    void onBalanceReceived();
     //transaction
     void on_btnTransactionHistory_clicked();
     //deposit
