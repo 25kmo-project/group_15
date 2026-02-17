@@ -25,6 +25,10 @@ set(PROJECT_SOURCES
     debitvscredit.h
     debitvscredit.ui
 
+    withdraw.cpp
+    withdraw.h
+    withdraw.ui
+
     appicon.rc
 )
 
@@ -37,6 +41,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         transactionhistory.h transactionhistory.cpp transactionhistory.ui
         clientinfo.h clientinfo.cpp clientinfo.ui
         transfer.h transfer.cpp transfer.ui
+        withdraw.h withdraw.cpp withdraw.ui
         currency.h currency.cpp currency.ui
         balance.h balance.cpp balance.ui
 

@@ -8,6 +8,8 @@
 #include "menu.h"
 #include "ui_menu.h"
 #include "deposit.h"
+#include "withdraw.h"
+
 #include "balance.h"
 
 
@@ -47,6 +49,16 @@ void Menu::on_btnDeposit_clicked()
     depositWin->show();
 
     this->hide();
+}
+
+void Menu::on_btnWithdraw_clicked()
+{
+    Withdraw w(this);
+
+    if (w.exec() == QDialog::Accepted) {
+        // Päivitä saldo jos nosto onnistunut
+        on_btnBalance_clicked();
+    }
 }
 
 //balance
