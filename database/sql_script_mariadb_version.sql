@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`account` (
   `credit_limit` DECIMAL(15,2) NULL DEFAULT NULL,
   `account_number` CHAR(18) NOT NULL,
   PRIMARY KEY (`account_id`),
-  INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
+  INDEX `user_id_idx` (`user_id`),
   UNIQUE INDEX `account_number_UNIQUE` (`account_number`),
   CONSTRAINT `fk_account_user`
     FOREIGN KEY (`user_id`)
