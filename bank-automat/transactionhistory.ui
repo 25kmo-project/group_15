@@ -18,61 +18,34 @@
     <rect>
      <x>300</x>
      <y>40</y>
-     <width>151</width>
-     <height>20</height>
+     <width>321</width>
+     <height>41</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>36</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Transaction History</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lblPageNumber">
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>440</y>
-     <width>41</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Page: 1</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnPrevPage">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>440</y>
-     <width>71</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt; </string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnNextPage">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>440</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&gt;</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btnBackToMenu">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>440</y>
-     <width>75</width>
-     <height>24</height>
+     <x>30</x>
+     <y>520</y>
+     <width>111</width>
+     <height>61</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Back</string>
@@ -83,9 +56,15 @@
     <rect>
      <x>50</x>
      <y>110</y>
-     <width>671</width>
-     <height>301</height>
+     <width>831</width>
+     <height>361</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="editTriggers">
     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -103,22 +82,97 @@
     <property name="text">
      <string>Time</string>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
    </column>
    <column>
     <property name="text">
      <string>Type</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>24</pointsize>
+     </font>
     </property>
    </column>
    <column>
     <property name="text">
      <string>Amount</string>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
    </column>
    <column>
     <property name="text">
      <string>ID</string>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
    </column>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>510</y>
+     <width>281</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="2">
+     <widget class="QPushButton" name="btnNextPage">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="btnPrevPage">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&lt; </string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="lblPageNumber">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Page: 1</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

@@ -13,7 +13,6 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-
   <widget class="QLabel" name="labelTitle">
    <property name="geometry">
     <rect>
@@ -26,19 +25,18 @@
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>24</pointsize>
+     <pointsize>36</pointsize>
     </font>
    </property>
    <property name="text">
     <string>Currency rates</string>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelUsdText">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>140</y>
+     <x>140</x>
+     <y>120</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -46,48 +44,45 @@
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>18</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
     <string>USD:</string>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelUsdValue">
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>140</y>
+     <y>110</y>
      <width>231</width>
-     <height>31</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>18</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
     <string>-</string>
    </property>
   </widget>
-
-  <!-- NEW: USD change line -->
   <widget class="QLabel" name="labelUsdChange">
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>170</y>
+     <y>150</y>
      <width>341</width>
-     <height>21</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>12</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
@@ -97,12 +92,11 @@
     <bool>true</bool>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelGbpText">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>210</y>
+     <x>140</x>
+     <y>220</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -110,48 +104,45 @@
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>18</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
     <string>GBP:</string>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelGbpValue">
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>210</y>
+     <y>220</y>
      <width>231</width>
-     <height>31</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>18</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
     <string>-</string>
    </property>
   </widget>
-
-  <!-- NEW: GBP change line -->
   <widget class="QLabel" name="labelGbpChange">
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>240</y>
+     <y>260</y>
      <width>341</width>
-     <height>21</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>12</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
@@ -161,27 +152,25 @@
     <bool>true</bool>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelDate">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>280</y>
-     <width>451</width>
-     <height>31</height>
+     <x>270</x>
+     <y>350</y>
+     <width>561</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>14</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
     <string>Updated: -</string>
    </property>
   </widget>
-
   <widget class="QLabel" name="labelStatus">
    <property name="geometry">
     <rect>
@@ -194,7 +183,7 @@
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>12</pointsize>
+     <pointsize>24</pointsize>
     </font>
    </property>
    <property name="text">
@@ -204,35 +193,44 @@
     <bool>true</bool>
    </property>
   </widget>
-
   <widget class="QPushButton" name="btnBack">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>370</y>
-     <width>100</width>
-     <height>32</height>
+     <x>20</x>
+     <y>440</y>
+     <width>101</width>
+     <height>41</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Back</string>
    </property>
   </widget>
-
   <widget class="QPushButton" name="btnRefresh">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>370</y>
-     <width>100</width>
-     <height>32</height>
+     <x>150</x>
+     <y>440</y>
+     <width>111</width>
+     <height>41</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Refresh</string>
    </property>
   </widget>
-
  </widget>
  <resources/>
  <connections/>

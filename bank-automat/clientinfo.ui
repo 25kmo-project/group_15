@@ -35,17 +35,22 @@
   <widget class="QPushButton" name="btnBackToMenu">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>60</x>
      <y>470</y>
-     <width>121</width>
-     <height>41</height>
+     <width>131</width>
+     <height>51</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Back</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -54,13 +59,18 @@
      <height>251</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="3" column="0">
      <widget class="QLabel" name="label_5">
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="text">
@@ -73,7 +83,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="text">
@@ -86,7 +96,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="text">
@@ -99,7 +109,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="text">
@@ -112,7 +122,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="text">
@@ -122,7 +132,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -131,13 +141,18 @@
      <height>251</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QLabel" name="labelFname">
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="layoutDirection">
@@ -153,7 +168,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="layoutDirection">
@@ -169,7 +184,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="layoutDirection">
@@ -185,7 +200,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="layoutDirection">
@@ -201,7 +216,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>18</pointsize>
+        <pointsize>24</pointsize>
        </font>
       </property>
       <property name="layoutDirection">
