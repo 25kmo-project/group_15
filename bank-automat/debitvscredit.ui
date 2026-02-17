@@ -22,6 +22,12 @@
      <height>111</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
    <property name="text">
     <string>Debit</string>
    </property>
@@ -34,6 +40,12 @@
      <width>141</width>
      <height>111</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Credit</string>

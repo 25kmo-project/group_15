@@ -1,4 +1,3 @@
-
 #include "currency.h"
 #include "ui_currency.h"
 #include "environment.h"

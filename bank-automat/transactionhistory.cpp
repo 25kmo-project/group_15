@@ -1,6 +1,7 @@
 #include "transactionhistory.h"
 #include "ui_transactionhistory.h"
 #include "environment.h"
+
 #include <QHeaderView>
 #include <QDebug>
 #include <QUrlQuery>
@@ -38,14 +39,14 @@ void TransactionHistory::initTableStyle()
 
     header->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    header->setSectionResizeMode(1, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(1, 100); // Type
+    header->setSectionResizeMode(1, QHeaderView::Stretch); // Type
+
 
     header->setSectionResizeMode(2, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(2, 100); // Amount
+    ui->tableTransactions->setColumnWidth(2, 200); // Amount
 
     header->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableTransactions->setColumnWidth(3, 60); // ID
+    ui->tableTransactions->setColumnWidth(3, 80); // ID
 
     ui->tableTransactions->verticalHeader()->setVisible(false);
 }

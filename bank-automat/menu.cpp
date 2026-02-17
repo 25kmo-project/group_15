@@ -17,11 +17,6 @@ Menu::Menu(QWidget *parent)
 {
     ui->setupUi(this);
     networkManager = new QNetworkAccessManager(this);
-    ui->stackedWidget->setCurrentIndex(0);
-
-    connect(ui->backButton, &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget->setCurrentIndex(0);
-    });
 }
 
 Menu::~Menu()
@@ -106,8 +101,13 @@ void Menu::on_btnCurrency_clicked()
         return;
     }
 
-    Currency c(Environment::token, this);
-    c.exec();
+    Currency *currencyWin = new Currency(Environment::token, this);
+    currencyWin->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(currencyWin, &QWidget::destroyed, this, &Menu::show);
+
+    currencyWin->show();
+    this->hide();
 }
 //my profile
 void Menu::on_btnMyProfile_clicked()
