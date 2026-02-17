@@ -3,10 +3,7 @@
 
 #include <QDialog>
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 
 namespace Ui {
 class ClientInfo;
@@ -24,15 +21,9 @@ public:
 
 private:
     Ui::ClientInfo *ui;
-    QByteArray info;
-    QNetworkAccessManager *networkManager;
-    QNetworkReply *reply;
-    int userId;
 
 private slots:
     void on_btnBackToMenu_clicked();
-    void on_btnSave_clicked();
-    void onUpdateReceived();
 };
 
 #endif // CLIENTINFO_H
