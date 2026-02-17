@@ -10,6 +10,7 @@
 #include "deposit.h"
 #include "withdraw.h"
 
+#include "balance.h"
 
 
 Menu::Menu(QWidget *parent)
@@ -38,6 +39,7 @@ void Menu::setupRequest(QNetworkRequest &request, const QString &path)
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 }
 
+//deposit
 void Menu::on_btnDeposit_clicked()
 {
     Deposit d(this);
@@ -56,42 +58,19 @@ void Menu::on_btnWithdraw_clicked()
     }
 }
 
+//balance
 void Menu::on_btnBalance_clicked()
 {
-    QString path = "transaction/balance";
-    QUrl url(Environment::base_url() + path);
-    QUrlQuery query;
-    query.addQueryItem("account_id", QString::number(Environment::accountId));
-    query.addQueryItem("card_id", QString::number(Environment::cardId));
-    url.setQuery(query);
+    Balance *balanceWin = new Balance(this);
+    balanceWin->setAttribute(Qt::WA_DeleteOnClose);
 
-    QNetworkRequest request(url);
-    QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
-    request.setRawHeader("Authorization", authHeader);
+    connect(balanceWin, &QWidget::destroyed, this, &Menu::show);
 
-    reply = networkManager->get(request);
-    connect(reply, &QNetworkReply::finished, this, &Menu::onBalanceReceived);
+    balanceWin->show();
+    this->hide();
 }
 
-void Menu::onBalanceReceived()
-{
-    ui->stackedWidget->setCurrentIndex(1);
-
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray responseData = reply->readAll();
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-        QJsonObject jsonObj = jsonDoc.object();
-
-        double balance = jsonObj["balance"].toDouble();
-        ui->labelBalance2->setText(QString::number(balance, 'f', 2) + " €");
-    } else {
-        qDebug() << "Error fetching balance:" << reply->errorString();
-        ui->labelBalance2->setText("Error!");
-    }
-
-    reply->deleteLater();
-}
-
+//transaction history
 void Menu::on_btnTransactionHistory_clicked()
 {
     if (Environment::token.isEmpty()) {
@@ -112,7 +91,7 @@ void Menu::on_btnTransactionHistory_clicked()
     historyWin->show();
     this->hide();
 }
-
+//transfer
 void Menu::on_btnTransfer_clicked()
 {
     Transfer *transferWin = new Transfer(Environment::accountId, Environment::cardId, Environment::token, this);
@@ -128,6 +107,7 @@ void Menu::on_btnTransfer_clicked()
     this->hide();
 
 }
+//currency
 void Menu::on_btnCurrency_clicked()
 {
     if (Environment::token.isEmpty()) {
@@ -138,7 +118,7 @@ void Menu::on_btnCurrency_clicked()
     Currency c(Environment::token, this);
     c.exec();
 }
-
+//my profile
 void Menu::on_btnMyProfile_clicked()
 {
     QString path = "user/" + QString::number(Environment::userId);
@@ -171,7 +151,7 @@ void Menu::onMyProfileReceived()
 
     reply->deleteLater();
 }
-
+//log out
 void Menu::on_btnLogOut_clicked()
 {
         //clear client's data

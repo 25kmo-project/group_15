@@ -43,6 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         transfer.h transfer.cpp transfer.ui
         withdraw.h withdraw.cpp withdraw.ui
         currency.h currency.cpp currency.ui
+        balance.h balance.cpp balance.ui
 
 
     )

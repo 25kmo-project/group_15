@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `bank`.`transaction` (
   `card_id` INT NULL,
   `transaction_type` ENUM('WITHDRAWAL', 'DEPOSIT', 'TRANSFER', 'INQUIRY') NOT NULL,
   `amount` DECIMAL(15,2) NOT NULL,
-  `transaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `transaction_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`transaction_id`),
   INDEX `account_id_idx` (`account_id` ASC) VISIBLE,
   INDEX `card_id_idx` (`card_id` ASC) VISIBLE,
