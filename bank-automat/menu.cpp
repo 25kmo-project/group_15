@@ -40,10 +40,13 @@ void Menu::setupRequest(QNetworkRequest &request, const QString &path)
 //deposit
 void Menu::on_btnDeposit_clicked()
 {
-    Deposit d(this);
-    if (d.exec() == QDialog::Accepted) {
-        on_btnBalance_clicked();
-    }
+    Deposit *depositWin = new Deposit(this);
+    depositWin->setAttribute(Qt::WA_DeleteOnClose);
+    connect(depositWin, &QWidget::destroyed, this, &Menu::show);
+
+    depositWin->show();
+
+    this->hide();
 }
 
 //balance
