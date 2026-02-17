@@ -7,8 +7,8 @@
 #include <QJsonObject>
 #include <QDoubleValidator>
 #include <QDebug>
-#include <QTimer>
 #include <QLocale>
+#include <QUrlQuery>
 
 
 Deposit::Deposit(QWidget *parent)
@@ -35,7 +35,7 @@ void Deposit::onConfirmClicked()
     QLocale fi(QLocale::Finnish, QLocale::Finland);
     double amount = fi.toDouble(text, &ok);
 
-    if (!ok) { // hyväksy myös piste
+    if (!ok) { // accept comma
         amount = QLocale::c().toDouble(text, &ok);
     }
 
@@ -67,30 +67,26 @@ void Deposit::onReplyFinished()
 {
     QByteArray data = reply->readAll();
 
-    // Palautetaan käyttöliittymä käyttöön (paitsi onnistumisessa suljetaan kohta)
+    // Re-enable UI after deposit attempt
     ui->btnConfirm->setEnabled(true);
     ui->lineAmount->setEnabled(true);
 
     if (reply->error() == QNetworkReply::NoError) {
-        ui->lblInfo->setText("Deposit successful.");
         ui->lineAmount->clear();
-        qDebug() << "Deposit OK:" << data;
+        qDebug() << "Deposit successful:" << data;
 
-        // Estetään lisäklikkailu ja annetaan viestin näkyä hetki
-        ui->btnConfirm->setEnabled(false);
-        ui->lineAmount->setEnabled(false);
+        reply->deleteLater();
+        reply = nullptr;
 
-        // Sulje 2 sekunnin jälkeen -> palaa Menuun (exec() loppuu)
-        QTimer::singleShot(2000, this, [this]() {
-            this->accept();
-        });
+        getBalance();
 
     } else {
         ui->lblInfo->setText("Deposit failed.");
         qDebug() << "Deposit error:" << reply->errorString() << data;
+        reply->deleteLater();
     }
 
-    reply->deleteLater();
+
 }
 Deposit::~Deposit()
 {
@@ -99,5 +95,38 @@ Deposit::~Deposit()
 
 void Deposit::on_btnBack_clicked()
 {
-    reject();  // sulkee ikkunan ja palaa Menuun
+    reject();  // close window and return to menu
+}
+
+void Deposit::onBalanceReceived()
+{
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
+        double balance = jsonObj["balance"].toDouble();
+        ui->lblInfo->setText("Deposit successful. Balance: " +
+                             QString::number(balance, 'f', 2) + " €");
+    } else {
+        ui->lblInfo->setText("Deposit successful.");
+    }
+
+    reply->deleteLater();
+}
+
+void Deposit::getBalance()
+{
+    QString path = "transaction/balance";
+    QUrl url(Environment::base_url() + path);
+    QUrlQuery query;
+    query.addQueryItem("account_id", QString::number(Environment::accountId));
+    query.addQueryItem("card_id", QString::number(Environment::cardId));
+    url.setQuery(query);
+
+    QNetworkRequest request(url);
+    QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
+    request.setRawHeader("Authorization", authHeader);
+
+    reply = networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, &Deposit::onBalanceReceived);
 }

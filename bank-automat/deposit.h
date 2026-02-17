@@ -21,11 +21,14 @@ private slots:
     void onConfirmClicked();
     void onReplyFinished();
     void on_btnBack_clicked();
+    void onBalanceReceived();
 
 private:
     Ui::Deposit *ui;
     QNetworkAccessManager *networkManager;
     QNetworkReply *reply;
+
+    void getBalance();
 };
 
 #endif // DEPOSIT_H
