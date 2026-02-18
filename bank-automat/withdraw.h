@@ -4,6 +4,11 @@
 #include <QDialog>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include "environment.h"
 
 namespace Ui {
 class Withdraw;
@@ -18,15 +23,19 @@ public:
     ~Withdraw();
 
 private slots:
-    void onAmountEntered();    // Käyttäjä painaa oma summa -näppäintä
-    void onReplyFinished();    // Backendin vastaus
+    void onAmountEntered();    // user push the own amount - button
+    void onReplyFinished();    // Backendin response
+
+    void onBalanceReceived();
 
 private:
     Ui::Withdraw *ui;
     QNetworkAccessManager *networkManager;
     QNetworkReply *reply;
 
-    void performWithdraw(double amount); // Lähettää requestin
+    void performWithdraw(double amount); // send request
+
+    void getBalance();
 };
 
 #endif // WITHDRAW_H

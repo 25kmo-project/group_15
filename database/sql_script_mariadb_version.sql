@@ -278,6 +278,79 @@ END $$
 
 DELIMITER ;
 
+-- =====================================================
+-- STORED PROCEDURE: WITHDRAW
+-- =====================================================
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS withdraw_money $$
+
+CREATE PROCEDURE withdraw_money(
+    IN p_account_id INT,
+    IN p_card_id INT,
+    IN p_amount DECIMAL(15,2)
+)
+BEGIN
+    DECLARE v_balance DECIMAL(15,2);
+    DECLARE v_card_status VARCHAR(20);
+    DECLARE v_access_type VARCHAR(20);
+
+    IF p_amount IS NULL OR p_amount <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'INVALID_AMOUNT';
+    END IF;
+
+    START TRANSACTION;
+
+    SELECT a.balance, c.status, aa.access_type
+      INTO v_balance, v_card_status, v_access_type
+    FROM account a
+    JOIN account_access aa ON aa.account_id = a.account_id
+    JOIN card c ON c.card_id = aa.card_id
+    WHERE a.account_id = p_account_id
+      AND c.card_id = p_card_id
+    FOR UPDATE;
+
+    IF v_balance IS NULL THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'NOT_FOUND';
+    END IF;
+
+    IF v_access_type <> 'FULL' THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'UNAUTHORIZED';
+    END IF;
+
+    IF v_card_status <> 'ACTIVE' THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'LOCKED';
+    END IF;
+
+    IF v_balance < p_amount THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'INSUFFICIENT_FUNDS';
+    END IF;
+
+    UPDATE account
+    SET balance = balance - p_amount
+    WHERE account_id = p_account_id;
+
+    INSERT INTO `transaction`
+        (account_id, card_id, transaction_type, amount)
+    VALUES
+        (p_account_id, p_card_id, 'WITHDRAWAL', p_amount);
+
+    COMMIT;
+
+    SELECT (v_balance - p_amount) AS new_balance;
+
+END $$
+
+DELIMITER ;
 
 
 
