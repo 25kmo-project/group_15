@@ -7,7 +7,6 @@
 #include <QJsonObject>
 #include <QDoubleValidator>
 #include <QDebug>
-#include <QTimer>
 
 Withdraw::Withdraw(QWidget *parent)
     : QDialog(parent),
@@ -17,18 +16,18 @@ Withdraw::Withdraw(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Validator sallii vain positiiviset desimaalit
+    // Validator allows only positive decimal values
     auto *validator = new QDoubleValidator(0, 1000000000, 2, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
     ui->lineAmount->setValidator(validator);
 
-    // Pika-nappien toiminta
+    // Functionality for quick-selection buttons
     connect(ui->withdraw20, &QPushButton::clicked, this, [this]() { performWithdraw(20); });
     connect(ui->withdraw40, &QPushButton::clicked, this, [this]() { performWithdraw(40); });
     connect(ui->withdraw50, &QPushButton::clicked, this, [this]() { performWithdraw(50); });
     connect(ui->withdraw100, &QPushButton::clicked, this, [this]() { performWithdraw(100); });
 
-    // Oma summa syötekentän Enter
+    // Own amount in the field Enter
     connect(ui->lineAmount, &QLineEdit::returnPressed, this, &Withdraw::onAmountEntered);
 }
 
@@ -37,7 +36,7 @@ Withdraw::~Withdraw()
     delete ui;
 }
 
-// Käyttäjä syöttää oman summan ja painaa Enter
+// User enters an own amount and presses Enter
 void Withdraw::onAmountEntered()
 {
     bool ok = false;
@@ -51,7 +50,7 @@ void Withdraw::onAmountEntered()
     performWithdraw(amount);
 }
 
-// Lähettää withdraw requestin
+// Send the withdrawal request
 void Withdraw::performWithdraw(double amount)
 {
     QUrl url(Environment::base_url() + "transaction/withdraw");
@@ -73,12 +72,12 @@ void Withdraw::performWithdraw(double amount)
     connect(reply, &QNetworkReply::finished, this, &Withdraw::onReplyFinished);
 }
 
-// Backendin vastaus
+// Backend response
 void Withdraw::onReplyFinished()
 {
     QByteArray data = reply->readAll();
 
-    // UI takaisin käyttöön
+    // UI back in use
     ui->lineAmount->setEnabled(true);
     for (auto btn : {ui->withdraw20, ui->withdraw40, ui->withdraw50, ui->withdraw100})
         btn->setEnabled(true);
@@ -86,12 +85,46 @@ void Withdraw::onReplyFinished()
     if (reply->error() == QNetworkReply::NoError) {
         ui->lblInfo->setText("Withdrawal successful.");
         ui->lineAmount->clear();
-        QTimer::singleShot(2000, this, [this]() { this->accept(); }); // Sulje dialogi hetken kuluttua
         qDebug() << "Withdraw OK:" << data;
+        reply->deleteLater();
+        reply = nullptr;
+        getBalance();
     } else {
         ui->lblInfo->setText("Withdrawal failed: " + reply->errorString());
         qDebug() << "Withdraw error:" << reply->errorString() << data;
+        reply->deleteLater();
     }
 
+}
+
+void Withdraw::getBalance()
+{
+    QString path = "transaction/balance";
+    QUrl url(Environment::base_url() + path);
+    QUrlQuery query;
+    query.addQueryItem("account_id", QString::number(Environment::accountId));
+    query.addQueryItem("card_id", QString::number(Environment::cardId));
+    url.setQuery(query);
+
+    QNetworkRequest request(url);
+    QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
+    request.setRawHeader("Authorization", authHeader);
+
+    reply = networkManager->get(request);
+    connect(reply, &QNetworkReply::finished, this, &Withdraw::onBalanceReceived);
+}
+
+void Withdraw::onBalanceReceived()
+{
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
+        double balance = jsonObj["balance"].toDouble();
+        ui->lblInfo->setText("Withdrawal successful. Balance: " +
+                             QString::number(balance, 'f', 2) + " €");
+    } else {
+        ui->lblInfo->setText("Withdrawal successful.");
+    }
     reply->deleteLater();
 }
