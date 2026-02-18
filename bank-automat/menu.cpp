@@ -45,15 +45,16 @@ void Menu::on_btnDeposit_clicked()
 
     this->hide();
 }
-
-void Menu::on_btnWithdraw_clicked()
+//withdrawal
+void Menu::on_btnWithdrawal_clicked()
 {
-    Withdraw w(this);
+    Withdraw *withdrawWin = new Withdraw(this);
+    withdrawWin->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (w.exec() == QDialog::Accepted) {
-        // Päivitä saldo jos nosto onnistunut
-        on_btnBalance_clicked();
-    }
+    connect(withdrawWin, &QWidget::destroyed, this, &Menu::show);
+
+    withdrawWin->show();
+    this->hide();
 }
 
 //balance

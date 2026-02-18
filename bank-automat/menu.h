@@ -48,7 +48,7 @@ private slots:
     //deposit
     void on_btnDeposit_clicked();
     //withdraw
-    void on_btnWithdraw_clicked(); // huolehdi että nimi vastaa .ui:n painiketta
+    void on_btnWithdrawal_clicked(); // huolehdi että nimi vastaa .ui:n painiketta
     //transfer
     void on_btnTransfer_clicked();
     //my profile
