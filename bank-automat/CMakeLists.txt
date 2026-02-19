@@ -92,6 +92,14 @@ set_target_properties(Pankkiautomaatti PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+# icon for macOS app
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE bankicon.icns)
+    set(APP_ICON_MACOSX ${CMAKE_CURRENT_SOURCE_DIR}/bankicon.icns)
+    set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(Pankkiautomaatti PRIVATE ${APP_ICON_MACOSX})
+endif()
+
 include(GNUInstallDirs)
 install(TARGETS Pankkiautomaatti
     BUNDLE DESTINATION .
