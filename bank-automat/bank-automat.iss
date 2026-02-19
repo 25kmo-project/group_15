@@ -37,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
-[[Files]
+[Files]
 ; Pääohjelma ja kaikki riippuvuudet
 Source: "..\build\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#SourcePath}\bankicon.ico"; DestDir: "{app}"; Flags: ignoreversion
