@@ -1,5 +1,7 @@
 #include "clientinfo.h"
 #include "ui_clientinfo.h"
+
+
 #include <QDebug>
 #include <QJsonObject>
 
@@ -36,5 +38,10 @@ void ClientInfo::setInfo(const QByteArray &newInfo)
 
 void ClientInfo::on_btnBackToMenu_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     this->close();
 }

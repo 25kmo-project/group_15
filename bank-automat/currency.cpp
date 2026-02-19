@@ -14,7 +14,7 @@ Currency::Currency(QString token, QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->btnBack, &QPushButton::clicked, this, &Currency::close);
+    connect(ui->btnBack, &QPushButton::clicked, this, &Currency::on_btnBack_clicked);
     connect(ui->btnRefresh, &QPushButton::clicked, this, &Currency::fetchRates);
 
 
@@ -41,12 +41,16 @@ void Currency::setupRequest(QNetworkRequest &request, const QString &path)
 
 void Currency::fetchRates()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     QNetworkRequest request;
     setupRequest(request, "currency/change");
 
     reply = manager->get(request);
-    connect(reply, &QNetworkReply::finished,
-            this, &Currency::onRatesReceived);
+    connect(reply, &QNetworkReply::finished,this, &Currency::onRatesReceived);
 }
 
 void Currency::onRatesReceived()
@@ -120,4 +124,13 @@ void Currency::onRatesReceived()
     }
 
     reply->deleteLater();
+}
+
+void Currency::on_btnBack_clicked()
+{
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+    this->close();
 }

@@ -25,7 +25,7 @@ public:
 private slots:
     void onAmountEntered();    // user push the own amount - button
     void onReplyFinished();    // Backendin response
-
+    void on_btnBack_clicked();
     void onBalanceReceived();
 
 private:

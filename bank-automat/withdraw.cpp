@@ -39,6 +39,11 @@ Withdraw::~Withdraw()
 // User enters an own amount and presses Enter
 void Withdraw::onAmountEntered()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     bool ok = false;
     double amount = ui->lineAmount->text().trimmed().toDouble(&ok);
 
@@ -53,6 +58,11 @@ void Withdraw::onAmountEntered()
 // Send the withdrawal request
 void Withdraw::performWithdraw(double amount)
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     QUrl url(Environment::base_url() + "transaction/withdraw");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -127,4 +137,13 @@ void Withdraw::onBalanceReceived()
         ui->lblInfo->setText("Withdrawal successful.");
     }
     reply->deleteLater();
+}
+
+void Withdraw::on_btnBack_clicked()
+{
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+    this->close();
 }

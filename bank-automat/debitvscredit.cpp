@@ -21,7 +21,7 @@ DebitvsCredit::~DebitvsCredit()
 
 void DebitvsCredit::setToken(const QString &newToken)
 {
-    //tarkista
+    //check
     token = "Bearer "+newToken;
     qDebug()<<token;
     qDebug() << "Current cardId: " << cardId;
@@ -30,6 +30,11 @@ void DebitvsCredit::setToken(const QString &newToken)
 
 void DebitvsCredit::DebitButtonClicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     if(Environment::accountIds.size() > 0){
         Environment::accountId = Environment::accountIds[0];
         qDebug()<<"Debit side"<<Environment::accountId;
@@ -41,6 +46,11 @@ void DebitvsCredit::DebitButtonClicked()
 
 void DebitvsCredit::CreditButtonClicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     if(Environment::accountIds.size() > 1){
         Environment::accountId = Environment::accountIds[1];
         qDebug()<<"Credit side"<<Environment::accountId;

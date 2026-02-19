@@ -1,6 +1,7 @@
 #include <QUrlQuery>
 #include <QDebug>
 #include <QApplication>
+
 #include "clientinfo.h"
 #include "transactionhistory.h"
 #include "transfer.h"
@@ -9,16 +10,25 @@
 #include "ui_menu.h"
 #include "deposit.h"
 #include "withdraw.h"
-
 #include "balance.h"
 
 
-Menu::Menu(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::Menu)
+Menu::Menu(QWidget *parent): QDialog(parent), ui(new Ui::Menu)
 {
     ui->setupUi(this);
     networkManager = new QNetworkAccessManager(this);
+
+    //create new timer if it does not exist
+    if (!Environment::timerLogOut){
+        Environment::timerLogOut = new QTimer();
+        Environment::timerLogOut->setInterval(30000); //timer 30 seconds
+    }
+
+    //connecting autoLogOut method
+    connect(Environment::timerLogOut, &QTimer::timeout, this, &Menu::autoLogOut);
+
+    //timer starts now
+    Environment::timerLogOut->start();
 }
 
 Menu::~Menu()
@@ -37,6 +47,9 @@ void Menu::setupRequest(QNetworkRequest &request, const QString &path)
 //deposit
 void Menu::on_btnDeposit_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     Deposit *depositWin = new Deposit(this);
     depositWin->setAttribute(Qt::WA_DeleteOnClose);
     connect(depositWin, &QWidget::destroyed, this, &Menu::show);
@@ -48,6 +61,9 @@ void Menu::on_btnDeposit_clicked()
 //withdrawal
 void Menu::on_btnWithdrawal_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     Withdraw *withdrawWin = new Withdraw(this);
     withdrawWin->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -60,6 +76,9 @@ void Menu::on_btnWithdrawal_clicked()
 //balance
 void Menu::on_btnBalance_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     Balance *balanceWin = new Balance(this);
     balanceWin->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -72,6 +91,9 @@ void Menu::on_btnBalance_clicked()
 //transaction history
 void Menu::on_btnTransactionHistory_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     if (Environment::token.isEmpty()) {
         qDebug() << "Error: Token is empty, cannot open history";
         return;
@@ -93,6 +115,9 @@ void Menu::on_btnTransactionHistory_clicked()
 //transfer
 void Menu::on_btnTransfer_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     Transfer *transferWin = new Transfer(Environment::accountId, Environment::cardId, Environment::token, this);
     transferWin->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -109,6 +134,9 @@ void Menu::on_btnTransfer_clicked()
 //currency
 void Menu::on_btnCurrency_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     if (Environment::token.isEmpty()) {
         qDebug() << "Error: Token is empty, cannot open currency";
         return;
@@ -122,9 +150,13 @@ void Menu::on_btnCurrency_clicked()
     currencyWin->show();
     this->hide();
 }
+
 //my profile
 void Menu::on_btnMyProfile_clicked()
 {
+    //timer restart
+    Environment::timerLogOut->start();
+
     QString path = "user/" + QString::number(Environment::userId);
     QUrl url(Environment::base_url() + path);
 
@@ -158,19 +190,89 @@ void Menu::onMyProfileReceived()
 //log out
 void Menu::on_btnLogOut_clicked()
 {
-        //clear client's data
-        Environment::token = "";
-        Environment::userId = 0;
-        Environment::cardId = 0;
-        Environment::accountId = 0;
-        Environment::accountIds.clear();
+    //timer is stopped
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->stop();
+    }
 
-        qDebug() << "Log out";
+    //close all windows
+    QWidgetList allWindows = QApplication::topLevelWidgets();
+    for (QWidget *w : allWindows) {
+        if (w != this && w->isVisible()) {
+            w->close();
+        }
+    }
 
-        //creating new mainwindow
+    //clear client's data
+    Environment::token = "";
+    Environment::userId = 0;
+    Environment::cardId = 0;
+    Environment::accountId = 0;
+    Environment::accountIds.clear();
+
+    qDebug() << "Log out";
+
+    //creating new mainwindow
+    MainWindow *newLoginWindow = new MainWindow();
+    newLoginWindow->show();
+
+    //close current window
+    this->close();
+}
+void Menu::closeAllNotMain(MainWindow *mainWindow)
+{
+    QWidgetList allWindows = QApplication::topLevelWidgets();
+    for (int i = 0; i < allWindows.size(); i++) {
+        QWidget *window = allWindows[i];
+        if (window != mainWindow) {
+            window->deleteLater();
+        }
+    }
+}
+
+
+//automatic log out when inactivity is 30 seconds
+void Menu::autoLogOut()
+{
+    qDebug() << "30 seconds passed, user is logged out";
+
+    //timer stopped
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->stop();
+    }
+
+    //clear all data
+    Environment::token = "";
+    Environment::userId = 0;
+    Environment::cardId = 0;
+    Environment::accountId = 0;
+    Environment::accountIds.clear();
+
+    //find MainWindow
+    QWidgetList allWindows = QApplication::topLevelWidgets();
+    MainWindow *existingMainWindow = nullptr;
+
+    for (int i = 0; i < allWindows.size(); i++) {
+        if (qobject_cast<MainWindow*>(allWindows[i])) {
+            existingMainWindow = qobject_cast<MainWindow*>(allWindows[i]);
+            break;
+        }
+    }
+
+    //show MainWindow and clear fields
+    if (existingMainWindow) {
+        existingMainWindow->clearFields();
+        existingMainWindow->show();
+        existingMainWindow->raise();
+        existingMainWindow->activateWindow();
+    } else {
         MainWindow *newLoginWindow = new MainWindow();
         newLoginWindow->show();
+    }
 
-        //close current window
-        this->close();
+    //delete all windows except MainWindow with delay so the app is not crushing
+    QTimer::singleShot(0,this, [this, existingMainWindow]() {
+        closeAllNotMain(existingMainWindow);
+    });
+    qDebug() << "Auto logout complete";
 }
