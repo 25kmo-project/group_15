@@ -12,3 +12,5 @@ QString Environment::base_url()
 {
     return "http://localhost:3000/";
 }
+
+QTimer* Environment::timerLogOut = nullptr;

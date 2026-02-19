@@ -58,5 +58,10 @@ void Balance::onBalanceReceived()
 
 void Balance::on_btnBack_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     this->close();
 }

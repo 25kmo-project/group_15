@@ -17,6 +17,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::clearFields()
+{
+    ui->textCardId->clear();
+    ui->textPincode->clear();
+    ui->labelInfo->clear();
+}
+
 //login
 void MainWindow::btnLoginSlot()
 {

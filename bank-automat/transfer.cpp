@@ -32,6 +32,11 @@ void Transfer::setupUiLogic()
 
 void Transfer::on_btnConfirm_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     //clean text in label and error display
     ui->labelTransfer->clear();
     ui->lblErrorDisplay->clear();
@@ -93,5 +98,10 @@ void Transfer::on_btnConfirm_clicked()
 
 void Transfer::on_btnBack_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     this->close();
 }

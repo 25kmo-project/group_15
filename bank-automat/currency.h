@@ -18,6 +18,7 @@ public:
 private slots:
     void fetchRates();
     void onRatesReceived();
+    void on_btnBack_clicked();
 
 private:
     Ui::Currency *ui;
