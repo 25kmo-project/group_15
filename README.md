@@ -5,107 +5,163 @@ This is a course project designed to simulate real-world bank ATM operations.
 The system follows a decoupled architecture (Frontend and Backend separation):  
 Frontend (**Qt/C++**): Provides a Graphical User Interface (GUI) for interactive user operations.  
 Backend (**Node.js**): Processes core business logic, such as PIN verification and balance management.  
-Database (**MySQL**): Stores user information, account balances, and all transaction logs.
+Database (**MySQL/MariaDB**): Stores user information, account balances, and all transaction logs.
 
 ## Tech Stack
 ### Frontend
 Framework: Qt (C++)   
 Networking: QNetworkAccessManager (For asynchronous REST API communication)  
-Data Parsing: QJsonDocument & QJsonObject
-UI Design: ?
+Data Parsing: QJsonDocument & QJsonObject  
+UI Design: QT designer
+Build system: Cmake
 
 ### Backend
-Runtime: Node.js
-Framework: Express.js
-Environment Management: dotenv 
-Security: bcryptjs 
-Middleware: cors 
+Runtime: Node.js  
+Framework: Express.js  
+Environment Management: dotenv    
+Security: bcryptjs and jsonwebtoken  
+Middleware: cors   
+Logging: morgan 
+Database Client: mysql2 
+
 
 ### Database
-System: MySQL 8.0+  
+System: MySQL 8.0+ / MariaDB  
 Library: mysql2   
 Schema: Relational multi-table design with Transactional Integrity  
 Data Structure
 Database "bank" utilizes a 5-table relational schema:![ER diagram](database/ER_diagram.pdf)
 
+## Key feature  
+**Multi-Account Support**: A single card can be linked to multiple accounts. Users can choose between Debit or Credit accounts after logging in.  
+**Core Financial Transactions**:
+* Withdrawal: Checks balance or credit limits, updates the account in real-time, and records the transaction.
+* Deposit: Increases account balance.
+* Transfer*: Facilitates fund transfers between different accounts.
 
-## Backend-database
-### User case
-login by card id + pin code.The database only stores pin codes that have been hashed using bcryptjs.
-After a user logs in, the system will provide selectable accounts for the user to operate:debit or credit.
+**Security Mechanisms**:
+* PIN codes are securely hashed using bcryptjs; no plain-text passwords are stored.
+* API requests are protected by JWT Tokens to prevent unauthorized access.
+* Logic included for handling Blocked card statuses.
 
-......
-
-
-### 
-#### Table: user
-* user_id (PK, INT)
-* user_name (VARCHAR(45))
-* user_phonenumber (VARCHAR(45))
-#### Table: card
-Stores authentication credentials and their link to a user.
-* card_id (PK, INT)
-* card_number (VARCHAR(20), UNIQUE): The number used for ATM login.
-* pin_code (VARCHAR(255)): Bcrypt-hashed password.
-* status ENUM('Active', 'Blocked', 'Expired'). 
-* user_id (FK, INT): Links the card to its owner in the user table.
-#### Table: account
-Stores financial data and overdraft rules.
-* account_id (PK, INT)
-* account_type ENUM('DEDIT', 'CREDIT', 'SAVINGS')
-* balance (DECIMAL(15,2)): for debit card
-* credit_limit (DECIMAL(15,2)): for credit card
-#### Table: account_access (Junction Table,"many to many")
-Connecting cards to multiple accounts.
-* card_id (PK/FK, INT)
-* account_id (PK/FK, INT)
-* access_type (ENUM): ENUM('FULL', 'VIEW ONLY'):for futher fuctions,eg:parents-child account.
-#### Table: transaction
-A permanent, immutable audit trail of all account activities.
-* transaction_id (PK, INT)
-* type ENUM('Withdrawal', 'Deposit', 'Transfer', 'Inquiry')
-* amount (DECIMAL(15,2))
-* date (DATETIME)
-* account_id (FK, INT): Links the transaction to the specific affected account.
-## project stucture
+**Additional Features**:
+* Currency Conversion: Supports calculations between different currency units.
+* Digital Receipt: Provides confirmation and details for completed transactions.
+## Project stucture
 ```text
 .backend/
-├── app.js                      # Main server file (configures middleware & routes)
-├── .env                        # Private config: DB_USER, DB_PASSWORD, JWT_SECRET
-├── package.json                # Dependencies: express, mysql2, dotenv, jsonwebtoken
-├── config/
-│   └── db.js                   # MySQL connection pool logic
+├── app.js            
+├── bin/www                
 ├── middleware/
-│   └── auth.js                 # Middleware to verify JWT Token before allowing transactions
-├── models/                     # DATA LAYER (SQL Queries)
-│   ├── transactionModel.js     # SQL for INSERT/SELECT transactions
-│   ├── accountModel.js         # SQL for updating balances (used in your logic)
-│   └── cardModel.js            # SQL for card-related checks
-├── controllers/                # LOGIC LAYER (The "Brain")
-│   ├── transactionController.js # The logic for "Withdraw" (check balance -> update -> record)
-│   └── loginController.js      # Logic for authenticating and generating tokens
-└── routes/                     # API ENDPOINTS
-    ├── transaction.js          # API paths like /transaction/withdraw
-    └── login.js                # API path for /login
+│   └── auth.js                 
+├── models/   
+│   ├── login_model.js          
+│   ├── user_model.js 
+│   ├── transaction_model.js    
+│   ├── account_model.js  
+│   ├── account_access_model.js       
+│   └── card_model.js            
+└── routes/ 
+│   ├── account.js 
+│   ├── account_access.js 
+│   ├── card.js 
+│   ├── currency.js 
+│   ├── database.js  
+│   ├── index.js
+│   ├── transaction.js 
+│   ├── user.js       
+│   login.js  
+├── package.json     
+└── package-lock.json            
 ```
 
 ```text
 frontend/
-├── bank-automat.pro            # Qt project configuration
-├── main.cpp                    # Application entry
-├── headers/                    # Header files (.h)
-│   ├── transactionwindow.h     # Header for the transaction UI
-│   ├── mainmenu.h              # Header for the main menu navigation
-│   └── restapi.h               # Header for the central API communication class
-├── sources/                    # Implementation files (.cpp)
-│   ├── transactionwindow.cpp   # Logic for clicking buttons & handling JSON
-│   ├── mainmenu.cpp            # Logic for switching between balance and withdrawal
-│   └── restapi.cpp             # The class that handles QNetworkAccessManager (HTTP requests)
-└── forms/                      # UI Design files (.ui)
-    ├── transactionwindow.ui    # Design for the list of transactions
-    └── mainmenu.ui             # Design for the main ATM menu
+├── CMakeLists.txt            
+├── bank-automat.iss   
+├── main.cpp              
+├── headers/    
+│   ├── environment.h 
+│   ├── mainwindow.h                 
+│   ├── menu.h 
+│   ├── debitvscredit.h 
+│   ├── clientinfo.h 
+│   ├── balance.h 
+│   ├── deposit.h 
+│   ├── debitvscredit.h 
+│   ├── withdrawal.h 
+│   ├── transaction.h     
+│   ├── transfer.h 
+│   ├── currency.h                
+│   └── receipt.h               
+├── sources/   
+│   ├── environment.cpp  
+│   ├── mainwindow.cpp  
+│   ├── menu.cpp  
+│   ├── debitvscredit.cpp   
+│   ├── clientinfo.cpp   
+│   ├── balance.cpp   
+│   ├── deposit.cpp   
+│   ├── withdrawal.cpp   
+│   ├── transaction.cpp   
+│   ├── transfer.cpp     
+│   ├── currency.cpp           
+│   └── receipt.cpp             
+└── forms/
+    ├── mainwindow.ui                        
+    ├── menu.ui  
+    ├── debitvscredit.ui  
+    ├── clientinfo.ui  
+    ├── balance.ui  
+    ├── deposit..ui  
+    ├── withdrawal.ui  
+    ├── transaction.ui  
+    ├── transfer.ui  
+    ├── currency.ui  
+    ├── receipt.ui  
+    ├── balance.ui  
+    └── menu.ui            
+```
+## Quick install
+### Database Setup
+For MySQL:
+```bash
+mysql -u your_username -p < database/sql_script_mysql_version.sql
+```
+For MariaDB:
+```bash
+mariadb -u your_username -p < database/sql_script_mariadb_version.sql
+```
+The project includes database/db_setup.sql for initializing the core database schema.
+
+### Backend Environment
+* Install all necessary dependencies.
+```bash
+cd backend
+npm install
+```
+* Copy **.env.example** to a new file named **.env** and configure your database connection credentials and JWT secret.
+* Launch the server.
+```bash
+npm start
 ```
 
+### Frontend Environment
+* Ensure Qt 5.15+ and CMake are installed.
+* in the **bank-automat** directory:
+```bash
+mkdir build && cd build
+cmake ..
+make  
+```
+* Or open CMakeLists.txt directly with Qt Creator
+
+## CI/CD & Automated Workflows
+The project utilizes **GitHub Actions** for continuous integration and automated releases:
+* **Build Workflows**: Every pull request to the main branch triggers automated builds for Windows (MSVC 2022) and macOS (Apple Silicon/ARM64) to ensure code stability and cross-platform compatibility.
+* **Release Workflows**: Pushing a version tag (e.g., v1.0) automatically initiates the distribution process:
+    * Windows: Packages the application into a professional installer (.exe) using Inno Setup。
+    * macOS: Generates a standard Disk Image (.dmg) for Apple Silicon users。
 
 ## Authors
 
@@ -114,11 +170,8 @@ frontend/
 - [@tinnihkis](https://github.com/tinnihkis)
 - [@ecedevere](https://github.com/ecedevere)
 
-
 ## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-- ei ole valmis tämä osio
+This project is licensed under the [MIT License](LICENSE).
 
 ## DRAFT_1 or What should be also included in readme
 
