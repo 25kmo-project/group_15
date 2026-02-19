@@ -1,3 +1,11 @@
+; Pankkiautomaatti Setup Script for Inno Setup
+; Requires Inno Setup 6.0 or later
+#define MyAppName "Pankkiautomaatti"
+#define MyAppVersion "0.1"
+#define MyAppPublisher "Your Name/Company"
+#define MyAppExeName "Pankkiautomaatti.exe"
+#define MyAppURL "https://yourwebsite.com"
+
 [Setup]
 ; Perusasetukset
 AppId={{E617069E-B8C0-4A82-9DC0-3A5B5A0F3443}}
