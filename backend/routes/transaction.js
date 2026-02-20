@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const transaction = require('../models/transaction_model');
 const authenticateToken = require('../middleware/auth');
+const db = require('../routes/database');
 
 
 // Get a single transaction by its ID
@@ -121,9 +122,9 @@ router.post('/transfer', authenticateToken, function(request, response) {
     }
 
     // 3. validate that the card_id in the token matches the card_id in the request body
-    if (request.body.card_id != data.card_id) {
-        console.log(`Unauthorized: Token(${request.body.card_id}) vs Body(${data.card_id})`);
-        return response.status(403).json({ message: "UNAUTHORIZED_CARD" });
+    if (Number(request.user.card_id) !== Number(data.card_id)) {
+    console.log(`Unauthorized: Token(${request.user.card_id}) vs Body(${data.card_id})`);
+    return response.status(403).json({ message: "UNAUTHORIZED_CARD" });
     }
 
     transaction.transfer(data, function(err, dbResult) {
@@ -140,6 +141,82 @@ router.post('/transfer', authenticateToken, function(request, response) {
         }
      }
     });
+});
+
+router.get('/receipt', authenticateToken, function(req, res) {
+  const account_id = parseInt(req.query.account_id);
+  const card_id = parseInt(req.query.card_id);
+
+  if (isNaN(account_id) || isNaN(card_id)) {
+    return res.status(400).json({ error: "Valid account_id and card_id required" });
+  }
+
+  // varmista että tokenin card_id == pyydetty card_id
+  if (Number(req.user.card_id) !== Number(card_id)) {
+    return res.status(403).json({ error: "Access denied" });
+  }
+
+  // 1) Hae saldo ilman inquiry-logia
+  transaction.getBalanceNoLog({ account_id, card_id }, function(err, bal) {
+    if (err) return res.status(403).json(err);
+
+    const session_id = req.user.session_id;
+    const nowIso = new Date().toISOString();
+
+    // jos session_id puuttuu -> palautetaan vain saldo + aika
+    if (!session_id) {
+      return res.json({
+        title: "Tulosta kuitti",
+        app: "Pankkiautomaattisovellus",
+        timestamp: nowIso,
+        balance: bal.balance,
+        events: []
+      });
+    }
+
+    //hae session login_time
+    db.query(
+      "SELECT login_time FROM session WHERE session_id = ? AND card_id = ?",
+      [session_id, card_id],
+      function(sErr, sRes) {
+        if (sErr) return res.status(500).json({ error: "DB error" });
+        if (!sRes || sRes.length === 0) {
+          return res.json({
+            title: "Tulosta kuitti",
+            app: "Pankkiautomaattisovellus",
+            timestamp: nowIso,
+            balance: bal.balance,
+            events: []
+          });
+        }
+
+        const login_time = sRes[0].login_time;
+
+        // hae tämän session tapahtumat transaction-taulusta
+        // huom: jätetään INQUIRY pois, jotta pelkkä saldon katselu ei tee “käytetty palveluja”
+        const evSql = `
+          SELECT transaction_type, amount, transaction_date
+          FROM transaction
+          WHERE account_id = ?
+            AND card_id = ?
+            AND transaction_date >= ?
+            AND transaction_type IN ('WITHDRAWAL', 'DEPOSIT', 'TRANSFER')
+          ORDER BY transaction_date ASC`;
+
+        db.query(evSql, [account_id, card_id, login_time], function(evErr, events) {
+          if (evErr) return res.status(500).json({ error: "DB error" });
+
+          return res.json({
+            title: "Tulosta kuitti",
+            app: "Pankkiautomaattisovellus",
+            timestamp: nowIso,
+            balance: bal.balance,
+            events: events || []
+          });
+        });
+      }
+    );
+  });
 });
 
 module.exports = router;
