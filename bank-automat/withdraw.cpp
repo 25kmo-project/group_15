@@ -103,35 +103,30 @@ void Withdraw::onReplyFinished()
     ui->withdraw100->setEnabled(true);
 
     // Default message
-    QString message = "Withdrawal failed";
+    QString message;
 
     // Get HTTP status code
     int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-    // Try parse JSON response
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-    QJsonObject jsonObj = jsonDoc.object();
-    if (jsonObj.contains("message")) {
-        message = jsonObj["message"].toString();
-    }
-
     if (status >= 200 && status < 300) {
-        // Success
+        // Successful withdrawal
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        QJsonObject jsonObj = jsonDoc.object();
+        message = jsonObj["message"].toString();
         if (message.isEmpty()) message = "Withdrawal successful";
+
         ui->lblInfo->setText(message);
 
-        // Close dialog after 3 seconds
+        // Close dialog automatically after 3 seconds
         QTimer::singleShot(3000, this, &QDialog::accept);
 
     } else {
-        // Failed withdrawal (400, 403, etc.)
-        if (message.isEmpty()) message = reply->errorString();
-        ui->lblInfo->setText("Withdrawal failed: " + message);
-        qDebug() << "Withdrawal error, status:" << status << "data:" << data;
+        // Failed withdrawal (invalid amount, insufficient funds, etc.)
+        ui->lblInfo->setText("Withdrawal failed");  // always generic
+        qDebug() << "Withdrawal failed, status:" << status << "data:" << data;
     }
 
     reply->deleteLater();
     reply = nullptr;
 }
-
 
