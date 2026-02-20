@@ -125,12 +125,22 @@ void TransactionHistory::displayData()
 // next page
 void TransactionHistory::on_btnNextPage_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     currentPage++;
     displayData();
 }
 // previous page
 void TransactionHistory::on_btnPrevPage_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     if(currentPage > 1) {
         currentPage--;
         displayData();
@@ -139,5 +149,10 @@ void TransactionHistory::on_btnPrevPage_clicked()
 // back to menu
 void TransactionHistory::on_btnBackToMenu_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     this->close();
 }

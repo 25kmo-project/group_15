@@ -5,6 +5,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "environment.h"
+
 namespace Ui {
 class ClientInfo;
 }

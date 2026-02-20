@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QList>
-
+#include <QTimer>
 
 class Environment
 {
@@ -15,6 +15,7 @@ public:
     static int accountId;
     static QList<int> accountIds;
     static int userId;
+    static QTimer *timerLogOut;
 
 };
 

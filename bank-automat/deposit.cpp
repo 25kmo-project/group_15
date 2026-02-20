@@ -29,6 +29,11 @@ Deposit::Deposit(QWidget *parent)
 
 void Deposit::onConfirmClicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     QString text = ui->lineAmount->text().trimmed();
 
     bool ok = false;
@@ -95,6 +100,11 @@ Deposit::~Deposit()
 
 void Deposit::on_btnBack_clicked()
 {
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     reject();  // close window and return to menu
 }
 

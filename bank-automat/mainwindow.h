@@ -25,6 +25,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    //clear fields (card id and password)
+    void clearFields();
 
 private:
     Ui::MainWindow *ui;

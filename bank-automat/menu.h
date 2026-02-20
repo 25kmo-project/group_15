@@ -9,12 +9,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTimer>
 
 #include "environment.h"
 #include "deposit.h"
 #include "transfer.h"
 #include "currency.h"
 #include "balance.h"
+#include "mainwindow.h"
 
 
 class TransactionHistory;
@@ -58,9 +60,9 @@ private slots:
     void on_btnLogOut_clicked();
     //currency
     void on_btnCurrency_clicked();
-
-
-
+    //automatic log out
+    void autoLogOut();
+    void closeAllNotMain(MainWindow *mainWindow);
 };
 
 
