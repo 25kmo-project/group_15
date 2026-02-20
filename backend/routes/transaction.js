@@ -20,21 +20,38 @@ router.get('/id/:id',authenticateToken, function(request, response) {
     });
 });
 
-// create a new withdrawal transaction
-router.post('/withdraw',authenticateToken, function(req, res) {
+router.post('/withdraw', authenticateToken, function(req, res) {
     const { account_id, card_id, amount } = req.body;
-        if (req.user.card_id != card_id) {
-            return res.status(403).json({ error: "Security breach: You cannot access other cards" });
-      }
-    transaction.withdraw({ account_id, card_id, amount }, function(err, result) {
-        
+
+    // Check that the user is using their own card
+    if (req.user.card_id != card_id) {
+        return res.status(403).json({ message: "Security breach: You cannot access other cards" });
+    }
+
+    // Backend validation: amount must be at least 20
+    const a = Number(amount);
+    if (!Number.isInteger(a) || a < 20) {
+        return res.status(400).json({ message: "Invalid amount: minimum 20€" });
+    }
+
+    // Backend validation: only allow amounts that can be formed with 20€ and 50€ bills
+    let valid = false;
+    for (let fifties = 0; fifties * 50 <= a; fifties++) {
+        if ((a - fifties * 50) % 20 === 0) valid = true;
+    }
+    if (!valid) {
+        return res.status(400).json({ message: "Invalid amount: must be 20/50 combination" });
+    }
+
+    // If all checks pass, execute the withdrawal
+    transaction.withdraw({ account_id, card_id, amount: a }, function(err, result) {
         if (err) {
             const clientErrors = ['INVALID_AMOUNT', 'NOT_FOUND', 'LOCKED', 'INSUFFICIENT_FUNDS'];
             const statusCode = clientErrors.includes(err.error) ? 400 : 500;
             return res.status(statusCode).json(err);
         }
         res.json({
-            status: "SUCCESS",
+            message: "Withdrawal successful",
             ...result,
             transaction_date: new Date()
         });
