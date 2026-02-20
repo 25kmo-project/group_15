@@ -12,7 +12,7 @@ Database (**MySQL/MariaDB**): Stores user information, account balances, and all
 Framework: Qt (C++)   
 Networking: QNetworkAccessManager (For asynchronous REST API communication)  
 Data Parsing: QJsonDocument & QJsonObject  
-UI Design: QT designer
+UI Design: QT designer  
 Build system: Cmake
 
 ### Backend
@@ -118,9 +118,7 @@ frontend/
     ├── transaction.ui  
     ├── transfer.ui  
     ├── currency.ui  
-    ├── receipt.ui  
-    ├── balance.ui  
-    └── menu.ui            
+    └── receipt.ui               
 ```
 ## Quick install
 ### Database Setup
