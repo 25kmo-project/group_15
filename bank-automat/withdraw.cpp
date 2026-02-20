@@ -134,10 +134,6 @@ void Withdraw::onReplyFinished()
     reply = nullptr;
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> ebf02f7ffb0ad7a0d2131e3da219fcf29bd215af
 void Withdraw::on_btnBack_clicked()
 {
     //restart timer
@@ -146,7 +142,3 @@ void Withdraw::on_btnBack_clicked()
     }
     this->close();
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> ebf02f7ffb0ad7a0d2131e3da219fcf29bd215af

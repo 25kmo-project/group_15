@@ -523,11 +523,12 @@ Base URL: http://localhost:3000
 ## WHAT ELSE NEED TO BE INCLUDED
 
 * Who did what: check your name and responsibility, need something to add/fix/etc?
-* which tools were used: anything else?
+* which tools were used: anything else? what do we used for documentation? drawio?lucidchart?diagrameditor?
 * system architecture -> maybe picture better ? 
 * api documentation: check if it is correct
 * screenshots of application (windows and mac, maybe one picture from both systems), what else?
 * presentation of the app -> add link when it's ready
+* updated image of database
 -------
 DON'T take into consideration
 * Logical order of read.me (later)
