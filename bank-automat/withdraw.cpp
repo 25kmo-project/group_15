@@ -45,7 +45,8 @@ bool Withdraw::isValidAmount(int amount)
     if (amount < 20) return false;
 
     for (int fifties = 0; fifties * 50 <= amount; fifties++) {
-        if ((amount - fifties * 50) % 20 == 0) return true;
+        if ((amount - fifties * 50) % 20 == 0)
+            return true;
     }
     return false;
 }
@@ -134,8 +135,7 @@ void Withdraw::onReplyFinished()
     reply = nullptr;
 }
 
-<<<<<<< feature/tiina
-=======
+
 void Withdraw::on_btnBack_clicked()
 {
     //restart timer
@@ -144,4 +144,4 @@ void Withdraw::on_btnBack_clicked()
     }
     this->close();
 }
->>>>>>> main
+
