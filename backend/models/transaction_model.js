@@ -69,9 +69,17 @@ withdraw: function (data, callback) {
     const { account_id, card_id, amount } = data;
 
     // 1) Input validation
-    if (!amount || amount <= 0) {
-        return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0' });
+    if (!amount || amount <= 0 || amount % 10 !== 0 || amount === 10 || amount === 30) {
+        return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0 and be possible with 20€ and 50€ notes' });
     }
+    
+    let count50 = Math.floor(amount / 50);
+    let remainder = amount % 50;
+    if (remainder % 20 !== 0) {
+        count50 -= 1;
+    }
+    
+    let count20 = (amount - (count50 * 50)) / 20;
 
     // 2) Call stored procedure
     return db.query(
@@ -92,7 +100,11 @@ withdraw: function (data, callback) {
 
             callback(null, {
                 status: "SUCCESS",
-                new_balance: newBalance
+                new_balance: newBalance,
+                bills: {
+                    notes_50: count50,
+                    notes_20: count20
+                }
             });
         }
     );

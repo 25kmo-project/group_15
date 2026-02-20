@@ -75,7 +75,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="muusumma">
+  <widget class="QLabel" name="AddAmount">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -85,7 +85,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Muu summa</string>
+    <string>Add Amount</string>
    </property>
   </widget>
   <widget class="QLabel" name="lblInfo">
@@ -98,7 +98,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>info</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label">
