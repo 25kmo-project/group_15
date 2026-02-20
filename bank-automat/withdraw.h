@@ -19,10 +19,8 @@ public:
 
 private slots:
     void onConfirmClicked();
-    void onAmountEntered();    // user push the own amount - button
     void onReplyFinished();    // Backendin response
     void on_btnBack_clicked();
-    void onBalanceReceived();
 
 private:
     Ui::Withdraw *ui;

@@ -92,7 +92,6 @@ void Withdraw::onConfirmClicked()
 
     reply = networkManager->post(request, QJsonDocument(json).toJson(QJsonDocument::Compact));
     connect(reply, &QNetworkReply::finished, this, &Withdraw::onReplyFinished);
-    }
 }
 
 void Withdraw::onReplyFinished()
@@ -134,8 +133,6 @@ void Withdraw::onReplyFinished()
     reply = nullptr;
 }
 
-<<<<<<< feature/tiina
-=======
 void Withdraw::on_btnBack_clicked()
 {
     //restart timer
@@ -144,4 +141,3 @@ void Withdraw::on_btnBack_clicked()
     }
     this->close();
 }
->>>>>>> main
