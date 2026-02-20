@@ -1,21 +1,140 @@
-/* background color */
+/* GLOBAL */
 
-QWidget {
-    background-color: #27DDF5;
+* {
+    font-family: "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 }
 
-/* signin */
+
+/* MAIN BACKGROUND */
+QMainWindow, QWidget {
+    background-color: #F5F7FA;
+}
+
+/* CARD PANEL */
+#centralwidget {
+    background-color: transparent;
+}
+
+/* LABELS */
+QLabel {
+    color: #0F172A;
+}
+
+/* TITLE */
+QLabel#label {
+    font-size: 42px;
+    font-weight: 600;
+}
+
+/* INPUT FIELDS */
+QLineEdit {
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 22px;
+}
+
+QLineEdit:focus {
+    border: 2px solid #2563EB;
+}
+
+/* BUTTON */
 QPushButton {
-    background-color: #FFFFFF;
-    color: black;
-    border: 2px solid #000000;
-    border-radius: 10px;
+    background-color: #2563EB;
+    color: white;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #1D4ED8;
 }
 
 QPushButton:pressed {
-    background-color: #ff77aa;
-    border: 2px solid #ff1493;
+    background-color: #1E40AF;
+}
+
+/* ERROR TEXT */
+QLabel#labelInfo {
+    color: #EF4444;
+    font-size: 20px;
+}
+
+/* ATM STYLE LARGE TOUCH */
+QPushButton, QLineEdit {
+    min-height: 60px;
+}
+
+/* REMOVE MENU */
+QMenuBar {
+    background: transparent;
+}
+* {
+    font-family: "Inter", "Segoe UI", Arial;
+}
+
+QMainWindow, QWidget {
+    background: #F5F7FA;
+}
+
+QLabel {
+    color: #0F172A;
+}
+
+#loginCard {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #FFFFFF, stop:1 #F9FAFB);
+    border-radius: 24px;
+    padding: 30px;
+    border: none;
 }
 
 
-/* etc */
+QLineEdit {
+    background: #FFFFFF;
+    border: 1px solid #D1D5DB;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-size: 20px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #2563EB;
+    background: #F9FAFB;
+}
+
+
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #2563EB, stop:1 #1D4ED8);
+    color: white;
+    border-radius: 20px;
+    font-size: 22px;
+    font-weight: 600;
+    min-height: 56px;
+    padding: 0 24px;
+}
+
+QPushButton:hover {
+    background: #1E40AF;
+}
+
+QPushButton:pressed {
+    background: #1B3A8B;
+    padding-top: 2px;  /* эффект нажатия */
+}
+
+
+QLabel {
+    background: transparent;
+    color: #0F172A;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+QLabel#label {
+    font-size: 44px;
+    font-weight: bold;
+}
