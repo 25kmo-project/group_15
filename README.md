@@ -523,7 +523,7 @@ Base URL: http://localhost:3000
 ## WHAT ELSE NEED TO BE INCLUDED
 
 * Who did what: check your name and responsibility, need something to add/fix/etc?
-* which tools were used: anything else? what do we used for documentation? drawio?lucidchart?diagrameditor?
+* which tools were used: anything else? what do we used for documentation? drawio?lucidchart?diagrameditor? what do we use (morgan module) for receipt?
 * system architecture -> maybe picture better ? 
 * api documentation: check if it is correct
 * screenshots of application (windows and mac, maybe one picture from both systems), what else?
