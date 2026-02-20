@@ -19,7 +19,6 @@ public:
 
 private slots:
     void onConfirmClicked();
-    void onReplyFinished();
     void onAmountEntered();    // user push the own amount - button
     void onReplyFinished();    // Backendin response
     void on_btnBack_clicked();
