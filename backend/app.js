@@ -24,15 +24,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/login', loginRouter); 
 
-//suojatut reitit
-//esimerkki
-// app.use('/user',authenticateToken, userRouter);
-app.use('/user', userRouter);
-app.use('/transaction', transactionRouter);
-app.use('/cards', cardRouter);
-app.use('/account_access', accountAccessRouter);
-app.use('/accounts', accountRouter);
-app.use('/currency', currencyRouter);
+//protected routes
+app.use('/user',authenticateToken, userRouter);
+app.use('/transaction',authenticateToken, transactionRouter);
+app.use('/cards',authenticateToken, cardRouter);
+app.use('/account_access',authenticateToken, accountAccessRouter);
+app.use('/accounts',authenticateToken, accountRouter);
+app.use('/currency',authenticateToken, currencyRouter);
 
 
 //tarkisus jwt(jason web token)

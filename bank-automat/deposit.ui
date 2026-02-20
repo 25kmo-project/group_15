@@ -21,8 +21,8 @@
   <widget class="QPushButton" name="btnConfirm">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>250</y>
+     <x>350</x>
+     <y>330</y>
      <width>151</width>
      <height>51</height>
     </rect>
@@ -41,9 +41,9 @@
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>90</y>
-     <width>301</width>
-     <height>61</height>
+     <y>30</y>
+     <width>351</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="font">
@@ -84,32 +84,13 @@
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnBack">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>460</y>
-     <width>121</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>24</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Back</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>180</y>
-     <width>451</width>
-     <height>33</height>
+     <x>160</x>
+     <y>160</y>
+     <width>541</width>
+     <height>101</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -143,6 +124,25 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="btnBack">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>510</y>
+     <width>111</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
   </widget>
  </widget>
  <resources/>
