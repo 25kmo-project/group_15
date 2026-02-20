@@ -1,34 +1,33 @@
 #include "withdraw.h"
 #include "ui_withdraw.h"
-#include "environment.h"
-
-#include <QNetworkRequest>
+#include "environment.h"  // contains token, accountId, cardId
+#include <QUrlQuery>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDoubleValidator>
+#include <QUrl>
+#include <QTimer>
 #include <QDebug>
+#include <QIntValidator>
 
-Withdraw::Withdraw(QWidget *parent)
-    : QDialog(parent),
+Withdraw::Withdraw(QWidget *parent) :
+    QDialog(parent),
     ui(new Ui::Withdraw),
     networkManager(new QNetworkAccessManager(this)),
     reply(nullptr)
 {
     ui->setupUi(this);
 
-    // Validator allows only positive decimal values
-    auto *validator = new QDoubleValidator(0, 1000000000, 2, this);
-    validator->setNotation(QDoubleValidator::StandardNotation);
-    ui->lineAmount->setValidator(validator);
+    // Only allow integers 20-10000
+    ui->lineAmount->setValidator(new QIntValidator(20, 10000, this));
 
-    // Functionality for quick-selection buttons
-    connect(ui->withdraw20, &QPushButton::clicked, this, [this]() { performWithdraw(20); });
-    connect(ui->withdraw40, &QPushButton::clicked, this, [this]() { performWithdraw(40); });
-    connect(ui->withdraw50, &QPushButton::clicked, this, [this]() { performWithdraw(50); });
-    connect(ui->withdraw100, &QPushButton::clicked, this, [this]() { performWithdraw(100); });
+    // Connect quick withdrawal buttons
+    connect(ui->withdraw20, &QPushButton::clicked, this, &Withdraw::onConfirmClicked);
+    connect(ui->withdraw40, &QPushButton::clicked, this, &Withdraw::onConfirmClicked);
+    connect(ui->withdraw50, &QPushButton::clicked, this, &Withdraw::onConfirmClicked);
+    connect(ui->withdraw100, &QPushButton::clicked, this, &Withdraw::onConfirmClicked);
 
-    // Own amount in the field Enter
-    connect(ui->lineAmount, &QLineEdit::returnPressed, this, &Withdraw::onAmountEntered);
+    // Enter key for custom amount
+    connect(ui->lineAmount, &QLineEdit::returnPressed, this, &Withdraw::onConfirmClicked);
 }
 
 Withdraw::~Withdraw()
@@ -36,95 +35,103 @@ Withdraw::~Withdraw()
     delete ui;
 }
 
-// User enters an own amount and presses Enter
-void Withdraw::onAmountEntered()
+// Frontend validation: minimum 20 and only 20/50 combinations
+bool Withdraw::isValidAmount(int amount)
 {
-    bool ok = false;
-    double amount = ui->lineAmount->text().trimmed().toDouble(&ok);
+    if (amount < 20) return false;
 
-    if (!ok || amount <= 0.0) {
-        ui->lblInfo->setText("Enter a positive amount.");
+    for (int fifties = 0; fifties * 50 <= amount; fifties++) {
+        if ((amount - fifties * 50) % 20 == 0) return true;
+    }
+    return false;
+}
+
+void Withdraw::onConfirmClicked()
+{
+    int amount = 0;
+    QPushButton *button = qobject_cast<QPushButton*>(sender());
+
+    // Determine amount from button or input
+    if (button == ui->withdraw20) amount = 20;
+    else if (button == ui->withdraw40) amount = 40;
+    else if (button == ui->withdraw50) amount = 50;
+    else if (button == ui->withdraw100) amount = 100;
+    else amount = ui->lineAmount->text().toInt();
+
+    // Frontend validation
+    if (!isValidAmount(amount)) {
+        ui->lblInfo->setText("Invalid amount: must be at least 20 and a combination of 20/50€ bills.");
         return;
     }
 
-    performWithdraw(amount);
-}
+    // Disable UI while processing
+    ui->lblInfo->setText("Processing...");
+    ui->lineAmount->setEnabled(false);
+    ui->withdraw20->setEnabled(false);
+    ui->withdraw40->setEnabled(false);
+    ui->withdraw50->setEnabled(false);
+    ui->withdraw100->setEnabled(false);
 
-// Send the withdrawal request
-void Withdraw::performWithdraw(double amount)
-{
+    // Prepare request
     QUrl url(Environment::base_url() + "transaction/withdraw");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", "Bearer " + Environment::token.toUtf8());
 
-    QJsonObject body;
-    body["account_id"] = Environment::accountId;
-    body["card_id"] = Environment::cardId;
-    body["amount"] = amount;
+    // Add authorization token
+    QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
+    request.setRawHeader("Authorization", authHeader);
 
-    ui->lblInfo->setText("Processing...");
-    ui->lineAmount->setEnabled(false);
-    for (auto btn : {ui->withdraw20, ui->withdraw40, ui->withdraw50, ui->withdraw100})
-        btn->setEnabled(false);
+    // JSON body
+    QJsonObject json;
+    json["amount"] = amount;
+    json["account_id"] = Environment::accountId;
+    json["card_id"] = Environment::cardId;
 
-    reply = networkManager->post(request, QJsonDocument(body).toJson(QJsonDocument::Compact));
+    reply = networkManager->post(request, QJsonDocument(json).toJson(QJsonDocument::Compact));
     connect(reply, &QNetworkReply::finished, this, &Withdraw::onReplyFinished);
 }
 
-// Backend response
 void Withdraw::onReplyFinished()
 {
     QByteArray data = reply->readAll();
 
-    // UI back in use
+    // Re-enable UI
     ui->lineAmount->setEnabled(true);
-    for (auto btn : {ui->withdraw20, ui->withdraw40, ui->withdraw50, ui->withdraw100})
-        btn->setEnabled(true);
+    ui->withdraw20->setEnabled(true);
+    ui->withdraw40->setEnabled(true);
+    ui->withdraw50->setEnabled(true);
+    ui->withdraw100->setEnabled(true);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        ui->lblInfo->setText("Withdrawal successful.");
-        ui->lineAmount->clear();
-        qDebug() << "Withdraw OK:" << data;
-        reply->deleteLater();
-        reply = nullptr;
-        getBalance();
-    } else {
-        ui->lblInfo->setText("Withdrawal failed: " + reply->errorString());
-        qDebug() << "Withdraw error:" << reply->errorString() << data;
-        reply->deleteLater();
+    // Default message
+    QString message = "Withdrawal failed";
+
+    // Get HTTP status code
+    int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+    // Try parse JSON response
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+    QJsonObject jsonObj = jsonDoc.object();
+    if (jsonObj.contains("message")) {
+        message = jsonObj["message"].toString();
     }
 
-}
+    if (status >= 200 && status < 300) {
+        // Success
+        if (message.isEmpty()) message = "Withdrawal successful";
+        ui->lblInfo->setText(message);
 
-void Withdraw::getBalance()
-{
-    QString path = "transaction/balance";
-    QUrl url(Environment::base_url() + path);
-    QUrlQuery query;
-    query.addQueryItem("account_id", QString::number(Environment::accountId));
-    query.addQueryItem("card_id", QString::number(Environment::cardId));
-    url.setQuery(query);
+        // Close dialog after 3 seconds
+        QTimer::singleShot(3000, this, &QDialog::accept);
 
-    QNetworkRequest request(url);
-    QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
-    request.setRawHeader("Authorization", authHeader);
-
-    reply = networkManager->get(request);
-    connect(reply, &QNetworkReply::finished, this, &Withdraw::onBalanceReceived);
-}
-
-void Withdraw::onBalanceReceived()
-{
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray data = reply->readAll();
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-        QJsonObject jsonObj = jsonDoc.object();
-        double balance = jsonObj["balance"].toDouble();
-        ui->lblInfo->setText("Withdrawal successful. Balance: " +
-                             QString::number(balance, 'f', 2) + " €");
     } else {
-        ui->lblInfo->setText("Withdrawal successful.");
+        // Failed withdrawal (400, 403, etc.)
+        if (message.isEmpty()) message = reply->errorString();
+        ui->lblInfo->setText("Withdrawal failed: " + message);
+        qDebug() << "Withdrawal error, status:" << status << "data:" << data;
     }
+
     reply->deleteLater();
+    reply = nullptr;
 }
+
+
