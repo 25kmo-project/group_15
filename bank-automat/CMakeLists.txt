@@ -44,6 +44,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         withdraw.h withdraw.cpp withdraw.ui
         currency.h currency.cpp currency.ui
         balance.h balance.cpp balance.ui
+        receipt.h receipt.cpp receipt.ui
 
 
     )

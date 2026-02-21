@@ -221,6 +221,38 @@ deposit: function (data, callback) {
         });
        });
     },
+    getBalanceNoLog: function(data, callback) {
+  const { account_id, card_id } = data;
+
+  const sql = `
+    SELECT 
+      u.user_name, u.user_lastname, 
+      a.balance, a.account_number, 
+      c.status AS card_status
+    FROM account_access aa
+    JOIN account a ON aa.account_id = a.account_id
+    JOIN user u ON a.user_id = u.user_id
+    JOIN card c ON aa.card_id = c.card_id
+    WHERE aa.account_id = ? AND aa.card_id = ?`;
+
+  db.query(sql, [account_id, card_id], function(err, results) {
+    if (err) return callback(err);
+    if (results.length === 0) {
+      return callback({ error: 'NOT_FOUND', message: 'Access denied' });
+    }
+
+    const row = results[0];
+    if (row.card_status !== 'ACTIVE') {
+      return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
+    }
+
+    callback(null, {
+      owner: `${row.user_name} ${row.user_lastname}`,
+      account_number: row.account_number,
+      balance: parseFloat(row.balance)
+    });
+  });
+},
     
     transfer: function(data, callback) {
         const { sender_account_id, receiver_account_number, card_id, amount } = data;
