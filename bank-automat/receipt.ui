@@ -6,44 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Receipt</string>
   </property>
-
-  <!-- Title -->
-  <widget class="QLabel" name="labelTitle">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>40</y>
-     <width>241</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>36</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Receipt</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-
-  <!-- Back button -->
   <widget class="QPushButton" name="btnBack">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>510</y>
+     <x>50</x>
+     <y>660</y>
      <width>131</width>
      <height>51</height>
     </rect>
@@ -57,49 +31,41 @@
     <string>Back</string>
    </property>
   </widget>
-
-  <!-- Receipt content area -->
-  <widget class="QWidget" name="layoutWidgetReceipt">
+  <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>130</y>
-     <width>781</width>
-     <height>351</height>
+     <x>30</x>
+     <y>0</y>
+     <width>1011</width>
+     <height>181</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
-    <item>
-     <widget class="QTextEdit" name="txtReceipt">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>18</pointsize>
-       </font>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-      <property name="placeholderText">
-       <string>Receipt will be shown here...</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>36</pointsize>
+    </font>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Digital Receipt</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
   </widget>
-
+  <widget class="QTextBrowser" name="txtReceipt">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>160</y>
+     <width>611</width>
+     <height>421</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
