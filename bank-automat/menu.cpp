@@ -11,6 +11,7 @@
 #include "deposit.h"
 #include "withdraw.h"
 #include "balance.h"
+#include "receipt.h"
 
 
 Menu::Menu(QWidget *parent): QDialog(parent), ui(new Ui::Menu)
@@ -72,7 +73,14 @@ void Menu::on_btnWithdrawal_clicked()
     withdrawWin->show();
     this->hide();
 }
+//receipt
+void Menu::on_btnReceipt_clicked()
+{
+    Environment::timerLogOut->start();
 
+    Receipt dlg(this);
+    dlg.exec();
+}
 //balance
 void Menu::on_btnBalance_clicked()
 {
@@ -150,6 +158,8 @@ void Menu::on_btnCurrency_clicked()
     currencyWin->show();
     this->hide();
 }
+
+
 
 //my profile
 void Menu::on_btnMyProfile_clicked()

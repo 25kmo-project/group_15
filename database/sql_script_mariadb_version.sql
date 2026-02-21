@@ -128,6 +128,22 @@ CREATE TABLE IF NOT EXISTS `bank`.`transaction` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
+-- -----------------------------------------------------
+-- Table `bank`.`session`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `session` (
+  `session_id` CHAR(36) NOT NULL,
+  `card_id` INT NOT NULL,
+  `login_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `logout_time` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`session_id`),
+  INDEX `card_id_idx` (`card_id` ASC),
+  CONSTRAINT `fk_session_card`
+    FOREIGN KEY (`card_id`)
+    REFERENCES `bank`.`card` (`card_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =====================================================
 -- STORED PROCEDURE: DEPOSIT

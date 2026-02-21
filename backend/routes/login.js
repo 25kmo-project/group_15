@@ -3,6 +3,8 @@ const router = express.Router();
 const login = require('../models/login_model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+const db = require('../routes/database');
 
 router.post('/', function(request, response){
     if(request.body.card_id && request.body.pin_code){
@@ -53,6 +55,7 @@ router.post('/', function(request, response){
                                     return response.status(401).json({"message":`Pincode is not correct (${attemptsNow}/3)`});
                                 }
                             });
+                            return;
 
                         }
                         else {
@@ -63,34 +66,49 @@ router.post('/', function(request, response){
                                     return response.status(500).json({"message":"Database error: Failed to reset attempts"});
                                 }
 
-                                const token = generateAccessToken(card_id);
+                               const session_id = uuidv4();
 
-                                //tarkistetaan kortin tyypit: debit ja credit rivit 69-77
-                                const accountTypes = [];
-                                const accountIds = [];
+db.query(
+    "INSERT INTO session (session_id, card_id) VALUES (?, ?)",
+    [session_id, card_id],
+    function(sessErr){
+        if(sessErr){
+            console.log("Database error (insert session):", sessErr);
+            return response.status(500).json({"message":"Database error: Failed to create session"});
+        }
 
-                                for(let i = 0; i < result.length; i++){
-                                    accountIds.push(result[i].account_id);
-    
-                                    if(!accountTypes.includes(result[i].account_type)){
-                                        accountTypes.push(result[i].account_type);
-                                        }
-                                }
+        // tokeniin card_id + session_id
+        const token = generateAccessToken({ card_id: Number(card_id), session_id });
 
-                                const user_id = result[0].user_id;
+        //tarkistetaan kortin tyypit: debit ja credit rivit 69-77
+        const accountTypes = [];
+        const accountIds = [];
 
-                                //vastaus json-muodossa
-                                response.setHeader('Content-Type','application/json');
-                                return response.status(200).json({
-                                    success: true,
-                                    message: "Login successful",
-                                    card_id: Number(card_id),
-                                    user_id: user_id,
-                                    account_id: accountIds,
-                                    account_types: accountTypes, //saadaan tili tyypit
-                                    side_selection: accountTypes.length > 1, //jos vastus on enemmän kuin 1->true
-                                    token: token
-                                });
+        for(let i = 0; i < result.length; i++){
+            accountIds.push(result[i].account_id);
+
+            if(!accountTypes.includes(result[i].account_type)){
+                accountTypes.push(result[i].account_type);
+            }
+        }
+
+        const user_id = result[0].user_id;
+
+        //vastaus json-muodossa
+        response.setHeader('Content-Type','application/json');
+        return response.status(200).json({
+            success: true,
+            message: "Login successful",
+            card_id: Number(card_id),
+            user_id: user_id,
+            account_id: accountIds,
+            account_types: accountTypes,
+            side_selection: accountTypes.length > 1,
+            session_id: session_id,  // <-- lisätty
+            token: token
+        });
+    }
+);
                             });
                         }
                     }); 
@@ -108,8 +126,8 @@ router.post('/', function(request, response){
     }
 });
 
-function generateAccessToken(card_id){
-    return jwt.sign({card_id}, process.env.MY_TOKEN, {expiresIn: '1800s'});
+function generateAccessToken(payload){
+    return jwt.sign(payload, process.env.MY_TOKEN, {expiresIn: '1800s'});
 }
 
 module.exports = router;
