@@ -38,44 +38,40 @@ Withdraw::~Withdraw()
 // Frontend validation: minimum 20 and only 20/50 combinations
 bool Withdraw::isValidAmount(int amount)
 {
-<<<<<<< feature/tiina
-    if (amount < 20) return false;
-=======
     //restart timer
     if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
-
-    bool ok = false;
-    double amount = ui->lineAmount->text().trimmed().toDouble(&ok);
->>>>>>> main
+    if (amount < 20) return false;
 
     for (int fifties = 0; fifties * 50 <= amount; fifties++) {
-        if ((amount - fifties * 50) % 20 == 0) return true;
+        if ((amount - fifties * 50) % 20 == 0)
+            return true;
     }
     return false;
 }
 
 void Withdraw::onConfirmClicked()
 {
-<<<<<<< feature/tiina
+    //restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     int amount = 0;
     QPushButton *button = qobject_cast<QPushButton*>(sender());
 
-    // Determine amount from button or input
     if (button == ui->withdraw20) amount = 20;
     else if (button == ui->withdraw40) amount = 40;
     else if (button == ui->withdraw50) amount = 50;
     else if (button == ui->withdraw100) amount = 100;
     else amount = ui->lineAmount->text().toInt();
 
-    // Frontend validation
     if (!isValidAmount(amount)) {
         ui->lblInfo->setText("Invalid amount: must be at least 20 and a combination of 20/50€ bills.");
         return;
     }
 
-    // Disable UI while processing
     ui->lblInfo->setText("Processing...");
     ui->lineAmount->setEnabled(false);
     ui->withdraw20->setEnabled(false);
@@ -83,23 +79,13 @@ void Withdraw::onConfirmClicked()
     ui->withdraw50->setEnabled(false);
     ui->withdraw100->setEnabled(false);
 
-    // Prepare request
-=======
-    //restart timer
-    if (Environment::timerLogOut) {
-        Environment::timerLogOut->start();
-    }
-
->>>>>>> main
     QUrl url(Environment::base_url() + "transaction/withdraw");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    // Add authorization token
     QByteArray authHeader = "Bearer " + Environment::token.toUtf8();
     request.setRawHeader("Authorization", authHeader);
 
-    // JSON body
     QJsonObject json;
     json["amount"] = amount;
     json["account_id"] = Environment::accountId;
@@ -148,8 +134,6 @@ void Withdraw::onReplyFinished()
     reply = nullptr;
 }
 
-<<<<<<< feature/tiina
-=======
 void Withdraw::on_btnBack_clicked()
 {
     //restart timer
@@ -158,4 +142,3 @@ void Withdraw::on_btnBack_clicked()
     }
     this->close();
 }
->>>>>>> main

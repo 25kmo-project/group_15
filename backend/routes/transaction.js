@@ -161,6 +161,8 @@ router.post('/transfer', authenticateToken, function(request, response) {
 });
 
 router.get('/receipt', authenticateToken, function(req, res) {
+    console.log("receipt token payload:", req.user);
+
   const account_id = parseInt(req.query.account_id);
   const card_id = parseInt(req.query.card_id);
 

@@ -17,6 +17,8 @@
 #include "currency.h"
 #include "balance.h"
 #include "mainwindow.h"
+#include "receipt.h"
+
 
 
 class TransactionHistory;
@@ -60,6 +62,8 @@ private slots:
     void on_btnLogOut_clicked();
     //currency
     void on_btnCurrency_clicked();
+    //receipt
+    void on_btnReceipt_clicked();
     //automatic log out
     void autoLogOut();
     void closeAllNotMain(MainWindow *mainWindow);
