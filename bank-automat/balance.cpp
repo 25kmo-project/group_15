@@ -12,6 +12,8 @@ Balance::Balance(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setWindowTitle("Balance");
+
     networkManager = new QNetworkAccessManager(this);
     getBalance();
 }

@@ -17,6 +17,9 @@
 Menu::Menu(QWidget *parent): QDialog(parent), ui(new Ui::Menu)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Menu");
+
     networkManager = new QNetworkAccessManager(this);
 
     //create new timer if it does not exist

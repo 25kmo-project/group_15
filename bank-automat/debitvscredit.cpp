@@ -8,6 +8,9 @@ DebitvsCredit::DebitvsCredit(QWidget *parent)
     , ui(new Ui::DebitvsCredit)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Card choice");
+
     this->cardId = Environment::cardId;
     this->accountId = Environment::accountId;
     connect(ui->btnDebit, &QPushButton::clicked, this, &DebitvsCredit::DebitButtonClicked);

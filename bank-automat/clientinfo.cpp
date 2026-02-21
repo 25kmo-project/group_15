@@ -10,6 +10,8 @@ ClientInfo::ClientInfo(QWidget *parent): QDialog(parent), ui(new Ui::ClientInfo)
 {
     ui->setupUi(this);
 
+    setWindowTitle("Information");
+
 }
 
 ClientInfo::~ClientInfo()
