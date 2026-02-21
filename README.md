@@ -183,8 +183,8 @@ frontend/
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 ## Installation & Setup 
-### Option 1️⃣
-Quick Install (End Users)
+## Option 1️⃣
+> Quick Install (End Users)
 
 ### Windows
 
@@ -199,7 +199,7 @@ Quick Install (End Users)
 
 ⚠️ The app requires a running backend server to function. Contact your system administrator for the server address, or set up your own using Option 2 below.
 
-### Option 2️⃣
+## Option 2️⃣
 
 ### First step: Clone the Repository
 ```bash
@@ -277,7 +277,7 @@ npm start
 ```
 * The API will be available at http://localhost:3000 by default.
 
-### Frontend Environment
+### Fourth step: Frontend Environment
 * Ensure Qt 5.15+ and CMake are installed:
 
 Qt Creator:
@@ -314,7 +314,8 @@ Pushing a version **tag** (e.g., v1.0) automatically initiates the distribution 
 - [@ecedevere](https://github.com/ecedevere)
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
-## 👥 Team
+
+## Team
 
 All team members participated across all areas of the project.
 Primary responsibilities were distributed as follows:
@@ -322,13 +323,14 @@ Primary responsibilities were distributed as follows:
 |Author|Primary Responsibilities|
 |--------|-------------|
 |[@juanyu0417](https://github.com/JuanYu0417)|Transaction feature(full stack)|
-|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt (backend)|
+|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt (full stack)|
 |[@tinnihkis](https://github.com/tinnihkis)|Withdrawal(full stack)|
-|[@ecedevere](https://github.com/ecedevere)|User(full stack), Receipt (frontend)|
+|[@ecedevere](https://github.com/ecedevere)|User(full stack)|
 
 All other parts of the project were made together.
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
+
 ## License
 This project is licensed under the [MIT License](LICENSE).
 
@@ -337,10 +339,8 @@ This project is licensed under the [MIT License](LICENSE).
 ## Tools
 
 * GitHub kanban board for task managment
-![Kanban](images/kanban_board_picture.png)
 * MySQL Workbench for databse planning and editing
 * Postman for testing API
-![Postman](images/postman_picture.png)
 * Discord for communication with eachother in team
 * Teams to communicate with teachers and to shared files with them
 * VS Code and Qt Creator as IDE
@@ -348,9 +348,17 @@ This project is licensed under the [MIT License](LICENSE).
 * Inno Setup for installer
 * Markddown PDF (extension for VS Code)
 
+
+<img src="images/kanban_board_picture.png" width="500"/>
+<img src="images/postman_picture.png" width="500"/>
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
 ## Presentation of the app
 
-link : /group_15/Bank_App_Presentation_Group_15.pptx
+[Bank App Presentation](https://github.com/25kmo-project/group_15/blob/main/Bank_App_Presentation_Group_15.pptx)
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
 
 ## Screenshots of the app
 
@@ -358,6 +366,8 @@ link : /group_15/Bank_App_Presentation_Group_15.pptx
 * receipt
 * withdrawal
 * something else?
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
 
 ## Frontend Navigation Flow
 
@@ -403,9 +413,9 @@ link : /group_15/Bank_App_Presentation_Group_15.pptx
      │                      ▼
      │   ┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
      └── │                             Main Menu                                                               │◀┐
-(logout) └──┬─────────┬─────────┬──────────┬─────────────────┬──────────────────┬────────────┬─────────────────┘ │
-            │         │         │          │                 │                  │            │                   │
-            ▼         ▼         ▼          ▼                 ▼                  ▼            ▼                   │
+(logout) └──┬─────────┬─────────┬──────────┬─────────────────┬──────────────────┬────────────┬───────────┬─────┘ │
+            │         │         │          │                 │                  │            │           │       │
+            ▼         ▼         ▼          ▼                 ▼                  ▼            ▼           ▼       │
         ┌──────────┐┌───────┐┌─────────┐┌──────────┐     ┌────────┐           ┌─────────────┐┌────────┐┌────────┐│
         │My Profile││Balance││ Deposit ││Withdrawal│     │Transfer│           │ Transaction ││Currency││Receipt ││
         │          ││       ││         ││          │     │        │           │ History     ││        ││        ││
@@ -430,8 +440,7 @@ link : /group_15/Bank_App_Presentation_Group_15.pptx
                                                        Back to Main Menu
 ```
 
-
-
+<a href="#-table-of-contents">⬆️ Back to top</a>
 
 ## API Documentation
 
@@ -520,6 +529,8 @@ Base URL: http://localhost:3000
 |PUT|/account_access/:card_id/:account_id|Update access type|
 |DELETE|/account_access/:card_id/:account_id|Revoke access|
 
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
 ## WHAT ELSE NEED TO BE INCLUDED
 
 * Who did what: check your name and responsibility, need something to add/fix/etc?
@@ -527,8 +538,7 @@ Base URL: http://localhost:3000
 * system architecture -> maybe picture better ? 
 * api documentation: check if it is correct
 * screenshots of application (windows and mac, maybe one picture from both systems), what else?
-* presentation of the app -> add link when it's ready
-* updated image of database
+* update image of database (with table for receipt)
 -------
 DON'T take into consideration
 * Logical order of read.me (later)
