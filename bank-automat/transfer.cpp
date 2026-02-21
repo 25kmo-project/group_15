@@ -10,6 +10,9 @@ Transfer::Transfer(int accId, int cId, QString t, QDialog *parent) :
     token(t)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Transfer");
+
     manager = new QNetworkAccessManager(this);
     setupUiLogic();
 }

@@ -14,6 +14,8 @@ Currency::Currency(QString token, QWidget *parent)
 {
     ui->setupUi(this);
 
+    setWindowTitle("Currency");
+
     connect(ui->btnBack, &QPushButton::clicked, this, &Currency::on_btnBack_clicked);
     connect(ui->btnRefresh, &QPushButton::clicked, this, &Currency::fetchRates);
 
