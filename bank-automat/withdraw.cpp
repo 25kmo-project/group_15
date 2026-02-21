@@ -39,7 +39,7 @@ Withdraw::~Withdraw()
 bool Withdraw::isValidAmount(int amount)
 {
     //restart timer
-    if (Environment::timerLogOut) {
+        if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
     if (amount < 20) return false;
