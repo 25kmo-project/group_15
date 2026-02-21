@@ -210,8 +210,23 @@ git clone https://github.com/25kmo-project/group_15.git
 cd group_15
 ```
 ### Second step: Database Setup
-* The **database/** folder contains all scripts needed to initialize the system. 
-* Run them in order
+
+#### Prerequisites: Database Server
+
+Before running the database scripts, make sure MySQL is running on your machine.
+
+**macOS — using XAMPP:**
+1. Download and install [XAMPP for macOS](https://www.apachefriends.org/download.html)
+2. Open the XAMPP Control Panel
+3. Click **Start** next to **MySQL Database**
+
+**Windows — using UniServer:**
+1. Download and install [UniServer](https://sourceforge.net/projects/miniserver/)
+2. Open the UniServer Control Panel
+3. Click **Start** next to **MySQL**
+______
+
+> The **database/** folder contains all scripts needed to initialize the system. Run them in order
 
 * Open **database/db_setup.sql** and replace **YOUR_PASSWORD_HERE** with a password of your choice
 
