@@ -6,37 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="lblTitle">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>20</y>
-     <width>271</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>36</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Funds Transfer</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btnConfirm">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>280</y>
+     <x>370</x>
+     <y>390</y>
      <width>141</width>
      <height>61</height>
     </rect>
@@ -51,32 +32,13 @@
     <string>Confirm</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnBack">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>430</y>
-     <width>141</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>24</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Back</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="lblErrorDisplay">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>360</y>
-     <width>251</width>
-     <height>20</height>
+     <x>280</x>
+     <y>650</y>
+     <width>331</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
@@ -92,42 +54,29 @@
     <string/>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>120</y>
-     <width>631</width>
-     <height>141</height>
+     <x>120</x>
+     <y>170</y>
+     <width>681</width>
+     <height>191</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="lblTargetLabel">
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="leAmount">
       <property name="font">
        <font>
         <family>Arial</family>
         <pointsize>24</pointsize>
        </font>
-      </property>
-      <property name="text">
-       <string>Receiver Account Number:</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="leTargetAccount">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="maxLength">
-       <number>18</number>
+      <property name="placeholderText">
+       <string>0.00</string>
       </property>
      </widget>
     </item>
@@ -147,19 +96,32 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="leAmount">
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="leTargetAccount">
       <property name="font">
        <font>
         <family>Arial</family>
         <pointsize>24</pointsize>
        </font>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+      <property name="maxLength">
+       <number>18</number>
       </property>
-      <property name="placeholderText">
-       <string>0.00</string>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="lblTargetLabel">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Receiver Account Number:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
      </widget>
     </item>
@@ -168,8 +130,8 @@
   <widget class="QLabel" name="labelTransfer">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>410</y>
+     <x>250</x>
+     <y>480</y>
      <width>431</width>
      <height>91</height>
     </rect>
@@ -182,6 +144,50 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>0</y>
+     <width>349</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>36</pointsize>
+    </font>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Funds Transfer</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnBack">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>640</y>
+     <width>111</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
    </property>
   </widget>
  </widget>

@@ -4,6 +4,9 @@
 #include <QDialog>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonObject>
+
+#include "ui_receipt.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Receipt; }

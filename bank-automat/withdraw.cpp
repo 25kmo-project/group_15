@@ -17,6 +17,8 @@ Withdraw::Withdraw(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowTitle("Withdrawal");
+
     // Only allow integers 20-10000
     ui->lineAmount->setValidator(new QIntValidator(20, 10000, this));
 
@@ -28,6 +30,7 @@ Withdraw::Withdraw(QWidget *parent) :
 
     // Enter key for custom amount
     connect(ui->lineAmount, &QLineEdit::returnPressed, this, &Withdraw::onConfirmClicked);
+    connect(ui->btnConfirm, &QPushButton::clicked, this, &Withdraw::onConfirmClicked);
 }
 
 Withdraw::~Withdraw()
@@ -39,7 +42,7 @@ Withdraw::~Withdraw()
 bool Withdraw::isValidAmount(int amount)
 {
     //restart timer
-    if (Environment::timerLogOut) {
+        if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
     if (amount < 20) return false;
@@ -120,9 +123,6 @@ void Withdraw::onReplyFinished()
         if (message.isEmpty()) message = "Withdrawal successful";
 
         ui->lblInfo->setText(message);
-
-        // Close dialog automatically after 3 seconds
-        QTimer::singleShot(3000, this, &QDialog::accept);
 
     } else {
         // Failed withdrawal (invalid amount, insufficient funds, etc.)

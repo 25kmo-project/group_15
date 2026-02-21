@@ -1,10 +1,31 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "menu.h"
+#include <QGraphicsDropShadowEffect>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Bank App");
+
+    //code start for ui shadow
+    auto *shadow = new QGraphicsDropShadowEffect(this);
+    shadow->setBlurRadius(30); //shadow softness
+    shadow->setOffset(0, 4); //depth
+    shadow->setColor(QColor(0, 0, 0, 50)); //transparancy
+    ui->loginCard->setGraphicsEffect(shadow);
+    //the end od ui shadow
+
+    //code start for ui shadow 2
+    auto *shadow2 = new QGraphicsDropShadowEffect(this);
+    shadow2->setBlurRadius(15);
+    shadow2->setOffset(0, 1);
+    shadow2->setColor(QColor(0, 0, 0, 20));
+    ui->loginCard->graphicsEffect()->setParent(shadow2);
+    ui->loginCard->setGraphicsEffect(shadow2);
+    //the end od ui shadow 2
+
     //login
     connect(ui->btnLogin, &QPushButton::clicked, this, &MainWindow::btnLoginSlot);
 

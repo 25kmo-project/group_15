@@ -16,6 +16,7 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
     accountId(accId), cardId(cId), token(t), currentPage(1)
 {
     ui->setupUi(this);
+    setWindowTitle("Transaction History");
     manager = new QNetworkAccessManager(this);
 
     if (!ui->tableTransactions) {
@@ -34,21 +35,45 @@ TransactionHistory::~TransactionHistory()
 
 void TransactionHistory::initTableStyle()
 {
+    // Table styling
+    ui->tableTransactions->setStyleSheet(
+        "QTableWidget {"
+        "  border: 1px solid #e0e0e0;"
+        "  border-radius: 6px;"
+        "  background-color: #ffffff;"
+        "  gridline-color: #f0f0f0;"
+        "}"
+        "QTableWidget::item {"
+        "  padding: 8px;"
+        "  color: #000000;"
+        "  border-bottom: 1px solid #f0f0f0;"
+        "}"
+        "QTableWidget::item:selected {"
+        "  background-color: #e8f0fe;"
+        "  color: #1a73e8;"
+        "}"
+        "QHeaderView::section {"
+        "  background-color: #ffffff;"
+        "  color: #666666;"
+        "  font-size: 18px;"
+        "  font-weight: bold;"
+        "  border: none;"
+        "  border-bottom: 2px solid #e0e0e0;"
+        "  padding: 8px;"
+        "}"
+        );
+
     QHeaderView *header = ui->tableTransactions->horizontalHeader();
-    header->setSectionResizeMode(QHeaderView::Interactive);
-
     header->setSectionResizeMode(0, QHeaderView::Stretch);
-
     header->setSectionResizeMode(1, QHeaderView::Stretch); // Type
-
-
     header->setSectionResizeMode(2, QHeaderView::Fixed);
     ui->tableTransactions->setColumnWidth(2, 200); // Amount
-
     header->setSectionResizeMode(3, QHeaderView::Fixed);
     ui->tableTransactions->setColumnWidth(3, 80); // ID
 
     ui->tableTransactions->verticalHeader()->setVisible(false);
+    ui->tableTransactions->setShowGrid(false);
+    ui->tableTransactions->setAlternatingRowColors(false);
 }
 
 void TransactionHistory::displayData()
@@ -80,7 +105,8 @@ void TransactionHistory::displayData()
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
             QJsonArray jsonArray = doc.array();
-            // new page,clear old data
+
+            // new page, clear old data
             ui->tableTransactions->setRowCount(0);
 
             if (jsonArray.size() < 10) {
@@ -89,9 +115,10 @@ void TransactionHistory::displayData()
                 ui->btnNextPage->setEnabled(true);
             }
 
-            // if page is 1,disable previous page button
+            // if page is 1, disable previous page button
             ui->btnPrevPage->setEnabled(currentPage > 1);
-            // 4. populate the table with data
+
+            // populate the table with data
             for (const QJsonValue &value : jsonArray) {
                 QJsonObject obj = value.toObject();
                 int row = ui->tableTransactions->rowCount();
@@ -101,14 +128,23 @@ void TransactionHistory::displayData()
                 dateStr = dateStr.replace("T", " ").left(19);
                 ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(dateStr));
 
-                QTableWidgetItem *typeItem = new QTableWidgetItem(obj["Tyyppi"].toString());
+                QString type = obj["Tyyppi"].toString();
+                QTableWidgetItem *typeItem = new QTableWidgetItem(type);
                 typeItem->setTextAlignment(Qt::AlignCenter);
                 ui->tableTransactions->setItem(row, 1, typeItem);
 
+                // amount comes from backend as string "100.00"
                 QJsonValue amtVal = obj.contains("AMOUNT") ? obj["AMOUNT"] : obj["Määrä"];
                 double amount = amtVal.toString().toDouble();
+
                 QTableWidgetItem *amountItem = new QTableWidgetItem(QString::number(amount, 'f', 2) + " €");
                 amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                // green for DEPOSIT, red for others
+                if (type == "DEPOSIT") {
+                    amountItem->setForeground(QColor("#2e7d32"));
+                } else {
+                    amountItem->setForeground(QColor("#c62828"));
+                }
                 ui->tableTransactions->setItem(row, 2, amountItem);
 
                 QTableWidgetItem *idItem = new QTableWidgetItem(QString::number(obj["ID"].toInt()));
@@ -122,37 +158,37 @@ void TransactionHistory::displayData()
         reply->deleteLater();
     });
 }
+
 // next page
 void TransactionHistory::on_btnNextPage_clicked()
 {
-    //restart timer
+    // restart timer
     if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
-
     currentPage++;
     displayData();
 }
+
 // previous page
 void TransactionHistory::on_btnPrevPage_clicked()
 {
-    //restart timer
+    // restart timer
     if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
-
-    if(currentPage > 1) {
+    if (currentPage > 1) {
         currentPage--;
         displayData();
     }
 }
+
 // back to menu
 void TransactionHistory::on_btnBackToMenu_clicked()
 {
-    //restart timer
+    // restart timer
     if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
-
     this->close();
 }

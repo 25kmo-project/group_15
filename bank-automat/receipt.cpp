@@ -17,7 +17,8 @@ Receipt::Receipt(QWidget *parent)
     reply(nullptr)
 {
     ui->setupUi(this);
-    setWindowTitle("Receipt");
+
+    setWindowTitle("Digital Receipt");
 
     // Käynnistä haku heti kun dialogi avataan
     fetchReceipt();
@@ -82,10 +83,11 @@ void Receipt::onReceiptReceived()
     }
 
     QJsonObject obj = doc.object();
-    ui->txtReceipt->setPlainText(buildReceiptText(obj));
+    //ui->txtReceipt->setPlainText(buildReceiptText(obj));
+    ui->txtReceipt->setHtml(buildReceiptText(obj));
 }
 
-QString Receipt::buildReceiptText(const QJsonObject &obj) const
+/*QString Receipt::buildReceiptText(const QJsonObject &obj) const
 {
     QString app = "Bank ATM Application";
     QString timestampIso = obj.value("timestamp").toString();
@@ -205,6 +207,114 @@ QString Receipt::buildReceiptText(const QJsonObject &obj) const
     }
 
     return text;
+
+
+    QString Receipt::buildReceiptText(const QJsonObject &obj) const
+    {
+        QString app = obj.value("app").toString("Pankkiautomaattisovellus");
+        QString timestampIso = obj.value("timestamp").toString();
+        double balance = obj.value("balance").toDouble(0.0);
+
+        QDateTime dt = QDateTime::fromString(timestampIso, Qt::ISODate);
+        QString dtStr = dt.isValid()
+                            ? dt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
+                            : QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss");
+
+        QString html;
+        html += "<div style='font-family: Arial; padding: 10px;'>";
+        html += "<h2 style='color: #1a73e8; text-align: center;'>" + app + "</h2>";
+        html += "<hr style='border: 1px solid #e0e0e0;'>";
+        html += "<p style='color: #666; font-size: 13px;'>Date: <b>" + dtStr + "</b></p>";
+        html += "<p style='font-size: 16px;'>Balance: <b style='color: #1a73e8;'>"
+                + QString::number(balance, 'f', 2) + " €</b></p>";
+        html += "<hr style='border: 1px solid #e0e0e0;'>";
+        html += "<p style='color: #666; font-size: 12px; text-transform: uppercase;'><b>Transactions</b></p>";
+
+        QJsonArray events = obj.value("events").toArray();
+        if (events.isEmpty()) {
+            html += "<p style='color: #999;'>No transactions this session.</p>";
+        } else {
+            for (const QJsonValue &v : events) {
+                QJsonObject e = v.toObject();
+                QString type = e.value("transaction_type").toString();
+                QString amountStr = e.value("amount").toString();
+                amountStr.replace(",", ".");
+                double amount = amountStr.toDouble();
+
+                QString tRaw = e.value("transaction_date").toString();
+                QDateTime tdt = QDateTime::fromString(tRaw, "yyyy-MM-dd HH:mm:ss");
+                QString tStr = tdt.isValid()
+                                   ? tdt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
+                                   : tRaw;
+
+                // цвет суммы: зелёный для DEPOSIT, красный для остальных
+                QString color = (type == "DEPOSIT") ? "#2e7d32" : "#c62828";
+
+                html += "<div style='display: flex; justify-content: space-between; "
+                        "padding: 8px 0; border-bottom: 1px solid #f0f0f0;'>";
+                html += "<span style='color: #333;'>" + tStr + "</span>";
+                html += "<span style='color: #555; margin: 0 10px;'>" + type + "</span>";
+                html += "<span style='color: " + color + "; font-weight: bold;'>"
+                        + QString::number(amount, 'f', 2) + " €</span>";
+                html += "</div>";
+            }
+        }
+
+        html += "</div>";
+        return html;
+    }
+*/
+
+QString Receipt::buildReceiptText(const QJsonObject &obj) const
+{
+    QString timestampIso = obj.value("timestamp").toString();
+    double balance = obj.value("balance").toDouble(0.0);
+
+    QDateTime dt = QDateTime::fromString(timestampIso, Qt::ISODate);
+    QString dtStr = dt.isValid()
+                        ? dt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
+                        : QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss");
+
+    QString html;
+    html += "<div style='font-family: Arial; padding: 10px;'>";
+    html += "<p style='color: #000000; font-size: 24px; text-align: left;'>Date: <b>" + dtStr + "</b></p>";
+    html += "<p style='color: #000000; font-size: 24px; text-align: center;'>Balance: <b style='color: #1a73e8;'>"
+            + QString::number(balance, 'f', 2) + " €</b></p>";
+    html += "<hr style='border: 1px solid #e0e0e0;'>";
+    html += "<p style='color: #000000; font-size: 18px; margin-bottom: 16px;'><b>TRANSACTIONS</b></p>";
+
+    QJsonArray events = obj.value("events").toArray();
+    if (events.isEmpty()) {
+        html += "<p style='color: #000000;'>No transactions this session.</p>";
+    } else {
+        html += "<table width='100%' cellspacing='0' cellpadding='6'>";
+        for (const QJsonValue &v : events) {
+            QJsonObject e = v.toObject();
+            QString type = e.value("transaction_type").toString();
+            QString amountStr = e.value("amount").toString();
+            amountStr.replace(",", ".");
+            double amount = amountStr.toDouble();
+
+            QString tRaw = e.value("transaction_date").toString();
+            QDateTime tdt = QDateTime::fromString(tRaw, "yyyy-MM-dd HH:mm:ss");
+            QString tStr = tdt.isValid()
+                               ? tdt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
+                               : tRaw;
+
+            QString color = (type == "DEPOSIT") ? "#2e7d32" : "#c62828";
+
+            html += "<tr>";
+            html += "<td style='color: #000000; font-size: 18px;'>" + tStr + "</td>";
+            html += "<td style='color: #000000; font-size: 18px;'>" + type + "</td>";
+            html += "<td align='right' style='color: " + color + "; font-size: 18px; font-weight: bold;'>"
+                    + QString::number(amount, 'f', 2) + " €</td>";
+            html += "</tr>";
+        }
+        html += "</table>";
+    }
+
+    html += "</div>";
+    return html;
 }
 
 

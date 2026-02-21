@@ -19,6 +19,8 @@ Deposit::Deposit(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setWindowTitle("Deposit");
+
     auto *validator = new QDoubleValidator(0.0, 1000000000.0, 2, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
     validator->setLocale(QLocale(QLocale::Finnish, QLocale::Finland));
@@ -78,18 +80,17 @@ void Deposit::onReplyFinished()
 
     if (reply->error() == QNetworkReply::NoError) {
         ui->lineAmount->clear();
-        qDebug() << "Deposit successful:" << data;
-
-        reply->deleteLater();
-        reply = nullptr;
-
-        getBalance();
-
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+        qDebug() << "Deposit response:" << jsonDoc; // ← добавь эту строку
+        double newBalance = jsonDoc.object()["new_balance"].toDouble();
+        ui->lblInfo->setText(QString("Deposit successful!\nNew balance: %1 €").arg(newBalance, 0, 'f', 2));
     } else {
         ui->lblInfo->setText("Deposit failed.");
         qDebug() << "Deposit error:" << reply->errorString() << data;
-        reply->deleteLater();
     }
+
+    reply->deleteLater();
+    reply = nullptr;
 
 
 }
