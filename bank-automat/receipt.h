@@ -4,10 +4,11 @@
 #include <QDialog>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonObject>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class Receipt; }
-QT_END_NAMESPACE
+namespace Ui {
+class Receipt;
+}
 
 class Receipt : public QDialog
 {
@@ -18,17 +19,20 @@ public:
     ~Receipt();
 
 private slots:
-    void fetchReceipt();
-    void onReceiptReceived();
     void on_btnBack_clicked();
+    void onReceiptReceived();
 
 private:
-    void showError(const QString &msg);
-    QString buildReceiptText(const QJsonObject &obj) const;
-
     Ui::Receipt *ui;
     QNetworkAccessManager *networkManager;
     QNetworkReply *reply;
+
+    bool triedFull;
+
+    void fetchReceipt();
+    void showError(const QString &msg);
+
+    QString buildReceiptHtml(const QJsonObject &obj) const;
 };
 
 #endif // RECEIPT_H

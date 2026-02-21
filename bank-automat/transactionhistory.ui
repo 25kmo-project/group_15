@@ -6,37 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="lblHistoryTitle">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>10</y>
-     <width>581</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>36</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Transaction History</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="tableTransactions">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>110</y>
+     <x>150</x>
+     <y>220</y>
      <width>831</width>
      <height>361</height>
     </rect>
@@ -107,10 +88,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>510</y>
+     <x>410</x>
+     <y>610</y>
      <width>281</width>
-     <height>61</height>
+     <height>88</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -127,19 +108,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="btnPrevPage">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&lt; </string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QLabel" name="lblPageNumber">
       <property name="font">
@@ -153,13 +121,26 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="btnPrevPage">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&lt; </string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QPushButton" name="btnBackToMenu">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>530</y>
+     <x>40</x>
+     <y>630</y>
      <width>111</width>
      <height>51</height>
     </rect>
@@ -172,6 +153,31 @@
    </property>
    <property name="text">
     <string>Back</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>10</y>
+     <width>921</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>36</pointsize>
+    </font>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Transaction History</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
  </widget>

@@ -6,6 +6,9 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Bank App");
+
     //code start for ui shadow
     auto *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(30); //shadow softness
