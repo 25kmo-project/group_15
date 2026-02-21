@@ -39,7 +39,7 @@ Receipt::Receipt(QWidget *parent)
     triedFull(false)
 {
     ui->setupUi(this);
-    setWindowTitle("Digital Receipt");
+    setWindowTitle("");
 
     // Make QTextEdit behave like a viewer
     ui->txtReceipt->setReadOnly(true);
