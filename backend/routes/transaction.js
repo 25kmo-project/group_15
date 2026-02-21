@@ -3,6 +3,23 @@ const router = express.Router();
 const transaction = require('../models/transaction_model');
 const authenticateToken = require('../middleware/auth');
 const db = require('../routes/database');
+const https = require('https');
+
+function fetchJson(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (apiRes) => {
+      let data = "";
+      apiRes.on("data", chunk => data += chunk);
+      apiRes.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          reject(new Error("Invalid JSON from currency API"));
+        }
+      });
+    }).on("error", reject);
+  });
+}
 
 
 // Get a single transaction by its ID
@@ -237,5 +254,165 @@ router.get('/receipt', authenticateToken, function(req, res) {
     );
   });
 });
+
+router.get('/receipt/full', authenticateToken, async function(req, res) {
+  const account_id = parseInt(req.query.account_id);
+  const card_id = parseInt(req.query.card_id);
+
+  if (isNaN(account_id) || isNaN(card_id)) {
+    return res.status(400).json({ error: "Valid account_id and card_id required" });
+  }
+
+  // varmista että tokenin card_id == pyydetty card_id
+  if (Number(req.user.card_id) !== Number(card_id)) {
+    return res.status(403).json({ error: "Access denied" });
+  }
+
+  try {
+    // 1) saldo ilman inquiry-logia
+    const bal = await new Promise((resolve, reject) => {
+      transaction.getBalanceNoLog({ account_id, card_id }, (err, r) => err ? reject(err) : resolve(r));
+    });
+
+    const nowIso = new Date().toISOString();
+    const session_id = req.user.session_id;
+
+    // 2) myprofile tiedot (kortin perusteella)
+    const profile = await new Promise((resolve, reject) => {
+      const profileSql = `
+        SELECT u.user_name, u.user_lastname, u.user_address, u.user_email, u.user_phonenumber
+        FROM card c
+        JOIN user u ON c.user_id = u.user_id
+        WHERE c.card_id = ?`;
+      db.query(profileSql, [card_id], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows && rows[0] ? rows[0] : null);
+      });
+    });
+
+    // 3) currency tiedot (käyttää samaa Frankfurter API:a kuin currency.js)
+    //    Tässä otetaan:
+    //    - latest (EUR->USD,GBP)
+    //    - change (abs/pct edelliseen työpäivään)
+    const latestUrl = "https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP";
+
+    const end = new Date();
+    const start = new Date(end);
+    start.setDate(end.getDate() - 10);
+    const format = (d) => d.toISOString().slice(0, 10);
+    const changeUrl = `https://api.frankfurter.dev/v1/${format(start)}..${format(end)}?base=EUR&symbols=USD,GBP`;
+
+    const [latestJson, changeJson] = await Promise.all([
+      fetchJson(latestUrl),
+      fetchJson(changeUrl)
+    ]);
+
+    // muotoillaan change samaan muotoon kuin teidän /currency/change
+    const rates = changeJson.rates || {};
+    const dates = Object.keys(rates).sort();
+    let change = null;
+
+    if (dates.length >= 2) {
+      const prevDate = dates[dates.length - 2];
+      const lastDate = dates[dates.length - 1];
+      const prev = rates[prevDate];
+      const last = rates[lastDate];
+
+      function calc(symbol) {
+        const rLast = Number(last[symbol]);
+        const rPrev = Number(prev[symbol]);
+        const abs = rLast - rPrev;
+        const pct = rPrev !== 0 ? (abs / rPrev) * 100 : 0;
+        return { rate: rLast, abs: Number(abs.toFixed(6)), pct: Number(pct.toFixed(2)) };
+      }
+
+      change = {
+        base: changeJson.base || "EUR",
+        lastDate,
+        prevDate,
+        USD: calc("USD"),
+        GBP: calc("GBP")
+      };
+    }
+
+    const currency = {
+      latest: {
+        base: latestJson.base,
+        date: latestJson.date,
+        USD: latestJson.rates?.USD,
+        GBP: latestJson.rates?.GBP
+      },
+      change
+    };
+
+    // 4) events: tämän session operaatiot
+    // jos session_id puuttuu -> events tyhjä (saldo + profile + currency näkyy silti)
+    if (!session_id) {
+      return res.json({
+        title: "Tulosta kuitti",
+        app: "Pankkiautomaattisovellus",
+        timestamp: nowIso,
+        balance: bal.balance,
+        profile,
+        currency,
+        events: []
+      });
+    }
+
+    // hae login_time sessiolle
+    const login_time = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT login_time FROM session WHERE session_id = ? AND card_id = ?",
+        [session_id, card_id],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows && rows[0] ? rows[0].login_time : null);
+        }
+      );
+    });
+
+    if (!login_time) {
+      return res.json({
+        title: "Tulosta kuitti",
+        app: "Pankkiautomaattisovellus",
+        timestamp: nowIso,
+        balance: bal.balance,
+        profile,
+        currency,
+        events: []
+      });
+    }
+
+    const events = await new Promise((resolve, reject) => {
+      const evSql = `
+        SELECT transaction_type, amount, transaction_date
+        FROM transaction
+        WHERE account_id = ?
+          AND card_id = ?
+          AND transaction_date >= ?
+          AND transaction_type IN ('WITHDRAWAL', 'DEPOSIT', 'TRANSFER')
+        ORDER BY transaction_date ASC`;
+      db.query(evSql, [account_id, card_id, login_time], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      });
+    });
+
+    return res.json({
+      title: "Tulosta kuitti",
+      app: "Pankkiautomaattisovellus",
+      timestamp: nowIso,
+      balance: bal.balance,
+      profile,
+      currency,
+      events
+    });
+
+  } catch (e) {
+    console.log("receipt/full error:", e);
+    return res.status(500).json({ error: "Receipt generation failed" });
+  }
+});
+
 
 module.exports = router;
