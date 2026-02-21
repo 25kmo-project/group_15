@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="font">
@@ -21,8 +21,8 @@
   <widget class="QPushButton" name="btnConfirm">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>330</y>
+     <x>490</x>
+     <y>430</y>
      <width>151</width>
      <height>51</height>
     </rect>
@@ -40,10 +40,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>30</y>
-     <width>351</width>
-     <height>121</height>
+     <x>330</x>
+     <y>40</y>
+     <width>431</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="font">
@@ -65,8 +65,8 @@
   <widget class="QLabel" name="lblInfo">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>330</y>
+     <x>250</x>
+     <y>540</y>
      <width>611</width>
      <height>61</height>
     </rect>
@@ -87,9 +87,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>160</y>
-     <width>541</width>
+     <x>300</x>
+     <y>270</y>
+     <width>401</width>
      <height>101</height>
     </rect>
    </property>
@@ -128,8 +128,8 @@
   <widget class="QPushButton" name="btnBack">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>510</y>
+     <x>50</x>
+     <y>630</y>
      <width>111</width>
      <height>51</height>
     </rect>

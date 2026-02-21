@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QPushButton" name="btnDebit">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>240</y>
-     <width>141</width>
-     <height>111</height>
+     <x>180</x>
+     <y>270</y>
+     <width>281</width>
+     <height>221</height>
     </rect>
    </property>
    <property name="font">
@@ -35,10 +35,10 @@
   <widget class="QPushButton" name="btnCredit">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>240</y>
-     <width>141</width>
-     <height>111</height>
+     <x>580</x>
+     <y>270</y>
+     <width>291</width>
+     <height>221</height>
     </rect>
    </property>
    <property name="font">
@@ -54,8 +54,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>30</y>
+     <x>130</x>
+     <y>10</y>
      <width>821</width>
      <height>201</height>
     </rect>
