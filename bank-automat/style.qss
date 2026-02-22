@@ -138,3 +138,13 @@ QLabel#label {
     font-size: 44px;
     font-weight: bold;
 }
+
+/* Default text for everything */
+QWidget {
+    color: #0F172A;
+}
+
+/* Buttons: white text */
+QPushButton {
+    color: #FFFFFF;
+}
