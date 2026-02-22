@@ -35,8 +35,17 @@ Withdraw::Withdraw(QWidget *parent) :
 
 Withdraw::~Withdraw()
 {
-    delete ui;
-}
+    //cancel any pending network request before destroying
+    //app crashing problem
+    {
+        if (reply) {
+            reply->abort();
+            reply->deleteLater();
+            reply = nullptr;
+        }
+        delete ui;
+    }
+        }
 
 // Frontend validation: minimum 20 and only 20/50 combinations
 bool Withdraw::isValidAmount(int amount)

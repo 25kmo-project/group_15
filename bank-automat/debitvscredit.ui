@@ -70,7 +70,7 @@
     <enum>Qt::LayoutDirection::LeftToRight</enum>
    </property>
    <property name="text">
-    <string>Which card do you want to use?</string>
+    <string>Select:</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>

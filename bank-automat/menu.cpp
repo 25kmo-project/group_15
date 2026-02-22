@@ -1,6 +1,7 @@
 #include <QUrlQuery>
 #include <QDebug>
 #include <QApplication>
+#include <QPointer>
 
 #include "clientinfo.h"
 #include "transactionhistory.h"
@@ -37,6 +38,9 @@ Menu::Menu(QWidget *parent): QDialog(parent), ui(new Ui::Menu)
 
 Menu::~Menu()
 {
+    if (Environment::timerLogOut) {
+        disconnect(Environment::timerLogOut, &QTimer::timeout, this, &Menu::autoLogOut);
+    }
     delete ui;
 }
 
@@ -54,7 +58,7 @@ void Menu::on_btnDeposit_clicked()
     //timer restart
     Environment::timerLogOut->start();
 
-    Deposit *depositWin = new Deposit(this);
+    Deposit *depositWin = new Deposit(nullptr);
     depositWin->setAttribute(Qt::WA_DeleteOnClose);
     connect(depositWin, &QWidget::destroyed, this, &Menu::show);
 
@@ -68,7 +72,7 @@ void Menu::on_btnWithdrawal_clicked()
     //timer restart
     Environment::timerLogOut->start();
 
-    Withdraw *withdrawWin = new Withdraw(this);
+    Withdraw *withdrawWin = new Withdraw(nullptr);
     withdrawWin->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(withdrawWin, &QWidget::destroyed, this, &Menu::show);
@@ -81,8 +85,12 @@ void Menu::on_btnReceipt_clicked()
 {
     Environment::timerLogOut->start();
 
-    Receipt dlg(this);
-    dlg.exec();
+    Receipt *receiptWin = new Receipt(nullptr);
+    receiptWin->setAttribute(Qt::WA_DeleteOnClose);
+    connect(receiptWin, &QWidget::destroyed, this, &Menu::show);
+
+    receiptWin->show();
+    this->hide();
 }
 //balance
 void Menu::on_btnBalance_clicked()
@@ -90,7 +98,7 @@ void Menu::on_btnBalance_clicked()
     //timer restart
     Environment::timerLogOut->start();
 
-    Balance *balanceWin = new Balance(this);
+    Balance *balanceWin = new Balance(nullptr);
     balanceWin->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(balanceWin, &QWidget::destroyed, this, &Menu::show);
@@ -102,7 +110,6 @@ void Menu::on_btnBalance_clicked()
 //transaction history
 void Menu::on_btnTransactionHistory_clicked()
 {
-    //timer restart
     Environment::timerLogOut->start();
 
     if (Environment::token.isEmpty()) {
@@ -119,9 +126,9 @@ void Menu::on_btnTransactionHistory_clicked()
     historyWin->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(historyWin, &QWidget::destroyed, this, &Menu::show);
-
     historyWin->show();
     this->hide();
+
 }
 //transfer
 void Menu::on_btnTransfer_clicked()
@@ -153,7 +160,7 @@ void Menu::on_btnCurrency_clicked()
         return;
     }
 
-    Currency *currencyWin = new Currency(Environment::token, this);
+    Currency *currencyWin = new Currency(Environment::token, nullptr);
     currencyWin->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(currencyWin, &QWidget::destroyed, this, &Menu::show);
@@ -184,9 +191,13 @@ void Menu::on_btnMyProfile_clicked()
 void Menu::onMyProfileReceived()
 {
     if (reply->error() == QNetworkReply::NoError) {
+
+        Environment::viewedProfile = true;
+        Environment::timeViewedProfile = QDateTime::currentDateTime();
+
         QByteArray responseData = reply->readAll();
 
-        ClientInfo *clientInfoWin = new ClientInfo(this);
+        ClientInfo *clientInfoWin = new ClientInfo(nullptr);
         clientInfoWin->setAttribute(Qt::WA_DeleteOnClose);
         clientInfoWin->setInfo(responseData);
 
@@ -223,6 +234,16 @@ void Menu::on_btnLogOut_clicked()
     Environment::accountId = 0;
     Environment::accountIds.clear();
 
+    Environment::viewedBalance = false;
+    Environment::viewedProfile = false;
+    Environment::viewedCurrency = false;
+    Environment::viewedTransactionHistory = false;
+
+    Environment::timeViewedBalance = QDateTime();
+    Environment::timeViewedProfile = QDateTime();
+    Environment::timeViewedCurrency = QDateTime();
+    Environment::timeViewedTransactionHistory = QDateTime();
+
     qDebug() << "Log out";
 
     //creating new mainwindow
@@ -235,10 +256,10 @@ void Menu::on_btnLogOut_clicked()
 void Menu::closeAllNotMain(MainWindow *mainWindow)
 {
     QWidgetList allWindows = QApplication::topLevelWidgets();
-    for (int i = 0; i < allWindows.size(); i++) {
-        QWidget *window = allWindows[i];
-        if (window != mainWindow) {
-            window->deleteLater();
+    for (QWidget *w : allWindows) {
+        if (w != mainWindow) {
+            w->hide();
+            w->deleteLater();
         }
     }
 }
@@ -247,6 +268,10 @@ void Menu::closeAllNotMain(MainWindow *mainWindow)
 //automatic log out when inactivity is 30 seconds
 void Menu::autoLogOut()
 {
+    qDebug() << "autoLogOut called at:" << QDateTime::currentDateTime().toString("HH:mm:ss");
+    qDebug() << "Timer interval:" << Environment::timerLogOut->interval();
+    qDebug() << "Sender:" << sender();
+
     qDebug() << "30 seconds passed, user is logged out";
 
     //timer stopped
@@ -261,8 +286,21 @@ void Menu::autoLogOut()
     Environment::accountId = 0;
     Environment::accountIds.clear();
 
-    //find MainWindow
+    Environment::viewedBalance = false;
+    Environment::viewedProfile = false;
+    Environment::viewedCurrency = false;
+    Environment::viewedTransactionHistory = false;
+
+    Environment::timeViewedBalance = QDateTime();
+    Environment::timeViewedProfile = QDateTime();
+    Environment::timeViewedCurrency = QDateTime();
+    Environment::timeViewedTransactionHistory = QDateTime();
+
+    qDebug() << "Data cleared";
+
+    //find MainWindow or create mainwindow
     QWidgetList allWindows = QApplication::topLevelWidgets();
+    qDebug() << "All windows:" << allWindows;
     MainWindow *existingMainWindow = nullptr;
 
     for (int i = 0; i < allWindows.size(); i++) {
@@ -271,6 +309,7 @@ void Menu::autoLogOut()
             break;
         }
     }
+    qDebug() << "existingMainWindow:" << existingMainWindow;
 
     //show MainWindow and clear fields
     if (existingMainWindow) {
@@ -279,13 +318,30 @@ void Menu::autoLogOut()
         existingMainWindow->raise();
         existingMainWindow->activateWindow();
     } else {
+        qDebug() << "Creating new MainWindow";
         MainWindow *newLoginWindow = new MainWindow();
         newLoginWindow->show();
     }
+    qDebug() << "MainWindow shown";
 
+    this->hide();
     //delete all windows except MainWindow with delay so the app is not crushing
-    QTimer::singleShot(0,this, [this, existingMainWindow]() {
-        closeAllNotMain(existingMainWindow);
+    QPointer<MainWindow> safeMain = existingMainWindow;
+    QPointer<Menu> safeMenu = this;
+    QTimer::singleShot(300, qApp, [safeMain, safeMenu]() {
+        qDebug() << "singleShot fired, safeMain valid:" << !safeMain.isNull();
+        QWidgetList allWindows = QApplication::topLevelWidgets();
+        for (QWidget *w : allWindows) {
+            if (qobject_cast<MainWindow*>(w)) continue;
+            if (safeMain && w == safeMain) continue;
+            qDebug() << "Closing:" << w;
+            w->hide();
+            w->deleteLater();
+            }
+        if (safeMenu) {
+            safeMenu->deleteLater();
+        }
     });
+    qDebug() << "All non-MainWindow windows closed";
     qDebug() << "Auto logout complete";
 }

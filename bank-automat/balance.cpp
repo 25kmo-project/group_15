@@ -9,6 +9,7 @@
 Balance::Balance(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Balance)
+    , reply(nullptr)
 {
     ui->setupUi(this);
 
@@ -16,10 +17,24 @@ Balance::Balance(QWidget *parent)
 
     networkManager = new QNetworkAccessManager(this);
     getBalance();
+
+    Environment::viewedBalance = true;
+    Environment::timeViewedBalance = QDateTime::currentDateTime();
+
+    // restart timer on open
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
 }
 
 Balance::~Balance()
 {
+    //prevent app crashing
+    if (reply) {
+        reply->abort();
+        reply->deleteLater();
+        reply = nullptr;
+    }
     delete ui;
 }
 
@@ -56,6 +71,7 @@ void Balance::onBalanceReceived()
     }
 
     reply->deleteLater();
+    reply=nullptr;
 }
 
 void Balance::on_btnBack_clicked()

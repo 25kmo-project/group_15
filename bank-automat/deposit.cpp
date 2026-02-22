@@ -21,6 +21,11 @@ Deposit::Deposit(QWidget *parent)
 
     setWindowTitle("Deposit");
 
+    // restart timer on open
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+
     auto *validator = new QDoubleValidator(0.0, 1000000000.0, 2, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
     validator->setLocale(QLocale(QLocale::Finnish, QLocale::Finland));
@@ -96,6 +101,13 @@ void Deposit::onReplyFinished()
 }
 Deposit::~Deposit()
 {
+    //cancel any pending network request before destroying
+    //problem with app crashing
+    if (reply) {
+        reply->abort();
+        reply->deleteLater();
+        reply = nullptr;
+    }
     delete ui;
 }
 

@@ -1,5 +1,7 @@
 #include "environment.h"
 
+#include <QDateTime>
+
 QString Environment::token = "";
 int Environment::cardId = 0;
 int Environment::accountId = 0;
@@ -14,3 +16,12 @@ QString Environment::base_url()
 }
 
 QTimer* Environment::timerLogOut = nullptr;
+
+bool Environment::viewedBalance = false;
+bool Environment::viewedProfile = false;
+bool Environment::viewedCurrency = false;
+bool Environment::viewedTransactionHistory = false;
+QDateTime Environment::timeViewedBalance;
+QDateTime Environment::timeViewedProfile;
+QDateTime Environment::timeViewedCurrency;
+QDateTime Environment::timeViewedTransactionHistory;

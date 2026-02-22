@@ -12,23 +12,26 @@
 #include <QNetworkRequest>
 #include <QDebug>
 
+// Escapes special HTML characters in a string
 static QString esc(const QString &s) { return s.toHtmlEscaped(); }
 
+// Returns color based on transaction type:
+// green for deposits, red for withdrawals/transfers/negative values
 static QString moneyColor(const QString& type, double amount)
 {
-    // Green for deposits, red for withdrawals/transfers/negative values
     if (type == "DEPOSIT") return "#2e7d32";
     if (amount < 0) return "#c62828";
     if (type == "WITHDRAWAL" || type == "TRANSFER") return "#c62828";
     return "#111827";
 }
 
-static QString row2(const QString& left, const QString& right)
+// Helper to build a two-column activity row (label on left, timestamp on right)
+static QString activityRow(const QString& label, const QString& time)
 {
-    return "<div style='display:flex; justify-content:space-between; gap:12px; padding:6px 0;'>"
-           "<div style='color:#111827;'>" + esc(left) + "</div>"
-                         "<div style='color:#111827; font-weight:700; text-align:right;'>" + esc(right) + "</div>"
-                          "</div>";
+    return "<tr style='border-bottom:1px solid #f3f4f6;'>"
+           "<td style='padding:10px 12px; width:60%; color:#111827;'>" + esc(label) + "</td>"
+                          "<td style='padding:10px 12px; width:40%; text-align:right; color:#111827;'>" + esc(time) + "</td>"
+                         "</tr>";
 }
 
 Receipt::Receipt(QWidget *parent)
@@ -41,7 +44,7 @@ Receipt::Receipt(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("");
 
-    // Make QTextEdit behave like a viewer
+    // Make QTextEdit read-only and frameless (viewer mode)
     ui->txtReceipt->setReadOnly(true);
     ui->txtReceipt->setFrameStyle(QFrame::NoFrame);
 
@@ -50,6 +53,7 @@ Receipt::Receipt(QWidget *parent)
 
 Receipt::~Receipt()
 {
+    // Abort any pending network request on close
     if (reply) {
         reply->abort();
         reply->deleteLater();
@@ -60,6 +64,7 @@ Receipt::~Receipt()
 
 void Receipt::fetchReceipt()
 {
+    // Check that session data is available
     if (Environment::token.isEmpty()) {
         showError("Token missing. Login again.");
         return;
@@ -70,7 +75,7 @@ void Receipt::fetchReceipt()
         return;
     }
 
-    // Try /receipt/full first; if backend doesn't have it -> fallback to /receipt
+    // Try /transaction/receipt/full first; fall back to /transaction/receipt if 404
     const QString endpoint = triedFull ? "transaction/receipt"
                                        : "transaction/receipt/full";
 
@@ -83,6 +88,7 @@ void Receipt::fetchReceipt()
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", ("Bearer " + Environment::token).toUtf8());
 
+    // Cancel any existing request before starting a new one
     if (reply) {
         reply->abort();
         reply->deleteLater();
@@ -107,18 +113,18 @@ void Receipt::onReceiptReceived()
     reply->deleteLater();
     reply = nullptr;
 
-    // If /receipt/full returns 404 -> retry with /receipt
+    // If /receipt/full returns 404, retry with the basic /receipt endpoint
     if (netErr != QNetworkReply::NoError) {
         if (!triedFull && httpStatus == 404) {
             triedFull = true;
             fetchReceipt();
             return;
         }
-
         showError("Could not fetch receipt: " + errStr);
         return;
     }
 
+    // Parse JSON response
     QJsonParseError pe;
     QJsonDocument doc = QJsonDocument::fromJson(responseData, &pe);
     if (!doc.isObject()) {
@@ -132,7 +138,7 @@ void Receipt::onReceiptReceived()
 
 QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
 {
-    // ---- Basic fields ----
+    // --- Parse timestamp and balance (always shown) ---
     const QString timestampIso = obj.value("timestamp").toString();
     const double balance = obj.value("balance").toDouble(0.0);
 
@@ -141,27 +147,16 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
                               ? dt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
                               : QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss");
 
-    // ---- Profile (optional) ----
-    const QJsonValue profileVal = obj.value("profile");
-    const QJsonObject profile = profileVal.isObject() ? profileVal.toObject() : QJsonObject();
-
-    const QString first = profile.value("user_name").toString();
-    const QString last  = profile.value("user_lastname").toString();
-    const QString addr  = profile.value("user_address").toString();
-    const QString email = profile.value("user_email").toString();
-    const QString phone = profile.value("user_phonenumber").toString();
-
-    // ---- Currency (optional) ----
-    const QJsonValue currencyVal = obj.value("currency");
-    const QJsonObject currency = currencyVal.isObject() ? currencyVal.toObject() : QJsonObject();
-
-    const QJsonObject latest = currency.value("latest").toObject();
-    const QJsonObject change = currency.value("change").toObject();
-
-    // ---- Events ----
+    // --- Parse transaction events ---
     const QJsonArray events = obj.value("events").toArray();
 
-    // ===== HTML start =====
+    // Check if there is any session activity to show
+    const bool hasActivity = Environment::viewedBalance
+                             || Environment::viewedProfile
+                             || Environment::viewedTransactionHistory
+                             || Environment::viewedCurrency;
+
+    // ===== Build HTML =====
     QString html;
 
     html += R"(
@@ -169,11 +164,10 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
   <div style="text-align:center; font-size:48px; font-weight:800; color:#0f172a; margin: 10px 0 22px 0;">
     Digital Receipt
   </div>
-
   <div style="max-width: 760px; margin: 0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius: 12px; padding: 18px;">
 )";
 
-    // Header row (date + balance)
+    // --- Header: date and balance (always visible) ---
     html += "<div style='display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;'>";
     html += "<div style='font-size:22px; color:#111827;'>Date: <b>" + esc(dtStr) + "</b></div>";
     html += "<div style='font-size:24px; color:#111827;'>Balance: "
@@ -182,95 +176,48 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
 
     html += "<hr style='border:none; border-top:1px solid #e5e7eb; margin:16px 0;'>";
 
-    // ===== Customer info card =====
-    html += "<div style='font-size:18px; font-weight:800; color:#111827; margin-bottom:8px;'>CUSTOMER INFORMATION</div>";
-    html += "<div style='background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:14px;'>";
+    // --- Session activity: shown only if user visited any screen ---
+    if (hasActivity) {
+        html += "<div style='font-size:13px; font-weight:700; color:#111827; "
+                "text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;'>Session Activity</div>";
 
-    if (profile.isEmpty()) {
-        html += "<div style='color:#374151;'>No customer information available.</div>";
-    } else {
-        if (!first.isEmpty() || !last.isEmpty())
-            html += row2("Name", first + " " + last);
-        if (!addr.isEmpty())
-            html += row2("Address", addr);
-        if (!email.isEmpty())
-            html += row2("Email", email);
-        if (!phone.isEmpty())
-            html += row2("Phone number", phone);
+        html += "<div style='border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; margin-bottom:16px;'>";
+        html += "<table style='width:100%; border-collapse:collapse; font-size:15px; color:#111827;'>";
+
+        if (Environment::viewedBalance)
+            html += activityRow("Balance inquiry",
+                                Environment::timeViewedBalance.toString("dd.MM.yyyy HH:mm:ss"));
+        if (Environment::viewedProfile)
+            html += activityRow("My profile viewed",
+                                Environment::timeViewedProfile.toString("dd.MM.yyyy HH:mm:ss"));
+        if (Environment::viewedTransactionHistory)
+            html += activityRow("Transaction history viewed",
+                                Environment::timeViewedTransactionHistory.toString("dd.MM.yyyy HH:mm:ss"));
+        if (Environment::viewedCurrency)
+            html += activityRow("Currency rates viewed",
+                                Environment::timeViewedCurrency.toString("dd.MM.yyyy HH:mm:ss"));
+
+        html += "</table></div>";
     }
-    html += "</div>";
 
-    // ===== Exchange rates latest =====
-    html += "<div style='font-size:18px; font-weight:800; color:#111827; margin-bottom:8px;'>EXCHANGE RATES (LATEST)</div>";
-    html += "<div style='background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:14px;'>";
+    // --- Transactions: shown only if there are events in this session ---
+    if (!events.isEmpty()) {
+        html += "<div style='font-size:13px; font-weight:700; color:#111827; "
+                "text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;'>Transactions</div>";
 
-    if (latest.isEmpty()) {
-        html += "<div style='color:#374151;'>No exchange rate data available.</div>";
-    } else {
-        const QString base = latest.value("base").toString("EUR");
-        const QString date = latest.value("date").toString();
-        const double usd = latest.value("USD").toDouble(0.0);
-        const double gbp = latest.value("GBP").toDouble(0.0);
-
-        html += row2("Base", base);
-        if (!date.isEmpty()) html += row2("Date", date);
-        if (usd > 0) html += row2("USD", QString::number(usd, 'f', 6));
-        if (gbp > 0) html += row2("GBP", QString::number(gbp, 'f', 6));
-    }
-    html += "</div>";
-
-    // ===== Exchange rate change =====
-    html += "<div style='font-size:18px; font-weight:800; color:#111827; margin-bottom:8px;'>EXCHANGE RATE CHANGE</div>";
-    html += "<div style='background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:14px;'>";
-
-    if (change.isEmpty()) {
-        html += "<div style='color:#374151;'>No change data available.</div>";
-    } else {
-        const QString base = change.value("base").toString("EUR");
-        const QString prevDate = change.value("prevDate").toString();
-        const QString lastDate = change.value("lastDate").toString();
-
-        html += row2("Base", base);
-        if (!prevDate.isEmpty() && !lastDate.isEmpty())
-            html += row2("Period", prevDate + " → " + lastDate);
-
-        auto addSymbol = [&](const QString &sym){
-            if (!change.value(sym).isObject()) return;
-            const QJsonObject s = change.value(sym).toObject();
-
-            const double rate = s.value("rate").toDouble(0.0);
-            const double abs  = s.value("abs").toDouble(0.0);
-            const double pct  = s.value("pct").toDouble(0.0);
-
-            QString right = QString::number(rate, 'f', 6)
-                            + " (" + (abs >= 0 ? "+" : "") + QString::number(abs, 'f', 6)
-                            + ", " + (pct >= 0 ? "+" : "") + QString::number(pct, 'f', 2) + "%)";
-
-            html += row2(sym, right);
-        };
-
-        addSymbol("USD");
-        addSymbol("GBP");
-    }
-    html += "</div>";
-
-    // ===== Transactions =====
-    html += "<div style='font-size:18px; font-weight:800; letter-spacing:0.5px; color:#111827; margin-bottom:8px;'>TRANSACTIONS</div>";
-
-    if (events.isEmpty()) {
-        html += "<div style='color:#374151; font-size:16px;'>No events during this session.</div>";
-    } else {
-        html += "<div style='border:1px solid #e5e7eb; border-radius:10px; padding:12px; background:#ffffff;'>";
-        html += "<table style='width:100%; border-collapse:collapse; font-size:16px; color:#111827;'>";
+        html += "<div style='border:1px solid #e5e7eb; border-radius:10px; overflow:hidden;'>";
+        html += "<table style='width:100%; border-collapse:collapse; font-size:15px; color:#111827;'>";
 
         for (const QJsonValue &v : events) {
             const QJsonObject e = v.toObject();
             const QString type = e.value("transaction_type").toString();
 
+            // Parse amount (handle both string and number formats)
             QString amountStr = e.value("amount").toString();
             amountStr.replace(",", ".");
             const double amount = amountStr.toDouble();
 
+            // Format transaction date
             const QString tRaw = e.value("transaction_date").toString();
             const QDateTime tdt = QDateTime::fromString(tRaw, "yyyy-MM-dd HH:mm:ss");
             const QString tStr = tdt.isValid()
@@ -278,13 +225,12 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
                                      : tRaw;
 
             const QString col = moneyColor(type, amount);
-            const QString amountShown = QString::number(amount, 'f', 2) + " €";
 
-            html += "<tr>";
-            html += "<td style='padding:6px 0; width:45%;'>" + esc(tStr) + "</td>";
-            html += "<td style='padding:6px 0; width:35%;'>" + esc(type) + "</td>";
-            html += "<td style='padding:6px 0; width:20%; text-align:right; font-weight:800; color:" + col + ";'>"
-                    + esc(amountShown) + "</td>";
+            html += "<tr style='border-bottom:1px solid #f3f4f6;'>";
+            html += "<td style='padding:10px 12px; width:40%; color:#111827;'>" + esc(tStr) + "</td>";
+            html += "<td style='padding:10px 12px; width:35%; font-weight:600;'>" + esc(type) + "</td>";
+            html += "<td style='padding:10px 12px; width:25%; text-align:right; font-weight:800; color:" + col + ";'>"
+                    + esc(QString::number(amount, 'f', 2) + " €") + "</td>";
             html += "</tr>";
         }
 
@@ -299,11 +245,13 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
     return html;
 }
 
+// Back button — close the dialog and return to menu
 void Receipt::on_btnBack_clicked()
 {
     accept();
 }
 
+// Display an error message in the receipt viewer
 void Receipt::showError(const QString &msg)
 {
     ui->txtReceipt->setPlainText("Error:\n" + msg);

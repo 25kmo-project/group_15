@@ -7,7 +7,8 @@ Transfer::Transfer(int accId, int cId, QString t, QDialog *parent) :
     ui(new Ui::Transfer),
     senderAccountId(accId),
     cardId(cId),
-    token(t)
+    token(t),
+    reply(nullptr)
 {
     ui->setupUi(this);
 
@@ -15,10 +16,22 @@ Transfer::Transfer(int accId, int cId, QString t, QDialog *parent) :
 
     manager = new QNetworkAccessManager(this);
     setupUiLogic();
+
+    // restart timer on open
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
 }
 
 Transfer::~Transfer()
 {
+    //cancel any pending network request before destroying
+    //problem with app crashing
+    if (reply) {
+        reply->abort();
+        reply->deleteLater();
+        reply = nullptr;
+    }
     delete ui;
 }
 
@@ -73,9 +86,9 @@ void Transfer::on_btnConfirm_clicked()
     QJsonDocument doc(json);
     qDebug() << "Sending JSON:" << doc.toJson(QJsonDocument::Compact); 
 
-    QNetworkReply *reply = manager->post(request, doc.toJson());
+    reply = manager->post(request, doc.toJson());
 
-    connect(reply, &QNetworkReply::finished, [this, reply]() {
+    connect(reply, &QNetworkReply::finished, [this]() {
         if (reply->error() == QNetworkReply::NoError) {
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             double newBalance = doc.object()["new_balance"].toString().toDouble();
@@ -96,6 +109,7 @@ void Transfer::on_btnConfirm_clicked()
             ui->lblErrorDisplay->setText(errorMsg);
         }
         reply->deleteLater();
+        reply=nullptr;
     });
 }
 
