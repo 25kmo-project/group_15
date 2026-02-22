@@ -12,6 +12,9 @@ ClientInfo::ClientInfo(QWidget *parent): QDialog(parent), ui(new Ui::ClientInfo)
 
     setWindowTitle("Information");
 
+    Environment::viewedProfile = true;
+    Environment::timeViewedProfile = QDateTime::currentDateTime();
+
 }
 
 ClientInfo::~ClientInfo()

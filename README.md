@@ -41,9 +41,9 @@ The system follows a client-server model with three independent layers:
 |-----------|-----------|
 |Runtime|Node.js|
 |Framework|Express.js|
-|Security|bcryptjs (PIN hashing) · jsonwebtoken (JWT auth)|
+|Security|bcryptjs (PIN hashing), jsonwebtoken (JWT auth)|
 |Database Client|mysql2|
-|Middleware|cors · morgan · dotenv|
+|Middleware|morgan, dotenv, cookie-parser|
 
 ### Database
 |Component|Technology|
@@ -109,7 +109,7 @@ The full entity-relationship diagram:
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
-## 📁 Project Structure
+## Project Structure
 ```text
 backend/
 ├── app.js
@@ -338,9 +338,9 @@ Primary responsibilities were distributed as follows:
 |Author|Primary Responsibilities|
 |--------|-------------|
 |[@juanyu0417](https://github.com/JuanYu0417)|Transaction feature(full stack)|
-|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt (full stack)|
+|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt(full stack)|
 |[@tinnihkis](https://github.com/tinnihkis)|Withdrawal(full stack)|
-|[@ecedevere](https://github.com/ecedevere)|User(full stack)|
+|[@ecedevere](https://github.com/ecedevere)|User(full stack), Receipt(frontend)|
 
 All other parts of the project were made together.
 
@@ -362,6 +362,8 @@ This project is licensed under the [MIT License](LICENSE).
 * Git/GitHub for version control
 * Inno Setup for installer
 * Markddown PDF (extension for VS Code)
+* Keynote for making presentation
+* Microsoft PowerPoint for making presentation
 
 
 <img src="images/kanban_board_picture.png" width="500"/>
@@ -488,7 +490,7 @@ Base URL: http://localhost:3000
 
 ### Currency 
 
- Method|Endpoint|Description|
+|Method|Endpoint|Description|
 |--------|----------|-------------|
 |GET|/currency/latest|Get latest EUR → USD, GBP exchange rates|
 |GET|/currency/change|Get rate change and percentage difference from previous business day|
@@ -499,11 +501,11 @@ Base URL: http://localhost:3000
 
 |Method|Endpoint|Description|
 |--------|----------|-------------|
-|GET|/account|Get all accounts|
-|GET|/account/:id|Get account by ID|
-|POST|/account|Create new account|
-|PUT|/account/:id|Update account|
-|DELETE|/account/:id|Delete account|
+|GET|/accounts|Get all accounts|
+|GET|/accounts/:id|Get account by ID|
+|POST|/accounts|Create new account|
+|PUT|/accounts/:id|Update account|
+|DELETE|/accounts/:id|Delete account|
 
 ---
 
@@ -511,12 +513,12 @@ Base URL: http://localhost:3000
 
 |Method|Endpoint|Description|
 |--------|----------|-------------|
-|GET|/card|Get all cards|
-|GET|/card/:card_id|Get card by ID|
-|POST|/card|Create new card (PIN is hashed automatically)|
-|PUT|/card/:card_id|Update card info (excluding PIN)|
-|PUT|/card/:card_id/pin|Update PIN (hashed with bcrypt)|
-|DELETE|/card/:card_id|Delete card|
+|GET|/cards|Get all cards|
+|GET|/cards/:card_id|Get card by ID|
+|POST|/cards|Create new card (PIN is hashed automatically)|
+|PUT|/cards/:card_id|Update card info (excluding PIN)|
+|PUT|/cards/:card_id/pin|Update PIN (hashed with bcrypt)|
+|DELETE|/cards/:card_id|Delete card|
 
 ---
 
@@ -546,14 +548,29 @@ Base URL: http://localhost:3000
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
+## Screenshots of the app
+* mac: login + desktop icons
+* windows: login + desktop icons
+* debit vs credit
+* menu
+* one of transactions: withdrawal
+* transaction history
+* receipt
+
+### Login
+![Login](pictures/screenshot_login.png)
+
+### Main Menu
+![Menu](pictures/screenshot_menu.png)
+
+### ETC
+
 ## WHAT ELSE NEED TO BE INCLUDED
 
 * Who did what: check your name and responsibility, need something to add/fix/etc?
 * which tools were used: anything else? what do we used for documentation? drawio?lucidchart?diagrameditor? what do we use (morgan module) for receipt?
 * system architecture -> maybe picture better ? 
-* api documentation: check if it is correct
-* screenshots of application (windows and mac, maybe one picture from both systems), what else?
-* update image of database (with table for receipt)
+
 -------
 DON'T take into consideration
 * Logical order of read.me (later)

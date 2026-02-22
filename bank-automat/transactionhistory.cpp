@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QPointer>
 
 TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *parent) :
     QWidget(parent), ui(new Ui::TransactionHistory),
@@ -17,6 +18,10 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
 {
     ui->setupUi(this);
     setWindowTitle("Transaction History");
+
+    Environment::viewedTransactionHistory = true;
+    Environment::timeViewedTransactionHistory = QDateTime::currentDateTime();
+
     manager = new QNetworkAccessManager(this);
 
     if (!ui->tableTransactions) {
@@ -30,6 +35,15 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
 
 TransactionHistory::~TransactionHistory()
 {
+    // Abort all pending network replies before destroying manager
+    if (manager) {
+        const QList<QNetworkReply*> replies = manager->findChildren<QNetworkReply*>();
+        for (QNetworkReply *r : replies) {
+            r->abort();
+            r->deleteLater();
+        }
+        // Don't deleteLater manager — it's a child of this, Qt deletes it automatically
+    }
     delete ui;
 }
 
@@ -76,6 +90,18 @@ void TransactionHistory::initTableStyle()
     ui->tableTransactions->setAlternatingRowColors(false);
 }
 
+
+
+// next page
+void TransactionHistory::on_btnNextPage_clicked()
+{
+    // restart timer
+    if (Environment::timerLogOut) {
+        Environment::timerLogOut->start();
+    }
+    currentPage++;
+    displayData();
+}
 void TransactionHistory::displayData()
 {
     if (!ui->lblPageNumber) {
@@ -99,77 +125,59 @@ void TransactionHistory::displayData()
 
     QNetworkReply *reply = manager->get(request);
 
-    // connect the reply's finished signal to a lambda function to handle the response
-    connect(reply, &QNetworkReply::finished, [this, reply]() {
+    QPointer<TransactionHistory> safeThis = this;
+    connect(reply, &QNetworkReply::finished, [safeThis, reply]() {
+        // Check if window still exists before touching UI
+        if (!safeThis) {
+            reply->deleteLater();
+            return;
+        }
+
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray response = reply->readAll();
             QJsonDocument doc = QJsonDocument::fromJson(response);
             QJsonArray jsonArray = doc.array();
 
-            // new page, clear old data
-            ui->tableTransactions->setRowCount(0);
+            safeThis->ui->tableTransactions->setRowCount(0);
 
-            if (jsonArray.size() < 10) {
-                ui->btnNextPage->setEnabled(false);
-            } else {
-                ui->btnNextPage->setEnabled(true);
-            }
+            safeThis->ui->btnNextPage->setEnabled(jsonArray.size() >= 10);
+            safeThis->ui->btnPrevPage->setEnabled(safeThis->currentPage > 1);
 
-            // if page is 1, disable previous page button
-            ui->btnPrevPage->setEnabled(currentPage > 1);
-
-            // populate the table with data
             for (const QJsonValue &value : jsonArray) {
                 QJsonObject obj = value.toObject();
-                int row = ui->tableTransactions->rowCount();
-                ui->tableTransactions->insertRow(row);
+                int row = safeThis->ui->tableTransactions->rowCount();
+                safeThis->ui->tableTransactions->insertRow(row);
 
                 QString dateStr = obj.contains("DATE") ? obj["DATE"].toString() : obj["Aika"].toString();
                 dateStr = dateStr.replace("T", " ").left(19);
-                ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(dateStr));
+                safeThis->ui->tableTransactions->setItem(row, 0, new QTableWidgetItem(dateStr));
 
                 QString type = obj["Tyyppi"].toString();
                 QTableWidgetItem *typeItem = new QTableWidgetItem(type);
                 typeItem->setTextAlignment(Qt::AlignCenter);
-                ui->tableTransactions->setItem(row, 1, typeItem);
+                safeThis->ui->tableTransactions->setItem(row, 1, typeItem);
 
-                // amount comes from backend as string "100.00"
                 QJsonValue amtVal = obj.contains("AMOUNT") ? obj["AMOUNT"] : obj["Määrä"];
                 double amount = amtVal.toString().toDouble();
 
-                QTableWidgetItem *amountItem = new QTableWidgetItem(QString::number(amount, 'f', 2) + " €");
+                QTableWidgetItem *amountItem = new QTableWidgetItem(
+                    QString::number(amount, 'f', 2) + " €");
                 amountItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                // green for DEPOSIT, red for others
-                if (type == "DEPOSIT") {
-                    amountItem->setForeground(QColor("#2e7d32"));
-                } else {
-                    amountItem->setForeground(QColor("#c62828"));
-                }
-                ui->tableTransactions->setItem(row, 2, amountItem);
+                amountItem->setForeground(QColor(type == "DEPOSIT" ? "#2e7d32" : "#c62828"));
+                safeThis->ui->tableTransactions->setItem(row, 2, amountItem);
 
-                QTableWidgetItem *idItem = new QTableWidgetItem(QString::number(obj["ID"].toInt()));
+                QTableWidgetItem *idItem = new QTableWidgetItem(
+                    QString::number(obj["ID"].toInt()));
                 idItem->setTextAlignment(Qt::AlignCenter);
-                ui->tableTransactions->setItem(row, 3, idItem);
+                safeThis->ui->tableTransactions->setItem(row, 3, idItem);
             }
         } else {
             qDebug() << "Error fetching data:" << reply->errorString();
-            ui->btnNextPage->setEnabled(false);
+            safeThis->ui->btnNextPage->setEnabled(false);
         }
         reply->deleteLater();
     });
 }
-
-// next page
-void TransactionHistory::on_btnNextPage_clicked()
-{
-    // restart timer
-    if (Environment::timerLogOut) {
-        Environment::timerLogOut->start();
-    }
-    currentPage++;
-    displayData();
-}
-
 // previous page
 void TransactionHistory::on_btnPrevPage_clicked()
 {

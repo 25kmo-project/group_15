@@ -29,6 +29,7 @@ private:
 private slots:
     void DebitButtonClicked();
     void CreditButtonClicked();
+    void autoLogOut();
 };
 
 #endif // DEBITVSCREDIT_H

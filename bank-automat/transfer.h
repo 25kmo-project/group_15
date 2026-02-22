@@ -29,6 +29,7 @@ private slots:
 private:
     Ui::Transfer *ui;
     QNetworkAccessManager *manager;
+    QNetworkReply *reply;
 
     // Session Data
     int senderAccountId;

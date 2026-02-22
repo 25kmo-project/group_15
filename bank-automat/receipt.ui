@@ -59,10 +59,10 @@
   <widget class="QTextBrowser" name="txtReceipt">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>160</y>
-     <width>611</width>
-     <height>421</height>
+     <x>260</x>
+     <y>20</y>
+     <width>671</width>
+     <height>621</height>
     </rect>
    </property>
   </widget>

@@ -16,6 +16,14 @@ public:
     static QList<int> accountIds;
     static int userId;
     static QTimer *timerLogOut;
+    static bool viewedBalance;
+    static bool viewedProfile;
+    static bool viewedCurrency;
+    static bool viewedTransactionHistory;
+    static QDateTime timeViewedBalance;
+    static QDateTime timeViewedProfile;
+    static QDateTime timeViewedCurrency;
+    static QDateTime timeViewedTransactionHistory;
 
 };
 
