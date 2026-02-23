@@ -174,84 +174,28 @@ deposit: function (data, callback) {
     getBalance: function(data, callback) {
         const { account_id, card_id } = data;
 
-        const sql = `
-            SELECT 
-                u.user_name, u.user_lastname, 
-                a.balance, a.account_number, 
-                c.status AS card_status
-            FROM account_access aa
-            JOIN account a ON aa.account_id = a.account_id
-            JOIN user u ON a.user_id = u.user_id
-            JOIN card c ON aa.card_id = c.card_id
-            WHERE aa.account_id = ? AND aa.card_id = ?`;
+       const sql = `CALL sp_get_account_balance(?, ?)`;
 
         db.query(sql, [account_id, card_id], function(err, results) {
-            if (err) return callback(err);
+           if (err) return callback({ error: 'DB_ERROR', message: err.sqlMessage });
+            const row = results[0][0];
 
-            // 1. Check if the card has access to this account
-            if (results.length === 0) {
-                return callback({ error: 'NOT_FOUND', message: 'Access denied' });
-            }
-
-            const row = results[0];
-
-            // 2. Validate card status
-            if (row.card_status !== 'ACTIVE') {
-                return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
-            }
-
-            //insert inquiry log
-            const logSql = `
-            INSERT INTO transaction (account_id, card_id, amount, transaction_type, transaction_date) 
-            VALUES (?, ?, 0.00, 'INQUIRY', NOW())`;
-        
-        db.query(logSql, [account_id, card_id], function(logErr) {
-            if (logErr) {
-                console.error("Failed to log Inquiry:", logErr.sqlMessage);
-            } else {
-                console.log(`Inquiry logged for account ${account_id}`);
-            }
-
-            // 3. Return success data
+           if (!row) {
+            return callback({ error: 'NOT_FOUND', message: 'No data returned from procedure' });
+        }
+    
             callback(null, {
                 owner: `${row.user_name} ${row.user_lastname}`,
+                account_number: row.account_number,
+                account_type: row.account_type,
                 balance: parseFloat(row.balance),
-                account_number: row.account_number
+                available_funds: parseFloat(row.available_funds),
+                credit_limit: row.credit_limit ? parseFloat(row.credit_limit) : 0
             });
         });
-       });
     },
     getBalanceNoLog: function(data, callback) {
-  const { account_id, card_id } = data;
-
-  const sql = `
-    SELECT 
-      u.user_name, u.user_lastname, 
-      a.balance, a.account_number, 
-      c.status AS card_status
-    FROM account_access aa
-    JOIN account a ON aa.account_id = a.account_id
-    JOIN user u ON a.user_id = u.user_id
-    JOIN card c ON aa.card_id = c.card_id
-    WHERE aa.account_id = ? AND aa.card_id = ?`;
-
-  db.query(sql, [account_id, card_id], function(err, results) {
-    if (err) return callback(err);
-    if (results.length === 0) {
-      return callback({ error: 'NOT_FOUND', message: 'Access denied' });
-    }
-
-    const row = results[0];
-    if (row.card_status !== 'ACTIVE') {
-      return callback({ error: 'CARD_LOCKED', message: 'Card is not active' });
-    }
-
-    callback(null, {
-      owner: `${row.user_name} ${row.user_lastname}`,
-      account_number: row.account_number,
-      balance: parseFloat(row.balance)
-    });
-  });
+        this.getBalance(data, callback);
 },
     
     transfer: function(data, callback) {

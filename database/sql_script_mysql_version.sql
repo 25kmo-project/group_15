@@ -147,6 +147,57 @@ CREATE TABLE IF NOT EXISTS `session` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
+-- =====================================================
+-- STORED PROCEDURE: Available Balance Inquiry
+-- =====================================================
+DELIMITER //
+
+CREATE PROCEDURE `sp_get_account_balance`(
+    IN p_account_id INT,
+    IN p_card_id INT
+)
+BEGIN
+    -- Variables for status check
+    DECLARE v_card_status VARCHAR(20);
+    DECLARE v_exists INT DEFAULT 0;
+
+    -- 1. Check access permissions and card status
+    SELECT COUNT(*), c.status INTO v_exists, v_card_status
+    FROM account_access aa
+    JOIN card c ON aa.card_id = c.card_id
+    WHERE aa.account_id = p_account_id AND aa.card_id = p_card_id
+    GROUP BY c.status;
+
+    -- 2. Logic validation
+    IF v_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Access denied or account not found';
+    ELSEIF v_card_status != 'ACTIVE' THEN
+        SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Card is not active';
+    ELSE
+        -- 3. Log inquiry transaction
+        INSERT INTO `transaction` (account_id, card_id, amount, transaction_type, transaction_date)
+        VALUES (p_account_id, p_card_id, 0.00, 'INQUIRY', NOW());
+
+        -- 4. Return calculated funds based on account type
+        SELECT 
+            u.user_name, 
+            u.user_lastname, 
+            a.account_number, 
+            a.account_type,
+            IFNULL(a.credit_limit, 0) AS credit_limit,
+            IFNULL(a.balance, 0) AS balance,
+            CASE 
+                WHEN a.account_type = 'DEBIT' THEN IFNULL(a.balance, 0)
+                WHEN a.account_type = 'CREDIT' THEN (IFNULL(a.credit_limit, 0) - IFNULL(a.balance, 0))
+                ELSE 0 
+            END AS available_funds
+        FROM account a
+        JOIN user u ON a.user_id = u.user_id
+        WHERE a.account_id = p_account_id;
+    END IF;
+END //
+
+DELIMITER ;
 
 -- =====================================================
 -- STORED PROCEDURE: DEPOSIT
