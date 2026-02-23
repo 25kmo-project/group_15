@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `session` (
 -- STORED PROCEDURE: Available Balance Inquiry
 -- =====================================================
 DELIMITER //
-
+DROP PROCEDURE IF EXISTS sp_get_account_balance//
 CREATE PROCEDURE `sp_get_account_balance`(
     IN p_account_id INT,
     IN p_card_id INT
@@ -188,7 +188,7 @@ BEGIN
             IFNULL(a.balance, 0) AS balance,
             CASE 
                 WHEN a.account_type = 'DEBIT' THEN IFNULL(a.balance, 0)
-                WHEN a.account_type = 'CREDIT' THEN (IFNULL(a.credit_limit, 0) - IFNULL(a.balance, 0))
+                WHEN a.account_type = 'CREDIT' THEN (IFNULL(a.credit_limit, 0) + IFNULL(a.balance, 0))
                 ELSE 0 
             END AS available_funds
         FROM account a
