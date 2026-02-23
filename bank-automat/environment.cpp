@@ -7,6 +7,7 @@ int Environment::cardId = 0;
 int Environment::accountId = 0;
 QList<int> Environment::accountIds = {};
 int Environment::userId = 0;
+QString Environment::cardType = "";
 
 Environment::Environment() {}
 

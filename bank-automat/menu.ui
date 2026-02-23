@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
- <class>Menu</class>
  <widget class="QDialog" name="Menu">
   <property name="geometry">
    <rect>
@@ -13,179 +12,329 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayoutRoot"><property name="leftMargin"><number>40</number></property><property name="topMargin"><number>30</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>30</number></property><item><spacer name="verticalSpacerTop"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint"><size><width>20</width><height>40</height></size></property></spacer></item><item><layout class="QHBoxLayout" name="horizontalLayoutCenter"><item><spacer name="horizontalSpacerLeft"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint"><size><width>40</width><height>20</height></size></property></spacer></item><item><widget class="QFrame" name="loginCard"><property name="minimumSize"><size><width>1076</width><height>750</height></size></property><layout class="QVBoxLayout" name="cardLayout"><property name="spacing"><number>0</number></property><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property><item><widget class="QWidget" name="contentWidget"><property name="minimumSize"><size><width>1076</width><height>750</height></size></property><property name="maximumSize"><size><width>1076</width><height>750</height></size></property><widget class="QPushButton" name="btnLogOut">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>630</y>
-     <width>141</width>
-     <height>61</height>
-    </rect>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin">
+    <number>0</number>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>24</pointsize>
-    </font>
+   <property name="topMargin">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string>Log out</string>
+   <property name="rightMargin">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>60</y>
-     <width>201</width>
-     <height>71</height>
-    </rect>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>48</pointsize>
-    </font>
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string>Menu</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>230</y>
-     <width>161</width>
-     <height>331</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>14</pointsize>
-    </font>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="4" column="0">
-     <widget class="QPushButton" name="btnWithdrawal">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Withdrawl</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="btnTransfer">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Transfer</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="btnBalance">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Balance</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="btnMyProfile">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>My profile</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>620</x>
-     <y>240</y>
-     <width>261</width>
-     <height>311</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <widget class="QPushButton" name="btnDeposit">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Deposit</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="btnTransactionHistory">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Transaction history</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="btnCurrency">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Currency</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="btnReceipt">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>24</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Receipt</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
- </widget></item></layout></widget></item><item><spacer name="horizontalSpacerRight"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint"><size><width>40</width><height>20</height></size></property></spacer></item></layout></item><item><spacer name="verticalSpacerBottom"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint"><size><width>20</width><height>40</height></size></property></spacer></item></layout></widget>
+   <item>
+    <layout class="QHBoxLayout" name="centerLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacerLeft">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QFrame" name="loginCard">
+       <property name="minimumSize">
+        <size>
+         <width>1076</width>
+         <height>750</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1076</width>
+         <height>750</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="loginCardLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QWidget" name="contentWidget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>1076</width>
+            <height>750</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>1076</width>
+            <height>750</height>
+           </size>
+          </property>
+          <widget class="QPushButton" name="btnLogOut">
+           <property name="geometry">
+            <rect>
+             <x>420</x>
+             <y>630</y>
+             <width>141</width>
+             <height>61</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>24</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Log out</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>410</x>
+             <y>60</y>
+             <width>201</width>
+             <height>71</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>48</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Menu</string>
+           </property>
+          </widget>
+          <widget class="QWidget" name="layoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>180</x>
+             <y>230</y>
+             <width>161</width>
+             <height>331</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="4" column="0">
+             <widget class="QPushButton" name="btnWithdrawal">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Withdrawl</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QPushButton" name="btnTransfer">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Transfer</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="btnBalance">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Balance</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btnMyProfile">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>My profile</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="layoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>620</x>
+             <y>240</y>
+             <width>261</width>
+             <height>311</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="btnDeposit">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Deposit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btnTransactionHistory">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Transaction history</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="btnCurrency">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Currency</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QPushButton" name="btnReceipt">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>24</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Receipt</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QPushButton" name="btnCardType">
+           <property name="geometry">
+            <rect>
+             <x>820</x>
+             <y>20</y>
+             <width>220</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Card: -</string>
+           </property>
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton#btnCardType{
+  background-color: #2563EB;
+  color: white;
+  border-radius: 14px;
+  font: 700 18pt "Arial";
+}
+QPushButton#btnCardType:disabled{
+  background-color: #2563EB;
+  color: white;
+  border: 1px solid rgba(255,255,255,80);
+}</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacerRight">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <class>Menu</class>
  <resources />
  <connections />
 </ui>
