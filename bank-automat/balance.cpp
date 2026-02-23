@@ -14,6 +14,7 @@ Balance::Balance(QWidget *parent)
     ui->setupUi(this);
 
     setWindowTitle("Balance");
+    ui->detailContainer->hide();
 
     networkManager = new QNetworkAccessManager(this);
     getBalance();
@@ -60,11 +61,24 @@ void Balance::onBalanceReceived()
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray responseData = reply->readAll();
+        qDebug() << "RAW RESPONSE:" << responseData;
         QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
         QJsonObject jsonObj = jsonDoc.object();
 
         double balance = jsonObj["balance"].toDouble();
-        ui->labelBalance->setText(QString::number(balance, 'f', 2) + " €");
+        double availableFunds = jsonObj["available_funds"].toDouble();
+        QString accountType = jsonObj["account_type"].toString();
+        double creditLimit = jsonObj["credit_limit"].toDouble();
+        ui->labelBalance->setText(QString::number(availableFunds, 'f', 2) + " €");
+        if (accountType == "CREDIT") {
+            ui->detailContainer->show(); 
+            ui->labelLimit->setText("Credit Limit: " + QString::number(creditLimit, 'f', 2) + " €");
+            ui->labelDebt->setText("Current Debt: " + QString::number(balance, 'f', 2) + " €");
+        } else {
+            if (ui->detailContainer) {
+                ui->detailContainer->hide();
+            }
+        }
     } else {
         qDebug() << "Error fetching balance:" << reply->errorString();
         ui->labelBalance->setText("Error!");
