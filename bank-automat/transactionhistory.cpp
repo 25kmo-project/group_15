@@ -78,7 +78,8 @@ void TransactionHistory::initTableStyle()
         );
 
     QHeaderView *header = ui->tableTransactions->horizontalHeader();
-    header->setSectionResizeMode(0, QHeaderView::Stretch);
+    header->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableTransactions->setColumnWidth(0, 260);//Time
     header->setSectionResizeMode(1, QHeaderView::Stretch); // Type
     header->setSectionResizeMode(2, QHeaderView::Fixed);
     ui->tableTransactions->setColumnWidth(2, 200); // Amount
