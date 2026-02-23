@@ -52,6 +52,8 @@ void DebitvsCredit::DebitButtonClicked()
         Environment::timerLogOut->start();
     }
 
+     Environment::cardType = "DEBIT";
+
     if(Environment::accountIds.size() > 0){
         Environment::accountId = Environment::accountIds[0];
         qDebug()<<"Debit side"<<Environment::accountId;
@@ -67,6 +69,8 @@ void DebitvsCredit::CreditButtonClicked()
     if (Environment::timerLogOut) {
         Environment::timerLogOut->start();
     }
+
+     Environment::cardType = "CREDIT";
 
     if(Environment::accountIds.size() > 1){
         Environment::accountId = Environment::accountIds[1];
@@ -91,6 +95,7 @@ void DebitvsCredit::autoLogOut()
     Environment::cardId = 0;
     Environment::accountId = 0;
     Environment::accountIds.clear();
+    Environment::cardType = "";
 
     // find or create MainWindow
     MainWindow *existingMainWindow = nullptr;

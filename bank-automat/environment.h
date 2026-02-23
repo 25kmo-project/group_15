@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QTimer>
+#include <QDateTime>
 
 class Environment
 {
@@ -15,6 +16,7 @@ public:
     static int accountId;
     static QList<int> accountIds;
     static int userId;
+    static QString cardType;
     static QTimer *timerLogOut;
     static bool viewedBalance;
     static bool viewedProfile;

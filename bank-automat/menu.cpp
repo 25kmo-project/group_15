@@ -19,6 +19,11 @@ Menu::Menu(QWidget *parent): QDialog(parent), ui(new Ui::Menu)
 {
     ui->setupUi(this);
 
+    if (ui->btnCardType) {
+        const QString type = Environment::cardType.trimmed();
+        ui->btnCardType->setText(type.isEmpty() ? "Card: -" : "Card: " + type);
+    }
+
     setWindowTitle("Menu");
 
     networkManager = new QNetworkAccessManager(this);

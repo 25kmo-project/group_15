@@ -103,7 +103,19 @@ void MainWindow::loginAction()
 
         // SINGLE: suoraan Menuun
         if (Environment::accountIds.size() == 1) {
-            Environment::accountId = Environment::accountIds.first(); // (lisää tämä muuttuja jos ei ole)
+            Environment::accountId = Environment::accountIds.first();            // (lisää tämä muuttuja jos ei ole)
+
+            if (jsonObject.contains("account_types") && jsonObject["account_types"].isArray()) {
+                QJsonArray types = jsonObject["account_types"].toArray();
+                if (!types.isEmpty()) {
+                    Environment::cardType = types.first().toString().toUpper();
+                } else {
+                    Environment::cardType = "";
+                }
+            } else {
+                Environment::cardType = "";
+            }
+
             Menu *m = new Menu(this);
             m->show();
             this->hide();
