@@ -1,12 +1,19 @@
 ##  Table of Contents
 - [About the Project](#-group-15--atm-banking-system)
+- [Poster](#-poster)
+- [Project Introduction](#-project-introduction)
 - [Tech Stack](#️-tech-stack)
 - [Key Features](#-key-features)
+- [System Architecture](#️-system-architecture)
+- [Screenshots](#-screenshots-of-the-app)
+- [Frontend Navigation Flow](#-frontend-navigation-flow)
 - [Project Structure](#-project-structure)
 - [Installation & Setup](#-installation--setup)
 - [API Documentation](#-api-documentation)
 - [CI/CD & Automated Workflows](#️-cicd--automated-workflows)
 - [Team](#-team)
+- [Tools](#-tools)
+- [Presentation](#-presentation-of-the-app)
 - [License](#license)
 
 # Group 15 Project-ATM Banking System
@@ -49,7 +56,6 @@ The system follows a client-server model with three independent layers:
 |Component|Technology|
 |-----------|-----------|
 |System|MySQL 8.0+ / MariaDB|
-|Library|MySQL 8.0+ / MariaDB|
 |Schema|Relational multi-table design with Transactional Integrity|
 |Stored Procedures|deposit, withdrawal, transfer|
 
@@ -59,7 +65,7 @@ The full entity-relationship diagram:
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
-## Key feature  
+## Key Features  
 **Multi-Account Support**: A single card can be linked to multiple accounts. After login, users choose between a Debit or Credit account before proceeding to the main menu. 
 
 **Core Financial Transactions**:
@@ -68,7 +74,7 @@ The full entity-relationship diagram:
 * Transfer: Sends funds to another account by account number. Validates that the recipient account exists and that the sender has sufficient funds
 
 **Security Mechanisms**:
-* PIN hasing: Stored using bcryptjs - no plain-text passwords in the database.
+* PIN hashing: Stored using bcryptjs - no plain-text passwords in the database.
 * JWT authentication: Every API request requires a valid token to prevent unauthorized access.
 * Card blocking: After 3 failed PIN attempts the card is automatically locked. Failed attempts are recorded in the database.
 
@@ -106,6 +112,100 @@ The full entity-relationship diagram:
 3. Business logic is processed and a stored procedure is called
 4. Database executes the transaction and returns the result
 5. REST API sends a JSON response back to the Qt client
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
+## Screenshots of the app
+* macOS installation:
+<img src="images/mac_installation.png" width="500"/>
+* macOS Login page:
+<img src="images/mac_login.png" width="500"/>
+* Windows installation: 
+<img src="images/windows_installation.png" width="500"/>
+* Windows Login page:
+<img src="images/windows_login.png" width="500"/>
+* Dual card choice page:
+<img src="images/dual_card_choice.png" width="500"/>
+* menu !!!!!!!!!!!!
+* One of transactions example (Withdrawal: succesful transaction and error transaction):
+<img src="images/withdrawal_examples.png" width="500"/>
+* Transaction History:
+<img src="images/transaction_history.png" width="500"/>
+* receipt examples (user used all features, user used nothing):
+<img src="images/receipt_examples.png" width="500"/>
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
+## Frontend Navigation Flow
+
+```text
+                        ┌─────────────┐
+                        │    START    │
+                        └──────┬──────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+     ┌────────────▶ │  Login (Card + PIN)  │◀────┐
+     │              └──────────┬───────────┘     │
+     │                         │                 │
+     │                  ┌──────▼──────┐          │
+     │                  │   PIN OK?   │          │
+     │                  └──┬───────┬──┘          │
+     │                  YES│    NO │             │
+     │                     │       └─────────────┘
+     │                     │        (failed attempt)
+     │                     │
+     │             ┌───────▼────────┐
+     │             │ 3 failed PIN   │
+     │             │ attempts?      │
+     │             └───┬───────┬────┘
+     │               NO│    YES│
+     │                 │       ▼
+     │                 │  ┌──────────────┐
+     │                 │  │ Card Blocked │
+     │                 │  └──────────────┘
+     │                 │
+     │                 ▼
+     │           ┌─────────────────────┐
+     │           │ Single account?     │
+     │           └────┬───────────┬────┘
+     │             YES│        NO │
+     │                │           ▼
+     │                │  ┌──────────────────┐
+     │                │  │ Debit vs Credit  │
+     │                │  │ Selection        │
+     │                │  └────────┬─────────┘
+     │                │           │
+     │                └─────┬─────┘
+     │                      ▼
+     │   ┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
+     └── │                             Main Menu                                                               │◀┐
+(logout) └──┬─────────┬─────────┬──────────┬─────────────────┬──────────────────┬────────────┬───────────┬─────┘ │
+            │         │         │          │                 │                  │            │           │       │
+            ▼         ▼         ▼          ▼                 ▼                  ▼            ▼           ▼       │
+        ┌──────────┐┌───────┐┌─────────┐┌──────────┐     ┌────────┐           ┌─────────────┐┌────────┐┌────────┐│
+        │My Profile││Balance││ Deposit ││Withdrawal│     │Transfer│           │ Transaction ││Currency││Receipt ││
+        │          ││       ││         ││          │     │        │           │ History     ││        ││        ││
+        └────┬─────┘└─┬─────┘└─┬───────┘└─┬────────┘     └───┬────┘           └───┬─────────┘└───┬────┘└───┬────┘│
+             │        │        │          │                  │                    │              │         │     │
+             │        │        ▼          ▼                  ▼                    ▼              │         │     │
+             │        │  ┌────────────┐┌──────────────────┐┌──────────────────┐ ┌──────────┐     │         │     │
+             │        │  │Enter Amount││20 / 40 / 50 / 100││ Receiver account │ │Pages ◀/▶ │     │         │     │
+             │        │  └─────┬──────┘│or custom amount  ││ number and amount│ └─────┬────┘     │         │     │
+             │        │        │       └────────┬─────────┘└────────┬─────────┘       │          │         │     │
+             │        │        │                │                   │                 │          │         │     │
+             │        │        ▼                ▼                   ▼                 │          │         │     │
+             │        │  ┌────────────┐  ┌────────────┐     ┌────────────┐            │          │         │     │
+             │        │  │Confirmation│  │Confirmation│     │Confirmation│            │          │         │     │ 
+             │        │  └─────┬──────┘  └─────┬──────┘     └─────┬──────┘            │          │         │     │
+             │        │        │               │                  │                   │          │         │     │
+             │        │        │               │                  │                   │          │         │     │
+             │        │        │               │                  │                   │          │         │     │
+             │        │        │               │                  │                   │          │         │     │
+             │        │        │               │                  │                   │          │         │     │
+             └────────┴────────┴───────────────┴──────────────────┴───────────────────┴──────────┴─────────┴─────┘
+                                                       Back to Main Menu
+```
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
@@ -183,25 +283,25 @@ frontend/
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 ## Installation & Setup 
-## Option 1️⃣
+### Option 1️⃣
 > Quick Install (End Users)
 
-### Windows
+#### Windows
 
 1. Download bank-automat-setup.exe from the latest release
 2. Run the installer and follow the on-screen steps
 3. Launch Bank Automat from the Start Menu or Desktop shortcut
 
-### macOS (Apple Silicon)
+#### macOS (Apple Silicon)
 
 1. Download bank-automat.dmg from the latest release
 2. Open the .dmg and drag the app to your Applications folder
 
 ⚠️ The app requires a running backend server to function. Contact your system administrator for the server address, or set up your own using Option 2 below.
 
-## Option 2️⃣
+### Option 2️⃣
 
-### First step: Clone the Repository
+#### First step: Clone the Repository
 ```bash
 git clone https://github.com/25kmo-project/group_15.git
 ```
@@ -209,9 +309,9 @@ git clone https://github.com/25kmo-project/group_15.git
 ```bash
 cd group_15
 ```
-### Second step: Database Setup
+#### Second step: Database Setup
 
-#### Prerequisites: Database Server
+##### Prerequisites: Database Server
 
 Before running the database scripts, make sure MySQL is running on your machine.
 
@@ -262,7 +362,7 @@ For mariaDB:
 ```bash
 mariadb -u bank_admin -p < database/db_client_scenarios.sql
 ```
-### Third step: Backend Environment
+#### Third step: Backend Environment
 * Install all necessary dependencies. This will automatically install everything listed in package.json
 ```bash
 cd backend
@@ -292,7 +392,7 @@ npm start
 ```
 * The API will be available at http://localhost:3000 by default.
 
-### Fourth step: Frontend Environment
+#### Fourth step: Frontend Environment
 * Ensure Qt 5.15+ and CMake are installed:
 
 Qt Creator:
@@ -301,161 +401,6 @@ https://www.qt.io/development/offline-installers
 Cmake : https://cmake.org/download/
 
 * Open CMakeLists.txt directly with Qt Creator
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## CI/CD & Automated Workflows
-
-The project uses **GitHub Actions** for continuous integration and automated releases.
-
-**Build Workflows**  
-Every pull request to the **main** branch triggers automated builds for Windows (MSVC 2022) and macOS (Apple Silicon/ARM64) to ensure code stability and cross-platform compatibility.
-
-**Release Workflows**  
-Pushing a version **tag** (e.g., v1.0) automatically initiates the distribution process:
-
-|Platform|Output|Tool|
-|----------|--------|------|
-|Windows|Installer `.exe`|Inno Setup|
-|macOS (Apple Silicon)|Disk Image `.dmg`|macOS native|
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Authors
-
-- [@juanyu0417](https://github.com/JuanYu0417)
-- [@jummijammi](https://github.com/jummijammi)
-- [@tinnihkis](https://github.com/tinnihkis)
-- [@ecedevere](https://github.com/ecedevere)
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Team
-
-All team members participated across all areas of the project.
-Primary responsibilities were distributed as follows:
-
-|Author|Primary Responsibilities|
-|--------|-------------|
-|[@juanyu0417](https://github.com/JuanYu0417)|Transaction feature(full stack)|
-|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt(full stack)|
-|[@tinnihkis](https://github.com/tinnihkis)|Withdrawal(full stack)|
-|[@ecedevere](https://github.com/ecedevere)|User(full stack), Receipt(frontend)|
-
-All other parts of the project were made together.
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## License
-This project is licensed under the [MIT License](LICENSE).
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Tools
-
-* GitHub kanban board for task managment
-* MySQL Workbench for databse planning and editing
-* Postman for testing API
-* Discord for communication with eachother in team
-* Teams to communicate with teachers and to shared files with them
-* VS Code and Qt Creator as IDE
-* Git/GitHub for version control
-* Inno Setup for installer
-* Markddown PDF (extension for VS Code)
-* Keynote for making presentation
-* Microsoft PowerPoint for making presentation
-
-
-<img src="images/kanban_board_picture.png" width="500"/>
-<img src="images/postman_picture.png" width="500"/>
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Presentation of the app
-
-[Bank App Presentation](https://github.com/25kmo-project/group_15/blob/main/Bank_App_Presentation_Group_15.pptx)
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Screenshots of the app
-
-* login windows and mac
-* receipt
-* withdrawal
-* something else?
-
-<a href="#-table-of-contents">⬆️ Back to top</a>
-
-## Frontend Navigation Flow
-
-```text
-                        ┌─────────────┐
-                        │    START    │
-                        └──────┬──────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-     ┌────────────▶ │  Login (Card + PIN)  │◀────┐
-     │              └──────────┬───────────┘     │
-     │                         │                 │
-     │                  ┌──────▼──────┐          │
-     │                  │   PIN OK?   │          │
-     │                  └──┬───────┬──┘          │
-     │                  YES│    NO │             │
-     │                     │       └─────────────┘
-     │                     │        (failed attempt)
-     │                     │
-     │             ┌───────▼────────┐
-     │             │ 3 failed PIN   │
-     │             │ attempts?      │
-     │             └───┬───────┬────┘
-     │               NO│    YES│
-     │                 │       ▼
-     │                 │  ┌──────────────┐
-     │                 │  │ Card Blocked │
-     │                 │  └──────────────┘
-     │                 │
-     │                 ▼
-     │           ┌─────────────────────┐
-     │           │ Single account?     │
-     │           └────┬───────────┬────┘
-     │             YES│        NO │
-     │                │           ▼
-     │                │  ┌──────────────────┐
-     │                │  │ Debit vs Credit  │
-     │                │  │ Selection        │
-     │                │  └────────┬─────────┘
-     │                │           │
-     │                └─────┬─────┘
-     │                      ▼
-     │   ┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
-     └── │                             Main Menu                                                               │◀┐
-(logout) └──┬─────────┬─────────┬──────────┬─────────────────┬──────────────────┬────────────┬───────────┬─────┘ │
-            │         │         │          │                 │                  │            │           │       │
-            ▼         ▼         ▼          ▼                 ▼                  ▼            ▼           ▼       │
-        ┌──────────┐┌───────┐┌─────────┐┌──────────┐     ┌────────┐           ┌─────────────┐┌────────┐┌────────┐│
-        │My Profile││Balance││ Deposit ││Withdrawal│     │Transfer│           │ Transaction ││Currency││Receipt ││
-        │          ││       ││         ││          │     │        │           │ History     ││        ││        ││
-        └────┬─────┘└─┬─────┘└─┬───────┘└─┬────────┘     └───┬────┘           └───┬─────────┘└───┬────┘└───┬────┘│
-             │        │        │          │                  │                    │              │         │     │
-             │        │        ▼          ▼                  ▼                    ▼              │         │     │
-             │        │  ┌────────────┐┌──────────────────┐┌──────────────────┐ ┌──────────┐     │         │     │
-             │        │  │Enter Amount││20 / 40 / 50 / 100││ Receiver account │ │Pages ◀/▶ │     │         │     │
-             │        │  └─────┬──────┘│or custom amount  ││ number and amount│ └─────┬────┘     │         │     │
-             │        │        │       └────────┬─────────┘└────────┬─────────┘       │          │         │     │
-             │        │        │                │                   │                 │          │         │     │
-             │        │        ▼                ▼                   ▼                 │          │         │     │
-             │        │  ┌────────────┐  ┌────────────┐     ┌────────────┐            │          │         │     │
-             │        │  │Confirmation│  │Confirmation│     │Confirmation│            │          │         │     │ 
-             │        │  └─────┬──────┘  └─────┬──────┘     └─────┬──────┘            │          │         │     │
-             │        │        │               │                  │                   │          │         │     │
-             │        │        │               │                  │                   │          │         │     │
-             │        │        │               │                  │                   │          │         │     │
-             │        │        │               │                  │                   │          │         │     │
-             │        │        │               │                  │                   │          │         │     │
-             └────────┴────────┴───────────────┴──────────────────┴───────────────────┴──────────┴─────────┴─────┘
-                                                       Back to Main Menu
-```
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
@@ -548,30 +493,67 @@ Base URL: http://localhost:3000
 
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
-## Screenshots of the app
-* mac: login + desktop icons
-* windows: login + desktop icons
-* debit vs credit
-* menu
-* one of transactions: withdrawal
-* transaction history
-* receipt
+## CI/CD & Automated Workflows
 
-### Login
-![Login](pictures/screenshot_login.png)
+The project uses **GitHub Actions** for continuous integration and automated releases.
 
-### Main Menu
-![Menu](pictures/screenshot_menu.png)
+**Build Workflows**  
+Every pull request to the **main** branch triggers automated builds for Windows (MSVC 2022) and macOS (Apple Silicon/ARM64) to ensure code stability and cross-platform compatibility.
 
-### ETC
+**Release Workflows**  
+Pushing a version **tag** (e.g., v1.0) automatically initiates the distribution process:
 
-## WHAT ELSE NEED TO BE INCLUDED
+|Platform|Output|Tool|
+|----------|--------|------|
+|Windows|Installer `.exe`|Inno Setup|
+|macOS (Apple Silicon)|Disk Image `.dmg`|macOS native|
 
-* Who did what: check your name and responsibility, need something to add/fix/etc?
-* which tools were used: anything else? what do we used for documentation? drawio?lucidchart?diagrameditor? what do we use (morgan module) for receipt?
-* system architecture -> maybe picture better ? 
+<a href="#-table-of-contents">⬆️ Back to top</a>
 
--------
-DON'T take into consideration
-* Logical order of read.me (later)
-* Table of Contents remake (the last step when readme is ready)
+## Team
+
+All team members participated across all areas of the project.
+Primary responsibilities were distributed as follows:
+
+|Author|Primary Responsibilities|
+|--------|-------------|
+|[@juanyu0417](https://github.com/JuanYu0417)|Transaction feature(full stack)|
+|[@jummijammi](https://github.com/jummijammi)|Deposit(full stack), Receipt(full stack)|
+|[@tinnihkis](https://github.com/tinnihkis)|Withdrawal(full stack)|
+|[@ecedevere](https://github.com/ecedevere)|User(full stack), Receipt(frontend)|
+
+All other parts of the project were made together.
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
+## Tools
+
+* GitHub kanban board for task management
+* MySQL Workbench for database planning and editing
+* Postman for testing API
+* Discord for communication with eachother in team
+* Teams to communicate with teachers and to shared files with them
+* VS Code and Qt Creator as IDE
+* Git/GitHub for version control
+* Inno Setup for installer
+* Markddown PDF (extension for VS Code)
+* Keynote for making presentation
+* Microsoft PowerPoint for making presentation
+* Canva for image collage
+
+
+<img src="images/kanban_board_picture.png" width="500"/>
+<img src="images/postman_picture.png" width="500"/>
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
+## Presentation of the app
+
+[Bank App Presentation](https://github.com/25kmo-project/group_15/blob/main/Bank_App_Presentation_Group_15.pptx)
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+
+<a href="#-table-of-contents">⬆️ Back to top</a>
