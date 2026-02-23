@@ -87,8 +87,8 @@ INSERT INTO account (user_id, account_type, balance, credit_limit, account_numbe
 VALUES 
 (@user3_id, 'DEBIT', 3500.00, NULL, 'FI3333333333333333'),
 (@user3_id, 'CREDIT', -800.00, 5000.00, 'FI3333333333333334');
-SET @account3_debit_id = LAST_INSERT_ID() - 1;
-SET @account3_credit_id = LAST_INSERT_ID();
+SET @account3_debit_id = LAST_INSERT_ID();
+SET @account3_credit_id = LAST_INSERT_ID() + 1;
 
 INSERT INTO card (card_number, pin_code, card_type, user_id, status, failed_pin_attempts)
 VALUES ('3333333333333333', '$2b$10$OCzcdvZdp4UVqlWWDGh.oexqbnOVGM4fLZr1rKBfTihseLMzcOLgW', 'PARENT', @user3_id, 'ACTIVE', 0);
@@ -250,8 +250,8 @@ INSERT INTO account (user_id, account_type, balance, credit_limit, account_numbe
 VALUES
 (@user10_id, 'DEBIT', 4500.00, NULL, 'FI1010101010101010'),
 (@user10_id, 'CREDIT', -1500.00, 8000.00, 'FI1010101010101011');
-SET @account10_debit_id = LAST_INSERT_ID() - 1;
-SET @account10_credit_id = LAST_INSERT_ID();
+SET @account10_debit_id = LAST_INSERT_ID();
+SET @account10_credit_id = LAST_INSERT_ID() + 1;
 
 INSERT INTO card (card_number, pin_code, card_type, user_id, status, failed_pin_attempts)
 VALUES ('1010101010101010', '$2b$10$CcAAUUCaIU5qvv1kZ3Pnv.m3nxPWDZaSTNDTgBlZNmvGLrNjDAH52', 'PARENT', @user10_id, 'ACTIVE', 0);
@@ -430,4 +430,3 @@ VALUES
 (@account17_id, @card17_id, 'DEPOSIT', 2000.00, '2025-12-01 10:00:00'),
 (@account17_id, @card17_id, 'WITHDRAWAL', 500.00, '2025-12-15 14:00:00'),
 (@account17_id, @card17_id, 'INQUIRY', 0.00, '2025-12-20 11:00:00');
-
