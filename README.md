@@ -85,26 +85,7 @@ The full entity-relationship diagram:
 <a href="#-table-of-contents">⬆️ Back to top</a>
 
 ## System Architecture
-```text
-┌─────────────────────────┐
-│     Qt Application      │
-│   (C++ / Qt Widgets)    │
-└───────────┬─────────────┘
-            │
-            │  HTTP + JSON + JWT
-            ▼
-┌─────────────────────────┐
-│        REST API         │
-│   (Node.js / Express)   │
-└───────────┬─────────────┘
-            │
-            │  Stored Procedures
-            ▼
-┌─────────────────────────┐
-│    MySQL / MariaDB      │
-│       Database          │
-└─────────────────────────┘
-```
+![System Atchitecure](images/system_architecture_picture.png)
 
 **Communication Flow**
 1. Qt client sends an HTTP request with a JWT token attached
