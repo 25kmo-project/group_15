@@ -126,7 +126,8 @@ The full entity-relationship diagram:
 <img src="images/windows_login.png" width="500"/>
 * Dual card choice page:
 <img src="images/dual_card_choice.png" width="500"/>
-* menu !!!!!!!!!!!!
+* Menu Screen:
+<img src="images/menu.png" width="500"/>
 * One of transactions example (Withdrawal: succesful transaction and error transaction):
 <img src="images/withdrawal_examples.png" width="500"/>
 * Transaction History:
