@@ -22,6 +22,7 @@ bool Environment::viewedBalance = false;
 bool Environment::viewedProfile = false;
 bool Environment::viewedCurrency = false;
 bool Environment::viewedTransactionHistory = false;
+
 QDateTime Environment::timeViewedBalance;
 QDateTime Environment::timeViewedProfile;
 QDateTime Environment::timeViewedCurrency;

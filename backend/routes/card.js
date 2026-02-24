@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const card = require("../models/card_model");
-const e = require("express");
 
-//Hae kaikki kortit
+//Get all cards
 router.get("/", function(request, response){
     card.getAll(function(err, result){
         if(err) {
@@ -15,7 +14,7 @@ router.get("/", function(request, response){
     })
 });
 
-// hae yksi kortti id:llä  
+//Get single card by id
 router.get("/:card_id", function(request, response){
     card.getOne(request.params.card_id, function(err, result){
         if (err){
@@ -27,7 +26,7 @@ router.get("/:card_id", function(request, response){
     })
 });
 
-// lisää uusi kortti
+//Add new card
 router.post("/", function(request, response){
     card.add(request.body, function(err, result){
         if (err){
@@ -40,7 +39,7 @@ router.post("/", function(request, response){
 });
 
 
-// Päivitä PIN (hashataan)
+//Update PIN (hashed before storing)
 router.put("/:card_id/pin", function(request, response) {
   card.updatePin(request.params.card_id, request.body.pin_code, function(err, result) {
         if (err){
@@ -51,7 +50,7 @@ router.put("/:card_id/pin", function(request, response) {
         }
   });
 });
-// päivitä kortti id:llä (ei PINiä) 
+//Update card details by id (excluding PIN)
 router.put("/:card_id", function(request, response){   
     card.update(request.body, request.params.card_id, function(err, result){
         if (err){
@@ -63,7 +62,7 @@ router.put("/:card_id", function(request, response){
     })
 });
 
-// poista kortti id:llä  
+//Delete card by id 
 router.delete("/:card_id", function(request, response){
     card.delete(request.params.card_id, function(err, result){
         if (err){

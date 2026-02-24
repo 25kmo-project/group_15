@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const access = require('../models/account_access_model');
 
-// GET / kaikki account_access rivit
+//Get all account_access rows
 router.get('/', function(request, response){
     access.getAll(function(err, result){
         if(err){
@@ -14,7 +14,7 @@ router.get('/', function(request, response){
     });
 });
 
-// GET /:card_id kaikki oikeudet tälle kortille
+//Get all access rights for a specific card
 router.get('/card/:card_id', function(request, response){
     access.getByCardId(request.params.card_id, function(err, result){
         if(err){
@@ -26,7 +26,7 @@ router.get('/card/:card_id', function(request, response){
     });
 });
 
-// GET /:account_id kaikki oikeudet tälle tilille
+//Get all access rights for a specific account
 router.get('/account/:account_id', function(request, response){
     access.getByAccountId(request.params.account_id, function(err, result){
         if(err){
@@ -38,7 +38,7 @@ router.get('/account/:account_id', function(request, response){
     });
 });
 
-// GET /:card_id/:account_id hae yhden kortin ja tilin oikeudet
+//Get access rights for a specific card and account
 router.get('/:card_id/:account_id', function(request, response){
     access.getOne(request.params.card_id, request.params.account_id, function(err, result){
         if(err){
@@ -50,7 +50,7 @@ router.get('/:card_id/:account_id', function(request, response){
     });
 });
 
-// POST / lisää uusi oikeus
+//Add new access right
 router.post('/', function(request, response){
     access.add(request.body, function(err, result){
         if(err){
@@ -62,7 +62,7 @@ router.post('/', function(request, response){
     });
 });
 
-// PUT / päivitä access_type
+//Update access_type
 router.put('/:card_id/:account_id', function(request, response){
     access.update(request.params.card_id, request.params.account_id, request.body.access_type, function(err, result){
         if(err){
@@ -74,7 +74,7 @@ router.put('/:card_id/:account_id', function(request, response){
     });
 });
 
-// DELETE / poista oikeus
+//Delete access right
 router.delete('/:card_id/:account_id', function(request, response){
     access.delete(request.params.card_id, request.params.account_id, function(err, result){
         if(err){

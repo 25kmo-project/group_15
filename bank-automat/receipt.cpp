@@ -124,7 +124,7 @@ void Receipt::onReceiptReceived()
         return;
     }
 
-    // Parse JSON response
+    //Parse JSON response
     QJsonParseError pe;
     QJsonDocument doc = QJsonDocument::fromJson(responseData, &pe);
     if (!doc.isObject()) {
@@ -138,7 +138,7 @@ void Receipt::onReceiptReceived()
 
 QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
 {
-    // --- Parse timestamp and balance (always shown) ---
+    //Parse timestamp and balance (always shown)
     const QString timestampIso = obj.value("timestamp").toString();
     const double balance = obj.value("balance").toDouble(0.0);
 
@@ -147,7 +147,7 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
                               ? dt.toLocalTime().toString("dd.MM.yyyy HH:mm:ss")
                               : QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss");
 
-    // --- Parse transaction events ---
+    //Parse transaction events
     const QJsonArray events = obj.value("events").toArray();
 
     // Check if there is any session activity to show
@@ -156,7 +156,7 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
                              || Environment::viewedTransactionHistory
                              || Environment::viewedCurrency;
 
-    // ===== Build HTML =====
+    //Build HTML
     QString html;
 
     html += R"(
@@ -167,7 +167,7 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
   <div style="max-width: 760px; margin: 0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius: 12px; padding: 18px;">
 )";
 
-    // --- Header: date and balance (always visible) ---
+    //Header: date and balance (always visible)
     html += "<div style='display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;'>";
     html += "<div style='font-size:22px; color:#111827;'>Date: <b>" + esc(dtStr) + "</b></div>";
     html += "<div style='font-size:24px; color:#111827;'>Balance: "
@@ -176,7 +176,7 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
 
     html += "<hr style='border:none; border-top:1px solid #e5e7eb; margin:16px 0;'>";
 
-    // --- Session activity: shown only if user visited any screen ---
+    //Session activity: shown only if user visited any screen
     if (hasActivity) {
         html += "<div style='font-size:13px; font-weight:700; color:#111827; "
                 "text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;'>Session Activity</div>";
@@ -200,7 +200,7 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
         html += "</table></div>";
     }
 
-    // --- Transactions: shown only if there are events in this session ---
+    //Transactions: shown only if there are events in this session
     if (!events.isEmpty()) {
         html += "<div style='font-size:13px; font-weight:700; color:#111827; "
                 "text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;'>Transactions</div>";
@@ -212,12 +212,12 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
             const QJsonObject e = v.toObject();
             const QString type = e.value("transaction_type").toString();
 
-            // Parse amount (handle both string and number formats)
+            //Parse amount (handle both string and number formats)
             QString amountStr = e.value("amount").toString();
             amountStr.replace(",", ".");
             const double amount = amountStr.toDouble();
 
-            // Format transaction date
+            //Format transaction date
             const QString tRaw = e.value("transaction_date").toString();
             const QDateTime tdt = QDateTime::fromString(tRaw, "yyyy-MM-dd HH:mm:ss");
             const QString tStr = tdt.isValid()
@@ -245,13 +245,12 @@ QString Receipt::buildReceiptHtml(const QJsonObject &obj) const
     return html;
 }
 
-// Back button — close the dialog and return to menu
 void Receipt::on_btnBack_clicked()
 {
     accept();
 }
 
-// Display an error message in the receipt viewer
+//if error occures
 void Receipt::showError(const QString &msg)
 {
     ui->txtReceipt->setPlainText("Error:\n" + msg);

@@ -35,14 +35,12 @@ TransactionHistory::TransactionHistory(int accId, int cId, QString t, QWidget *p
 
 TransactionHistory::~TransactionHistory()
 {
-    // Abort all pending network replies before destroying manager
     if (manager) {
         const QList<QNetworkReply*> replies = manager->findChildren<QNetworkReply*>();
         for (QNetworkReply *r : replies) {
             r->abort();
             r->deleteLater();
         }
-        // Don't deleteLater manager — it's a child of this, Qt deletes it automatically
     }
     delete ui;
 }

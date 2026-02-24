@@ -5,13 +5,6 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
--- Schema bank
--- -----------------------------------------------------
-
--- -----------------------------------------------------
 -- Schema bank
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `bank` DEFAULT CHARACTER SET utf8mb4 ;
@@ -217,6 +210,7 @@ BEGIN
     DECLARE v_card_status VARCHAR(20);
     DECLARE v_access_type VARCHAR(20);
 
+    -- 1. Validate amount
     IF p_amount IS NULL OR p_amount <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'INVALID_AMOUNT';
@@ -224,6 +218,7 @@ BEGIN
 
     START TRANSACTION;
 
+    -- 2. Lock row and get account/card data
     SELECT a.balance, c.status, aa.access_type
       INTO v_balance, v_card_status, v_access_type
     FROM account a
@@ -233,6 +228,7 @@ BEGIN
       AND c.card_id = p_card_id
     FOR UPDATE;
 
+    -- 3. Validate access and status
     IF v_balance IS NULL THEN
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
@@ -251,10 +247,12 @@ BEGIN
         SET MESSAGE_TEXT = 'LOCKED';
     END IF;
 
+    -- 4. Update balance
     UPDATE account
     SET balance = balance + p_amount
     WHERE account_id = p_account_id;
 
+    -- 5. Log transaction
     INSERT INTO `transaction`
         (account_id, card_id, transaction_type, amount)
     VALUES
@@ -365,6 +363,7 @@ BEGIN
     DECLARE v_card_status VARCHAR(20);
     DECLARE v_access_type VARCHAR(20);
 
+    -- 1. Validate amount
     IF p_amount IS NULL OR p_amount <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'INVALID_AMOUNT';
@@ -372,6 +371,7 @@ BEGIN
 
     START TRANSACTION;
 
+    -- 2. Lock row and get account/card data
     SELECT a.balance, c.status, aa.access_type
       INTO v_balance, v_card_status, v_access_type
     FROM account a
@@ -381,6 +381,7 @@ BEGIN
       AND c.card_id = p_card_id
     FOR UPDATE;
 
+    -- 3. Validate access and status
     IF v_balance IS NULL THEN
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
@@ -399,16 +400,19 @@ BEGIN
         SET MESSAGE_TEXT = 'LOCKED';
     END IF;
 
+    -- 4. Check sufficient funds
     IF v_balance < p_amount THEN
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'INSUFFICIENT_FUNDS';
     END IF;
 
+    -- 5. Update balance
     UPDATE account
     SET balance = balance - p_amount
     WHERE account_id = p_account_id;
 
+    -- 6. Log transaction
     INSERT INTO `transaction`
         (account_id, card_id, transaction_type, amount)
     VALUES
@@ -421,8 +425,6 @@ BEGIN
 END $$
 
 DELIMITER ;
-
-
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

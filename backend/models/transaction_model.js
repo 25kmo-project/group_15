@@ -2,18 +2,18 @@ const db = require('../routes/database');
 
 const transaction = {
     
-    // Get all transactions from the table
+    //Get all transactions
     getAll: function(callback) {
         return db.query("SELECT * FROM transaction", callback);
     },
 
-    // Get a specific transaction by its ID
+    //Get a specific transaction by its id
     getById: function(id, callback) {
         return db.query("SELECT * FROM transaction WHERE transaction_id=?", [id], callback);
     },
 
-    // Get all transactions for a specific account (Useful for showing statement/history)
-    // Ordered by date DESC to show the latest transactions first
+    //Get all transactions for a specific account
+    //Ordered by date DESC to show the latest transactions first
     getByAccountId: function(account_id, callback) {
         return db.query(
             "SELECT * FROM transaction WHERE account_id=? ORDER BY transaction_date DESC", 
@@ -21,6 +21,7 @@ const transaction = {
             callback
         );
     },
+    //Get all transactions for a specific card
     getByCardId: function(id, callback) {
         return db.query(
             'SELECT * FROM transaction WHERE card_id = ?', 
@@ -29,7 +30,7 @@ const transaction = {
         );
     },
 
-    // Add a new transaction record
+    //Add a new transaction record
     add: function(transaction, callback) {
         return db.query(
             "INSERT INTO transaction (transaction_type, amount, account_id, card_id) VALUES (?,?,?,?)",
@@ -43,7 +44,7 @@ const transaction = {
         );
     },
 
-    // Update existing transaction data
+    //Update existing transaction data
     update: function(id, transaction, callback) {
         return db.query(
             "UPDATE transaction SET transaction_type=?, amount=?, transaction_date=?, account_id=?, card_id=? WHERE transaction_id=?",
@@ -59,16 +60,16 @@ const transaction = {
         );
     },
 
-    // Remove a transaction from the database
+    //Delete a transaction by id
     delete: function(id, callback) {
         return db.query("DELETE FROM transaction WHERE transaction_id=?", [id], callback);
     },
 
-// withdraw function (STORED PROCEDURE)
+//thdraw money via stored procedure
 withdraw: function (data, callback) {
     const { account_id, card_id, amount } = data;
 
-    // 1) Input validation
+    // 1. Input validation
     if (!amount || amount <= 0 || amount % 10 !== 0 || amount === 10 || amount === 30) {
         return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0 and be possible with 20€ and 50€ notes' });
     }
@@ -81,7 +82,7 @@ withdraw: function (data, callback) {
     
     let count20 = (amount - (count50 * 50)) / 20;
 
-    // 2) Call stored procedure
+    //2. Call stored procedure
     return db.query(
         "CALL withdraw_money(?, ?, ?)",
         [account_id, card_id, amount],
@@ -109,16 +110,16 @@ withdraw: function (data, callback) {
         }
     );
 },
-// deposit function (STORED PROCEDURE)
+//Deposit money via stored procedure
 deposit: function (data, callback) {
     const { account_id, card_id, amount } = data;
 
-    // 1) Input validation
+    //1. Input validation
     if (!amount || amount <= 0) {
         return callback({ error: 'INVALID_AMOUNT', message: 'Amount must be greater than 0' });
     }
 
-    // 2) Call stored procedure
+    //2. Call stored procedure
     return db.query(
         "CALL deposit_money(?, ?, ?)",
         [account_id, card_id, amount],
@@ -130,7 +131,6 @@ deposit: function (data, callback) {
                 });
             }
 
-            // Stored procedure tekee SELECT new_balance
             const newBalance =
                 results && results[0] && results[0][0] && results[0][0].new_balance !== undefined
                     ? parseFloat(results[0][0].new_balance)
@@ -144,7 +144,7 @@ deposit: function (data, callback) {
     );
 },
     
-    //View Transaction History
+    //View transaction history for a specific account and card
     getTransactionHistory: function(data, callback) {
         const { account_id, card_id, page } = data;
         const limit = 10;
@@ -170,7 +170,7 @@ deposit: function (data, callback) {
         return db.query(sql, [account_id, card_id, limit, offset], callback);
     },
 
-    // banlance inquiry
+    //Banlance inquiry via stored procedure (logs INQUIRY transaction)
     getBalance: function(data, callback) {
         const { account_id, card_id } = data;
 
@@ -194,10 +194,11 @@ deposit: function (data, callback) {
             });
         });
     },
+    //Banlance inquiry without logging
     getBalanceNoLog: function(data, callback) {
         this.getBalance(data, callback);
 },
-    
+//Transfer money via stored procedure  
     transfer: function(data, callback) {
         const { sender_account_id, receiver_account_number, card_id, amount } = data;
         const sql = "CALL transfer_money(?, ?, ?, ?)";

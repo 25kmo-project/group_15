@@ -3,10 +3,7 @@ var router = express.Router();
 const https = require('https');
 
 
-// =========================
-// GET /currency/latest
-// =========================
-// Palauttaa viimeisimmän työpäivän kurssit
+//Get exchange rates for the latest working day
 router.get('/latest', function(req, res) {
 
     const url = "https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP";
@@ -41,16 +38,10 @@ router.get('/latest', function(req, res) {
 });
 
 
-// =========================
-// GET /currency/change
-// =========================
-// Palauttaa:
-// - viimeisin kurssi
-// - muutos edelliseen työpäivään
-// - prosenttimuutos
+//Get exchange rates from previous working day and percentage change
 router.get('/change', function(req, res) {
 
-    // haetaan ~10 päivän data, jotta saadaan 2 viimeistä työpäivää
+    //Search for data from last 10 days and get last 2 working days.
     const end = new Date();
     const start = new Date(end);
     start.setDate(end.getDate() - 10);
@@ -84,6 +75,7 @@ router.get('/change', function(req, res) {
                 const prev = rates[prevDate];
                 const last = rates[lastDate];
 
+                //Calculate absolute and percentage change for a given currency symbol
                 function calc(symbol) {
                     const rLast = Number(last[symbol]);
                     const rPrev = Number(prev[symbol]);

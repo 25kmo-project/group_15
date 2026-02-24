@@ -79,7 +79,7 @@ void Deposit::onReplyFinished()
 {
     QByteArray data = reply->readAll();
 
-    // Re-enable UI after deposit attempt
+    // Re-enable ui after deposit attempt
     ui->btnConfirm->setEnabled(true);
     ui->lineAmount->setEnabled(true);
 
@@ -118,7 +118,7 @@ void Deposit::on_btnBack_clicked()
         Environment::timerLogOut->start();
     }
 
-    reject();  // close window and return to menu
+    reject();
 }
 
 void Deposit::onBalanceReceived()
