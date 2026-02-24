@@ -2,6 +2,6 @@ mysql> CREATE DATABASE IF NOT EXISTS bank;
 
 mysql> CREATE USER 'bank_admin'@'localhost' IDENTIFIED BY 'YOUR_PASSWORD_HERE';
 
-mysql> GRANT ALL PRIVILEGES ON bank.* TO 'bank_admin'@'localhost';
+mysql> GRANT SELECT, INSERT, UPDATE ON bank.* TO 'bank_admin'@'localhost';
 
 mysql> FLUSH PRIVILEGES;
