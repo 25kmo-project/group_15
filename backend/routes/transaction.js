@@ -5,6 +5,7 @@ const authenticateToken = require('../middleware/auth');
 const db = require('../routes/database');
 const https = require('https');
 
+//Get json data from external api
 function fetchJson(url) {
   return new Promise((resolve, reject) => {
     https.get(url, (apiRes) => {
@@ -22,7 +23,7 @@ function fetchJson(url) {
 }
 
 
-// Get a single transaction by its ID
+//Get a single transaction by its id
 router.get('/id/:id',authenticateToken, function(request, response) {
     transaction.getById(request.params.id, function(err, dbResult) {
         if (err) return response.status(500).json(err);
@@ -40,18 +41,18 @@ router.get('/id/:id',authenticateToken, function(request, response) {
 router.post('/withdraw', authenticateToken, function(req, res) {
     const { account_id, card_id, amount } = req.body;
 
-    // Check that the user is using their own card
+    //Check that the user is using their own card
     if (req.user.card_id != card_id) {
         return res.status(403).json({ message: "Security breach: You cannot access other cards" });
     }
 
-    // Backend validation: amount must be at least 20
+    //Backend validation: amount must be at least 20
     const a = Number(amount);
     if (!Number.isInteger(a) || a < 20) {
         return res.status(400).json({ message: "Invalid amount: minimum 20€" });
     }
 
-    // Backend validation: only allow amounts that can be formed with 20€ and 50€ bills
+    //Backend validation: only allow amounts that can be formed with 20€ and 50€ bills
     let valid = false;
     for (let fifties = 0; fifties * 50 <= a; fifties++) {
         if ((a - fifties * 50) % 20 === 0) valid = true;
@@ -60,7 +61,7 @@ router.post('/withdraw', authenticateToken, function(req, res) {
         return res.status(400).json({ message: "Invalid amount: must be 20/50 combination" });
     }
 
-    // If all checks pass, execute the withdrawal
+    //If all checks pass, execute the withdrawal
     transaction.withdraw({ account_id, card_id, amount: a }, function(err, result) {
         if (err) {
             const clientErrors = ['INVALID_AMOUNT', 'NOT_FOUND', 'LOCKED', 'INSUFFICIENT_FUNDS'];
@@ -75,7 +76,7 @@ router.post('/withdraw', authenticateToken, function(req, res) {
     });
 });
 
-// Get paginated transaction history for an account and card
+//Get paginated transaction history for an account and card
 router.get('/history', authenticateToken, function(request, response) {
     const data = {
         account_id: parseInt(request.query.account_id),
@@ -99,7 +100,7 @@ router.get('/history', authenticateToken, function(request, response) {
     });
 });
 
-// Get account balance 
+//Get account balance 
 router.get('/balance', authenticateToken, function(req, res) {
     const data = {
         account_id: parseInt(req.query.account_id),
@@ -114,7 +115,7 @@ router.get('/balance', authenticateToken, function(req, res) {
     });
 });
 
-// create a new deposit transaction
+//Create a new deposit transaction
 router.post('/deposit', authenticateToken, function(req, res) {
     const { account_id, card_id, amount } = req.body;
 
@@ -138,7 +139,7 @@ router.post('/deposit', authenticateToken, function(req, res) {
 });
 
 router.post('/transfer', authenticateToken, function(request, response) {
-    // 1. check if request body exists
+    //1. Check if request body exists
     if (!request.body) {
         return response.status(400).json({ error: "No request body received" });
     }
@@ -150,12 +151,12 @@ router.post('/transfer', authenticateToken, function(request, response) {
         amount: parseFloat(request.body.amount)
     };
     
-    // 2. validate required parameters and their types
+    //2. Validate required parameters and their types
     if (!data.sender_account_id || !data.receiver_account_number || !data.card_id || isNaN(data.amount)) {
         return response.status(400).json({ error: "Missing or invalid parameters" });
     }
 
-    // 3. validate that the card_id in the token matches the card_id in the request body
+    // 3.Validate that the card_id in the token matches the card_id in the request body
     if (Number(request.user.card_id) !== Number(data.card_id)) {
     console.log(`Unauthorized: Token(${request.user.card_id}) vs Body(${data.card_id})`);
     return response.status(403).json({ message: "UNAUTHORIZED_CARD" });
@@ -187,19 +188,19 @@ router.get('/receipt', authenticateToken, function(req, res) {
     return res.status(400).json({ error: "Valid account_id and card_id required" });
   }
 
-  // varmista että tokenin card_id == pyydetty card_id
+ //Ensure that token card_id matches requested card_id
   if (Number(req.user.card_id) !== Number(card_id)) {
     return res.status(403).json({ error: "Access denied" });
   }
 
-  // 1) Hae saldo ilman inquiry-logia
+  // 1)Get balance without logging inquiry transaction
   transaction.getBalanceNoLog({ account_id, card_id }, function(err, bal) {
     if (err) return res.status(403).json(err);
 
     const session_id = req.user.session_id;
     const nowIso = new Date().toISOString();
 
-    // jos session_id puuttuu -> palautetaan vain saldo + aika
+    //If session_id is missing->return only balance and timestamp
     if (!session_id) {
       return res.json({
         title: "Tulosta kuitti",
@@ -210,7 +211,7 @@ router.get('/receipt', authenticateToken, function(req, res) {
       });
     }
 
-    //hae session login_time
+    //Fetch session login_time
     db.query(
       "SELECT login_time FROM session WHERE session_id = ? AND card_id = ?",
       [session_id, card_id],
@@ -228,8 +229,8 @@ router.get('/receipt', authenticateToken, function(req, res) {
 
         const login_time = sRes[0].login_time;
 
-        // hae tämän session tapahtumat transaction-taulusta
-        // huom: jätetään INQUIRY pois, jotta pelkkä saldon katselu ei tee “käytetty palveluja”
+        //Fetch all transactions for this session from transaction table
+        //NOTE: INQUIRY is excluded so balance checks do not appear as transactions
         const evSql = `
           SELECT transaction_type, amount, transaction_date
           FROM transaction
@@ -263,13 +264,13 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
     return res.status(400).json({ error: "Valid account_id and card_id required" });
   }
 
-  // varmista että tokenin card_id == pyydetty card_id
+//Ensure token card_id matches requested card_id
   if (Number(req.user.card_id) !== Number(card_id)) {
     return res.status(403).json({ error: "Access denied" });
   }
 
   try {
-    // 1) saldo ilman inquiry-logia
+    // 1)Get balance without inquiry logging
     const bal = await new Promise((resolve, reject) => {
       transaction.getBalanceNoLog({ account_id, card_id }, (err, r) => err ? reject(err) : resolve(r));
     });
@@ -277,7 +278,7 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
     const nowIso = new Date().toISOString();
     const session_id = req.user.session_id;
 
-    // 2) myprofile tiedot (kortin perusteella)
+    //2)Fetch user profile data using card_id
     const profile = await new Promise((resolve, reject) => {
       const profileSql = `
         SELECT u.user_name, u.user_lastname, u.user_address, u.user_email, u.user_phonenumber
@@ -290,10 +291,8 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
       });
     });
 
-    // 3) currency tiedot (käyttää samaa Frankfurter API:a kuin currency.js)
-    //    Tässä otetaan:
-    //    - latest (EUR->USD,GBP)
-    //    - change (abs/pct edelliseen työpäivään)
+    //3)Fetch currency data (uses same Frankfurter API as currency.js)
+
     const latestUrl = "https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP";
 
     const end = new Date();
@@ -307,7 +306,6 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
       fetchJson(changeUrl)
     ]);
 
-    // muotoillaan change samaan muotoon kuin teidän /currency/change
     const rates = changeJson.rates || {};
     const dates = Object.keys(rates).sort();
     let change = null;
@@ -345,8 +343,8 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
       change
     };
 
-    // 4) events: tämän session operaatiot
-    // jos session_id puuttuu -> events tyhjä (saldo + profile + currency näkyy silti)
+    //4) Events: all operations within the current session
+    //If session_id is not given-> events is empty(balance,profile,currency is shown) 
     if (!session_id) {
       return res.json({
         title: "Tulosta kuitti",
@@ -359,7 +357,7 @@ router.get('/receipt/full', authenticateToken, async function(req, res) {
       });
     }
 
-    // hae login_time sessiolle
+    //Fetch login_time for sessio
     const login_time = await new Promise((resolve, reject) => {
       db.query(
         "SELECT login_time FROM session WHERE session_id = ? AND card_id = ?",

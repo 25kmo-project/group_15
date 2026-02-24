@@ -23,7 +23,7 @@ Currency::Currency(QString token, QWidget *parent)
     connect(ui->btnRefresh, &QPushButton::clicked, this, &Currency::fetchRates);
 
 
-    // hae kurssit heti kun ikkuna avataan
+    //Get data immediately when window opens
     fetchRates();
 }
 
@@ -90,11 +90,11 @@ void Currency::onRatesReceived()
             return (x > 0) ? QString("+") : QString("");
         };
 
-        // isot kurssit (vain numero)
+        //update ui with main rates
         ui->labelUsdValue->setText(QString::number(usdRate, 'f', 4));
         ui->labelGbpValue->setText(QString::number(gbpRate, 'f', 4));
 
-        // pienet muutokset erikseen
+        //update ui with detailed change info
         ui->labelUsdChange->setText(
             QString("%1%2 (%3%4%) %5 vs %6")
                 .arg(sign(usdAbs))
@@ -119,6 +119,7 @@ void Currency::onRatesReceived()
         ui->labelStatus->setText("");
 
     } else {
+        //Error handling
         ui->labelStatus->setText("Error: " + reply->errorString());
 
         ui->labelUsdValue->setText("-");

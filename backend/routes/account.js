@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const account = require('../models/account_model');
 
-// GET all accounts
+//Get all accounts
 router.get('/', (req, res) => {
     account.getAll((err, result) => {
         if (err) return res.status(500).json(err);
@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     });
 });
 
-// GET account by ID
+//Get account by id
 router.get('/:id', (req, res) => {
     account.getOne(req.params.id, (err, result) => {
         if (err) return res.status(500).json(err);
@@ -18,7 +18,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// POST create new account
+//Add new account
 router.post('/', (req, res) => {
     account.add(req.body, (err, result) => {
         if (err) return res.status(500).json(err);
@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
     });
 });
 
-// PUT update account
+//Update account
 router.put('/:id', (req, res) => {
     account.update(req.body, req.params.id, (err, result) => {
         if (err) return res.status(500).json(err);
@@ -34,7 +34,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// DELETE account
+//Delete account
 router.delete('/:id', (req, res) => {
     account.delete(req.params.id, (err, result) => {
         if (err) return res.status(500).json(err);

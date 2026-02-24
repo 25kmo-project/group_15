@@ -19,7 +19,7 @@ public:
 
 private slots:
     void onConfirmClicked();
-    void onReplyFinished();    // Backendin response
+    void onReplyFinished();
     void on_btnBack_clicked();
 
 private:

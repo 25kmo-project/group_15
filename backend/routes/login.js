@@ -6,11 +6,12 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../routes/database');
 
+//Сheck if card id and pin are given
 router.post('/', function(request, response){
     if(request.body.card_id && request.body.pin_code){
         const card_id = request.body.card_id;
         const pin_code = request.body.pin_code;
-
+        //Get card id and pincode
         login.getCardIdPincode(card_id, function(err, result){
             if(err){
                 console.log("Database error (getCardIdPincode):", err);
@@ -19,21 +20,22 @@ router.post('/', function(request, response){
             else{
                 if(result.length > 0){
 
-                    // kortin status tarkistus
+                    //Check card status
                     if(result[0].status && result[0].status !== 'ACTIVE'){
                         console.log("Card is not active");
                         return response.status(403).json({"message":"Card is not active"});
                     }
-
+                    //Compare entered pin with stored hased pin
                     bcrypt.compare(pin_code, result[0].pin_code, function(err, compareResult){
                         if(err){
                             console.log("Error checking pin:", err);
                             return response.status(500).json({"message": "Error checking pin code"});
                         }
+                        //Wrong pin entered
                         else if(!compareResult){
                             console.log("Pincode is not correct");
 
-                            // kasvatetaan epäonnistuneet yritykset VAIN väärällä PINillä
+                            //Increment failed pin attempt counter
                             login.updateFailedPinAttempts(card_id, function(err2){
                                 if(err2){
                                     console.log("Database error (updateFailedPinAttempts):", err2);
@@ -42,7 +44,7 @@ router.post('/', function(request, response){
 
                                 const attemptsNow = (result[0].failed_pin_attempts || 0) + 1;
 
-                                // 3 väärää -> sulje kortti
+                                //3 wrong attempts->card is closed
                                 if(attemptsNow >= 3){
                                     login.closeCard(card_id, function(err3){
                                         if(err3){
@@ -59,15 +61,15 @@ router.post('/', function(request, response){
 
                         }
                         else {
-                            // oikea PIN -> nollaa epäonnistuneet yritykset
+                            //Correct pin-> reset failed attempt counter 
                             login.resetFailedPinAttempts(card_id, function(err2){
                                 if(err2){
                                     console.log("Database error (resetFailedPinAttempts):", err2);
                                     return response.status(500).json({"message":"Database error: Failed to reset attempts"});
                                 }
-
+                                //Generate new session id
                                const session_id = uuidv4();
-
+//Create new session in database
 db.query(
     "INSERT INTO session (session_id, card_id) VALUES (?, ?)",
     [session_id, card_id],
@@ -77,10 +79,10 @@ db.query(
             return response.status(500).json({"message":"Database error: Failed to create session"});
         }
 
-        // tokeniin card_id + session_id
+        //Generate jwt token containing card id and session id
         const token = generateAccessToken({ card_id: Number(card_id), session_id });
 
-        //tarkistetaan kortin tyypit: debit ja credit rivit 69-77
+        //Check if card is debit or credit
         const accountTypes = [];
         const accountIds = [];
 
@@ -94,7 +96,7 @@ db.query(
 
         const user_id = result[0].user_id;
 
-        //vastaus json-muodossa
+        //Answer in json
         response.setHeader('Content-Type','application/json');
         return response.status(200).json({
             success: true,
@@ -104,7 +106,7 @@ db.query(
             account_id: accountIds,
             account_types: accountTypes,
             side_selection: accountTypes.length > 1,
-            session_id: session_id,  // <-- lisätty
+            session_id: session_id,
             token: token
         });
     }
