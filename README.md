@@ -16,6 +16,8 @@
 - [Presentation](#-presentation-of-the-app)
 - [License](#license)
 
+YouTube video esitys suomeksi https://youtu.be/FvJnko7foXg
+
 # Group 15 Project-ATM Banking System
 This is a course project designed to simulate real-world bank ATM operations. The goal was to design and implement a fully functional ATM simulation that reflects real-world banking workflows — from secure card authentication to multi-account transaction management.
 
